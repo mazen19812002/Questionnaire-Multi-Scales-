@@ -107,8 +107,8 @@
 
     <!-- Header Logos -->
     <div class="flex justify-between items-start mb-8">
-        <img src="00.png" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
-        <img src="02.png" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
+        <img src="https://via.placeholder.com/100/ffffff/000000?text=LOGO+1" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
+        <img src="https://via.placeholder.com/100/ffffff/000000?text=LOGO+2" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
     </div>
 
     <main class="max-w-7xl mx-auto w-full bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl flex-grow mb-12">
@@ -195,8 +195,8 @@
         <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
             <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase tracking-tighter">Analyze Data Now</button>
             <div class="flex gap-4 w-full justify-center">
-                <button id="exportButton" class="px-8 py-4 btn-execute bg-blue-700 text-white text-lg font-black rounded-2xl shadow-xl hover:bg-blue-800 hover-zoom transition-all uppercase">Export Result</button>
-                <button id="copyTableButton" class="px-8 py-4 btn-execute bg-teal-700 text-white text-lg font-black rounded-2xl shadow-xl hover:bg-teal-800 hover-zoom transition-all uppercase">Copy Result</button>
+                <button id="exportButton" class="px-8 py-4 btn-execute text-white text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase">Export Result</button>
+                <button id="copyTableButton" class="px-8 py-4 btn-execute text-white text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase">Copy Result</button>
             </div>
         </div>
 
@@ -261,6 +261,7 @@
 
         const languageData = {
             en: {
+                reportTitle: 'Questionnaire Analysis Report',
                 title: 'Questionnaire Results Analysis',
                 confirm: 'Confirm Mapping & Discriminate Scales',
                 summaryTitle: 'Questionnaire Summary',
@@ -277,6 +278,7 @@
                 groupLabel: 'Scale Group'
             },
             ar: {
+                reportTitle: 'تقرير تحليل الاستبيان',
                 title: 'تحليل نتائج الاستبيان',
                 confirm: 'تأكيد الإعداد وتمييز المقاييس',
                 summaryTitle: 'ملخص الاستبيان',
@@ -389,8 +391,8 @@
                     }
                 });
             } else {
-                const itemsCount = rawExcelData[parseInt(itemIndexSelect.value)].length - 1;
-                for (let colIndex = 0; colIndex < itemsCount; colIndex++) {
+                const firstRow = rawExcelData[parseInt(itemIndexSelect.value)] || [];
+                firstRow.slice(1).forEach((_, colIndex) => {
                     const options = new Set();
                     rawExcelData.slice(respStartIdx).forEach(row => {
                         const str = String(row[colIndex + 1] || "").trim();
@@ -403,8 +405,9 @@
                         }
                         itemToScaleGroup.set(colIndex, signature);
                     }
-                }
+                });
             }
+
             renderScaleGroups();
             scaleOrderSection.classList.remove('hidden');
             actionButtons.classList.remove('hidden');
@@ -465,7 +468,7 @@
                 const allItemsList = [];
                 identifiedScaleGroups.forEach((groupData, sig) => {
                     const itemsInGroup = [];
-                    itemsRaw.forEach((txt, idx) => { if(itemToScaleGroup.get(idx) === sig) itemsInGroup.push({txt, responses: responsesRaw[idx]}); });
+                    itemsRaw.forEach((txt, idx) => { if(itemToScaleGroup.get(idx) === sig) itemsInGroup.push({txt, originalTxt: txt, responses: responsesRaw[idx]}); });
                     if(itemsInGroup.length === 0) return;
                     const domainGroups = {};
                     itemsInGroup.forEach(item => {
@@ -567,26 +570,94 @@
         }
 
         exportButton.onclick = () => {
+            const d = languageData[currentLang];
             const wb = XLSX.utils.book_new();
-            const sheetData = [["Questionnaire Analysis Report"], [`File: ${fileNameDisplay.textContent}`], [participantCountDisplay.textContent], []];
-            document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper').forEach((wrapper) => {
+            const sheetData = [
+                [d.reportTitle], 
+                [`File: ${fileNameDisplay.textContent}`], 
+                [participantCountDisplay.textContent], 
+                []
+            ];
+
+            // 1. Export Analysis Tables
+            document.querySelectorAll('.domain-result-wrapper').forEach((wrapper) => {
                 const title = wrapper.querySelector('h2').innerText;
                 sheetData.push([title.toUpperCase()]);
                 const table = wrapper.querySelector('table');
-                const rows = [];
                 table.querySelectorAll('tr').forEach(tr => {
                     const row = [];
                     tr.querySelectorAll('th, td').forEach(cell => row.push(cell.innerText));
-                    rows.push(row);
+                    sheetData.push(row);
                 });
-                sheetData.push(...rows, []);
+                sheetData.push([], []);
             });
+
+            // 2. Export Summary Table
+            document.querySelectorAll('.summary-table-wrapper').forEach((wrapper) => {
+                const title = wrapper.querySelector('h2').innerText;
+                sheetData.push([title.toUpperCase()]);
+                const table = wrapper.querySelector('table');
+                table.querySelectorAll('tr').forEach(tr => {
+                    const row = [];
+                    tr.querySelectorAll('th, td').forEach(cell => row.push(cell.innerText));
+                    sheetData.push(row);
+                });
+                sheetData.push([], []);
+            });
+
+            // 3. Export Insights Lists
+            sheetData.push([d.strengths.toUpperCase()]);
+            positiveNegativeItemsContainer.querySelectorAll('.bg-green-50 li').forEach(li => {
+                sheetData.push(["", li.innerText]);
+            });
+            sheetData.push([]);
+            sheetData.push([d.improvement.toUpperCase()]);
+            positiveNegativeItemsContainer.querySelectorAll('.bg-red-50 li').forEach(li => {
+                sheetData.push(["", li.innerText]);
+            });
+
             const ws = XLSX.utils.aoa_to_sheet(sheetData);
             XLSX.utils.book_append_sheet(wb, ws, "Analysis");
-            XLSX.writeFile(wb, `${fileNameDisplay.textContent}_Report.xlsx`);
+            XLSX.writeFile(wb, `${fileNameDisplay.textContent}_Full_Report.xlsx`);
         };
 
-        copyTableButton.onclick = () => { const text = resultsContainer.innerText; const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); };
+        copyTableButton.onclick = () => {
+            const d = languageData[currentLang];
+            let content = `${d.reportTitle}\n`;
+            content += `File: ${fileNameDisplay.textContent}\n`;
+            content += `${participantCountDisplay.textContent}\n\n`;
+
+            // Tables
+            document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper').forEach((wrapper) => {
+                const title = wrapper.querySelector('h2').innerText;
+                content += `${title.toUpperCase()}\n`;
+                const table = wrapper.querySelector('table');
+                table.querySelectorAll('tr').forEach(tr => {
+                    const rowData = [];
+                    tr.querySelectorAll('th, td').forEach(cell => rowData.push(cell.innerText));
+                    content += rowData.join('\t') + '\n';
+                });
+                content += '\n\n';
+            });
+
+            // Lists
+            content += `${d.strengths.toUpperCase()}\n`;
+            positiveNegativeItemsContainer.querySelectorAll('.bg-green-50 li').forEach(li => {
+                content += `• ${li.innerText}\n`;
+            });
+            content += `\n${d.improvement.toUpperCase()}\n`;
+            positiveNegativeItemsContainer.querySelectorAll('.bg-red-50 li').forEach(li => {
+                content += `• ${li.innerText}\n`;
+            });
+
+            const ta = document.createElement('textarea');
+            ta.value = content;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+        };
+
         document.getElementById('showVerticalTemplateBtn').onclick = () => { document.getElementById('templateGuideContainer').classList.remove('hidden'); document.getElementById('verticalTemplateContent').classList.remove('hidden'); document.getElementById('horizontalTemplateContent').classList.add('hidden'); };
         document.getElementById('showHorizontalTemplateBtn').onclick = () => { document.getElementById('templateGuideContainer').classList.remove('hidden'); document.getElementById('horizontalTemplateContent').classList.remove('hidden'); document.getElementById('verticalTemplateContent').classList.add('hidden'); };
         document.getElementById('closeTemplateGuideBtn').onclick = () => document.getElementById('templateGuideContainer').classList.add('hidden');
@@ -595,5 +666,4 @@
     });
     </script>
 </body>
-
 </html>
