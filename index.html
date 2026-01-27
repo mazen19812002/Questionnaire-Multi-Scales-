@@ -107,18 +107,18 @@
 
     <!-- Header Logos -->
     <div class="flex justify-between items-start mb-8">
-        <img src="00.png" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
-        <img src="02.jpg" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
+        <img src="https://via.placeholder.com/100/ffffff/000000?text=LOGO+1" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
+        <img src="https://via.placeholder.com/100/ffffff/000000?text=LOGO+2" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
     </div>
 
     <main class="max-w-7xl mx-auto w-full bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl flex-grow mb-12">
-        <h1 id="mainTitle" class="text-5xl thin-title text-center mb-2 text-slate-800">Questionnaire Results Analysis</h1>
+        <h1 id="mainTitle" class="text-5xl thin-title text-center mb-2 text-slate-800 font-black">Questionnaire Results Analysis</h1>
         <p class="text-center text-indigo-700 mb-8 text-xl font-bold" id="developerCredit">Developed by Dr. Mazen Badawy – Doctorate of English Teaching & Testing</p>
         
         <div class="flex flex-col items-center space-y-6 mb-10">
             <div id="langToggle" class="flex rounded-xl shadow-inner bg-gray-100 p-1 cursor-pointer overflow-hidden border border-gray-200">
-                <span id="lang-en" class="px-8 py-2 font-bold transition-all rounded-lg active-lang">English</span>
-                <span id="lang-ar" class="px-8 py-2 font-bold transition-all rounded-lg">العربية</span>
+                <span id="lang-en" class="px-8 py-2 font-black transition-all rounded-lg active-lang">English</span>
+                <span id="lang-ar" class="px-8 py-2 font-black transition-all rounded-lg">العربية</span>
             </div>
             <div class="flex space-x-4">
                 <button id="showVerticalTemplateBtn" class="px-6 py-2 bg-blue-100 text-blue-800 font-black rounded-xl hover:bg-blue-200 hover-zoom transition-all uppercase text-xs tracking-widest shadow-sm">Vertical Template</button>
@@ -132,7 +132,7 @@
                 <label for="xlsxFile" class="cursor-pointer w-full text-center">
                     <div class="p-10 btn-execute rounded-2xl shadow-xl hover-zoom inline-block w-full">
                         <span id="fileButtonText" class="text-2xl font-black uppercase tracking-tight">Step 1: Choose XLSX File</span>
-                        <p class="text-xs mt-2 opacity-90 font-bold" id="fileHint">Upload your data to begin</p>
+                        <p class="text-xs mt-2 opacity-90 font-black" id="fileHint">Upload your data to begin</p>
                     </div>
                     <input type="file" id="xlsxFile" class="hidden" accept=".xlsx, .xls">
                 </label>
@@ -195,8 +195,8 @@
         <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
             <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase tracking-tighter">Analyze Data Now</button>
             <div class="flex gap-4 w-full justify-center">
-                <button id="exportButton" class="px-8 py-4 btn-execute text-white text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase">Export Result</button>
-                <button id="copyTableButton" class="px-8 py-4 btn-execute text-white text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase">Copy Result</button>
+                <button id="exportButton" class="px-8 py-4 btn-execute bg-blue-700 text-white text-lg font-black rounded-2xl shadow-xl hover:bg-blue-800 hover-zoom transition-all uppercase">Export Result</button>
+                <button id="copyTableButton" class="px-8 py-4 btn-execute bg-teal-700 text-white text-lg font-black rounded-2xl shadow-xl hover:bg-teal-800 hover-zoom transition-all uppercase">Copy Result</button>
             </div>
         </div>
 
@@ -534,7 +534,12 @@
                 const posSum = Array.from(dm.positives).reduce((s, o) => s + (dm.freqs[o] || 0), 0);
                 html += `<tr class="hover:bg-indigo-50/50"><td class="p-8 text-center font-black text-indigo-300">${i+1}</td><td class="p-8 font-black text-slate-800">${dm.name}</td><td class="p-8 text-center font-black text-green-600 text-2xl bg-green-50/20">${dm.total ? (posSum/dm.total*100).toFixed(1) : '0.0'}%</td></tr>`;
             });
-            html += `</tbody></table></div>`;
+            // Total Summary Average Footer
+            const grandTotal = data.reduce((s, dm) => s + dm.total, 0);
+            const grandPos = data.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
+            const grandAvg = grandTotal ? (grandPos / grandTotal * 100).toFixed(1) : '0.0';
+
+            html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300"><tr><td class="p-8 text-center table-header-clear uppercase" colspan="2">${d.headers.footer}</td><td class="p-8 text-center text-green-800 text-2xl font-black">${grandAvg}%</td></tr></tfoot></table></div>`;
             div.innerHTML = html;
             resultsContainer.appendChild(div);
         }
@@ -579,46 +584,32 @@
                 []
             ];
 
-            // 1. Export Analysis Tables
-            document.querySelectorAll('.domain-result-wrapper').forEach((wrapper) => {
+            document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper').forEach((wrapper) => {
                 const title = wrapper.querySelector('h2').innerText;
                 sheetData.push([title.toUpperCase()]);
                 const table = wrapper.querySelector('table');
+                
                 table.querySelectorAll('tr').forEach(tr => {
                     const row = [];
-                    tr.querySelectorAll('th, td').forEach(cell => row.push(cell.innerText));
+                    tr.querySelectorAll('th, td').forEach(cell => {
+                        row.push(cell.innerText);
+                        const colspan = parseInt(cell.getAttribute('colspan') || "1");
+                        for(let i=1; i<colspan; i++) row.push(""); // Align Excel columns
+                    });
                     sheetData.push(row);
                 });
                 sheetData.push([], []);
             });
 
-            // 2. Export Summary Table
-            document.querySelectorAll('.summary-table-wrapper').forEach((wrapper) => {
-                const title = wrapper.querySelector('h2').innerText;
-                sheetData.push([title.toUpperCase()]);
-                const table = wrapper.querySelector('table');
-                table.querySelectorAll('tr').forEach(tr => {
-                    const row = [];
-                    tr.querySelectorAll('th, td').forEach(cell => row.push(cell.innerText));
-                    sheetData.push(row);
-                });
-                sheetData.push([], []);
-            });
-
-            // 3. Export Insights Lists
             sheetData.push([d.strengths.toUpperCase()]);
-            positiveNegativeItemsContainer.querySelectorAll('.bg-green-50 li').forEach(li => {
-                sheetData.push(["", li.innerText]);
-            });
+            positiveNegativeItemsContainer.querySelectorAll('.bg-green-50 li').forEach(li => sheetData.push(["", li.innerText]));
             sheetData.push([]);
             sheetData.push([d.improvement.toUpperCase()]);
-            positiveNegativeItemsContainer.querySelectorAll('.bg-red-50 li').forEach(li => {
-                sheetData.push(["", li.innerText]);
-            });
+            positiveNegativeItemsContainer.querySelectorAll('.bg-red-50 li').forEach(li => sheetData.push(["", li.innerText]));
 
             const ws = XLSX.utils.aoa_to_sheet(sheetData);
             XLSX.utils.book_append_sheet(wb, ws, "Analysis");
-            XLSX.writeFile(wb, `${fileNameDisplay.textContent}_Full_Report.xlsx`);
+            XLSX.writeFile(wb, `${fileNameDisplay.textContent}_Report.xlsx`);
         };
 
         copyTableButton.onclick = () => {
@@ -627,28 +618,26 @@
             content += `File: ${fileNameDisplay.textContent}\n`;
             content += `${participantCountDisplay.textContent}\n\n`;
 
-            // Tables
             document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper').forEach((wrapper) => {
                 const title = wrapper.querySelector('h2').innerText;
                 content += `${title.toUpperCase()}\n`;
                 const table = wrapper.querySelector('table');
                 table.querySelectorAll('tr').forEach(tr => {
                     const rowData = [];
-                    tr.querySelectorAll('th, td').forEach(cell => rowData.push(cell.innerText));
+                    tr.querySelectorAll('th, td').forEach(cell => {
+                        rowData.push(cell.innerText);
+                        const colspan = parseInt(cell.getAttribute('colspan') || "1");
+                        for(let i=1; i<colspan; i++) rowData.push(""); // Maintain alignment via tabs
+                    });
                     content += rowData.join('\t') + '\n';
                 });
                 content += '\n\n';
             });
 
-            // Lists
             content += `${d.strengths.toUpperCase()}\n`;
-            positiveNegativeItemsContainer.querySelectorAll('.bg-green-50 li').forEach(li => {
-                content += `• ${li.innerText}\n`;
-            });
+            positiveNegativeItemsContainer.querySelectorAll('.bg-green-50 li').forEach(li => content += `• ${li.innerText}\n`);
             content += `\n${d.improvement.toUpperCase()}\n`;
-            positiveNegativeItemsContainer.querySelectorAll('.bg-red-50 li').forEach(li => {
-                content += `• ${li.innerText}\n`;
-            });
+            positiveNegativeItemsContainer.querySelectorAll('.bg-red-50 li').forEach(li => content += `• ${li.innerText}\n`);
 
             const ta = document.createElement('textarea');
             ta.value = content;
@@ -667,4 +656,3 @@
     </script>
 </body>
 </html>
-
