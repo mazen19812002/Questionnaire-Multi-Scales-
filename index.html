@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionnaire Results Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e0f2fe; /* Light Blue Background */
+            color: #0f172a; /* Clear Dark Slate Font */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .thin-title {
+            font-weight: 300;
+            letter-spacing: -0.025em;
+        }
+
+        /* Hover Zoom/Scale Transition */
+        .hover-zoom {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .hover-zoom:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Green execute buttons */
+        .btn-execute {
+            background-color: #22c55e;
+            color: white;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .btn-execute:hover {
+            background-color: #16a34a;
+            transform: scale(1.05);
+        }
+
+        /* Red delete/cancel buttons */
+        .btn-cancel {
+            background-color: #ef4444;
+            color: white;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .btn-cancel:hover {
+            background-color: #dc2626;
+            transform: scale(1.05);
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #e5e7eb; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        .active-lang {
+            background-color: #4f46e5 !important;
+            color: white !important;
+        }
+
+        .input-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            border: 1px solid #d1e9ff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        .dragging {
+            opacity: 0.5;
+            background-color: #f1f5f9;
+            border: 2px dashed #4f46e5;
+        }
+        .drop-target {
+            border-top: 4px solid #4f46e5;
+        }
+
+        /* Stronger Typography for Tables */
+        .table-header-clear {
+            color: #0f172a;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-12">
+
+    <!-- Header Logos -->
+    <div class="flex justify-between items-start mb-8">
+        <img src="https://via.placeholder.com/100/ffffff/000000?text=LOGO+1" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
+        <img src="https://via.placeholder.com/100/ffffff/000000?text=LOGO+2" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
+    </div>
+
+    <main class="max-w-7xl mx-auto w-full bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl flex-grow mb-12">
+        <h1 id="mainTitle" class="text-5xl thin-title text-center mb-2 text-slate-800">Questionnaire Results Analysis</h1>
+        <p class="text-center text-indigo-700 mb-8 text-xl font-bold" id="developerCredit">Developed by Dr. Mazen Badawy – Doctorate of English Teaching & Testing</p>
+        
+        <div class="flex flex-col items-center space-y-6 mb-10">
+            <div id="langToggle" class="flex rounded-xl shadow-inner bg-gray-100 p-1 cursor-pointer overflow-hidden border border-gray-200">
+                <span id="lang-en" class="px-8 py-2 font-bold transition-all rounded-lg active-lang">English</span>
+                <span id="lang-ar" class="px-8 py-2 font-bold transition-all rounded-lg">العربية</span>
+            </div>
+            <div class="flex space-x-4">
+                <button id="showVerticalTemplateBtn" class="px-6 py-2 bg-blue-100 text-blue-800 font-black rounded-xl hover:bg-blue-200 hover-zoom transition-all uppercase text-xs tracking-widest shadow-sm">Vertical Template</button>
+                <button id="showHorizontalTemplateBtn" class="px-6 py-2 bg-blue-100 text-blue-800 font-black rounded-xl hover:bg-blue-200 hover-zoom transition-all uppercase text-xs tracking-widest shadow-sm">Horizontal Template</button>
+            </div>
+        </div>
+
+        <!-- Step 1: Upload -->
+        <div class="max-w-xl mx-auto mb-10">
+            <div id="fileUploadSection" class="input-card flex flex-col items-center justify-center border-dashed border-2 border-blue-200 hover:border-blue-400 transition-colors">
+                <label for="xlsxFile" class="cursor-pointer w-full text-center">
+                    <div class="p-10 btn-execute rounded-2xl shadow-xl hover-zoom inline-block w-full">
+                        <span id="fileButtonText" class="text-2xl font-black uppercase tracking-tight">Step 1: Choose XLSX File</span>
+                        <p class="text-xs mt-2 opacity-90 font-bold" id="fileHint">Upload your data to begin</p>
+                    </div>
+                    <input type="file" id="xlsxFile" class="hidden" accept=".xlsx, .xls">
+                </label>
+                <div id="loadingMessage" class="hidden mt-4 text-indigo-700 font-black animate-pulse text-lg italic">Processing Excel File...</div>
+            </div>
+        </div>
+
+        <!-- Step 2: Configuration -->
+        <div id="dataConfigSection" class="hidden grid grid-cols-1 gap-8 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div class="input-card bg-blue-50/50">
+                <div class="text-center border-b border-blue-100 pb-4 mb-6">
+                    <p id="dataOrientationLabel" class="text-slate-900 font-black thin-title text-2xl mb-4 uppercase">Step 2: Data Configuration</p>
+                    <fieldset class="flex justify-center space-x-8">
+                        <label class="flex items-center cursor-pointer hover-zoom p-3 rounded-xl bg-white shadow-sm border border-blue-100">
+                            <input type="radio" id="orientation-vertical" name="dataOrientation" value="horizontal" class="h-5 w-5 text-green-600" checked>
+                            <span class="ml-2 font-black text-slate-800" id="labelVertical">Items are in Columns</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer hover-zoom p-3 rounded-xl bg-white shadow-sm border border-blue-100">
+                            <input type="radio" id="orientation-horizontal" name="dataOrientation" value="vertical" class="h-5 w-5 text-green-600">
+                            <span class="ml-2 font-black text-slate-800" id="labelHorizontal">Items are in Rows</span>
+                        </label>
+                    </fieldset>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="flex flex-col">
+                        <label id="labelItemIndex" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest">Select Column containing Items</label>
+                        <select id="itemIndexSelect" class="p-4 border border-blue-200 rounded-2xl bg-white focus:ring-4 focus:ring-blue-100 outline-none hover-zoom font-black text-slate-900 shadow-sm"></select>
+                    </div>
+                    <div class="flex flex-col">
+                        <label id="labelRespIndex" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest">Select Column where Responses begin</label>
+                        <select id="respStartIndexSelect" class="p-4 border border-blue-200 rounded-2xl bg-white focus:ring-4 focus:ring-blue-100 outline-none hover-zoom font-black text-slate-900 shadow-sm"></select>
+                    </div>
+                </div>
+
+                <div class="flex justify-center">
+                    <button id="confirmMappingBtn" class="px-10 py-4 btn-execute text-xl font-black rounded-2xl shadow-lg hover-zoom uppercase tracking-wide">
+                        Confirm Mapping & Discriminate Scales
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Multi-Scale Ranking Widget -->
+        <div id="scaleOrderSection" class="hidden mb-10 p-8 bg-slate-100 rounded-3xl shadow-inner border border-slate-200 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+                <div>
+                    <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 uppercase font-black">Step 3: Define Scale Orders</h2>
+                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic">Drag items within each group to rank them (Highest value at Top)</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center">
+                    <label class="font-black text-xs text-slate-800 mr-4 uppercase tracking-tighter" id="labelThreshold">Positives Threshold (%):</label>
+                    <input type="number" id="positivesThresholdInput" value="85" min="0" max="100" class="w-24 px-4 py-2 border rounded-xl focus:ring-2 focus:ring-green-500 outline-none font-black text-xl text-center text-indigo-700">
+                </div>
+            </div>
+            <div id="scaleGroupsContainer" class="space-y-10"></div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
+            <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase tracking-tighter">Analyze Data Now</button>
+            <div class="flex gap-4 w-full justify-center">
+                <button id="exportButton" class="px-8 py-4 btn-execute bg-blue-700 text-white text-lg font-black rounded-2xl shadow-xl hover:bg-blue-800 hover-zoom transition-all uppercase">Export Result</button>
+                <button id="copyTableButton" class="px-8 py-4 btn-execute bg-teal-700 text-white text-lg font-black rounded-2xl shadow-xl hover:bg-teal-800 hover-zoom transition-all uppercase">Copy Result</button>
+            </div>
+        </div>
+
+        <div class="text-center mb-10">
+            <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 mb-2 hidden uppercase font-black"></p>
+            <p id="participantCountDisplay" class="text-2xl text-indigo-800 font-black hidden uppercase tracking-tighter"></p>
+        </div>
+
+        <div id="resultsContainer" class="hidden space-y-16"></div>
+        <div id="chartContainer" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-10 mt-12"></div>
+        <div id="positiveNegativeItemsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 mt-12"></div>
+    </main>
+
+    <footer class="w-full text-center py-8 mt-auto text-slate-900 font-black border-t border-blue-200 bg-blue-50/95 backdrop-blur-sm uppercase text-sm tracking-widest">
+        All rights are reserved to Dr. Mazen Badawy – Doctorate of English Teaching & Testing
+    </footer>
+
+    <div id="templateGuideContainer" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div class="bg-white p-10 rounded-[3rem] shadow-2xl max-w-2xl w-full relative border-4 border-blue-100">
+            <button id="closeTemplateGuideBtn" class="absolute top-6 right-8 text-4xl font-light hover:text-red-500 transition-colors btn-cancel">&times;</button>
+            <h3 id="templateGuideTitle" class="text-3xl thin-title mb-8 border-b pb-4 text-slate-900 font-black uppercase">XLSX File Guide</h3>
+            <div id="verticalTemplateContent" class="hidden space-y-6 text-slate-800 font-bold">
+                <p>Select column containing the questions and the first column where responses begin.</p>
+            </div>
+            <div id="horizontalTemplateContent" class="hidden space-y-6 text-slate-800 font-bold">
+                <p>Select row containing the questions and the first row where responses begin.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        Chart.register(ChartDataLabels);
+
+        const xlsxFile = document.getElementById('xlsxFile');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const chartContainer = document.getElementById('chartContainer');
+        const actionButtons = document.getElementById('actionButtons');
+        const analyzeButton = document.getElementById('analyzeButton');
+        const exportButton = document.getElementById('exportButton');
+        const copyTableButton = document.getElementById('copyTableButton');
+        const langEn = document.getElementById('lang-en');
+        const langAr = document.getElementById('lang-ar');
+        const scaleOrderSection = document.getElementById('scaleOrderSection');
+        const scaleGroupsContainer = document.getElementById('scaleGroupsContainer');
+        const positivesThresholdInput = document.getElementById('positivesThresholdInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const participantCountDisplay = document.getElementById('participantCountDisplay');
+        const positiveNegativeItemsContainer = document.getElementById('positiveNegativeItemsContainer');
+        const dataConfigSection = document.getElementById('dataConfigSection');
+        const itemIndexSelect = document.getElementById('itemIndexSelect');
+        const respStartIndexSelect = document.getElementById('respStartIndexSelect');
+        const confirmMappingBtn = document.getElementById('confirmMappingBtn');
+
+        let currentLang = 'en';
+        let dataOrientation = 'horizontal'; 
+        let rawExcelData = null;
+        let identifiedScaleGroups = new Map(); 
+        let itemToScaleGroup = new Map();
+        let chartInstances = [];
+
+        const languageData = {
+            en: {
+                title: 'Questionnaire Results Analysis',
+                confirm: 'Confirm Mapping & Discriminate Scales',
+                summaryTitle: 'Questionnaire Summary',
+                pos: 'Positive',
+                participants: 'Participants',
+                v: 'Items are in Columns',
+                h: 'Items are in Rows',
+                btnText: 'Step 1: Choose XLSX File',
+                hint: 'Upload your data to begin',
+                headers: { no: '#', item: 'Item Statement', domain: 'Domain Name', total: 'Total (%)', positives: 'Positives (%)', footer: 'Overall Averages' },
+                strengths: 'Core Strengths',
+                improvement: 'Critical Improvement Areas',
+                emptyList: 'No items met this criteria',
+                groupLabel: 'Scale Group'
+            },
+            ar: {
+                title: 'تحليل نتائج الاستبيان',
+                confirm: 'تأكيد الإعداد وتمييز المقاييس',
+                summaryTitle: 'ملخص الاستبيان',
+                pos: 'إيجابي',
+                participants: 'مشارك',
+                v: 'البنود مرتبة في أعمدة',
+                h: 'البنود مرتبة في صفوف',
+                btnText: 'الخطوة 1: اختر ملف XLSX',
+                hint: 'قم بتحميل بياناتك للبدء',
+                headers: { no: '#', item: 'بيان البند', domain: 'اسم المجال', total: 'الإجمالي (%)', positives: 'الإيجابيات (%)', footer: 'المتوسطات الكلية' },
+                strengths: 'نقاط القوة الأساسية',
+                improvement: 'مجالات التحسين الحرجة',
+                emptyList: 'لا توجد بنود تطابق هذه المعايير',
+                groupLabel: 'مجموعة المقياس'
+            }
+        };
+
+        function updateUI() {
+            const d = languageData[currentLang];
+            document.getElementById('mainTitle').textContent = d.title;
+            document.getElementById('fileButtonText').textContent = d.btnText;
+            document.getElementById('fileHint').textContent = d.hint;
+            document.getElementById('labelVertical').textContent = d.v;
+            document.getElementById('labelHorizontal').textContent = d.h;
+            confirmMappingBtn.textContent = d.confirm;
+            langEn.classList.toggle('active-lang', currentLang === 'en');
+            langAr.classList.toggle('active-lang', currentLang === 'ar');
+            document.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+        }
+
+        langEn.onclick = () => { currentLang = 'en'; updateUI(); if(rawExcelData) renderScaleGroups(); };
+        langAr.onclick = () => { currentLang = 'ar'; updateUI(); if(rawExcelData) renderScaleGroups(); };
+
+        document.querySelectorAll('input[name="dataOrientation"]').forEach(el => {
+            el.onchange = (e) => {
+                dataOrientation = e.target.value;
+                updateUI();
+                if (rawExcelData) populateHeaderSelects(rawExcelData);
+                scaleOrderSection.classList.add('hidden');
+                actionButtons.classList.add('hidden');
+            };
+        });
+
+        xlsxFile.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            loadingMessage.classList.remove('hidden');
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                rawExcelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+                sessionStorage.setItem('parsedData', JSON.stringify(rawExcelData));
+                fileNameDisplay.textContent = file.name.split('.')[0];
+                fileNameDisplay.classList.remove('hidden');
+                dataConfigSection.classList.remove('hidden');
+                scaleOrderSection.classList.add('hidden');
+                actionButtons.classList.add('hidden');
+                populateHeaderSelects(rawExcelData);
+                loadingMessage.classList.add('hidden');
+                dataConfigSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function populateHeaderSelects(data) {
+            itemIndexSelect.innerHTML = '';
+            respStartIndexSelect.innerHTML = '';
+            const getColLetter = (n) => { let l = ''; while(n >= 0){ l = String.fromCharCode((n % 26) + 65) + l; n = Math.floor(n/26) - 1; } return l; };
+            if (dataOrientation === 'horizontal') {
+                const headers = data[0] || [];
+                headers.forEach((h, i) => {
+                    const label = h ? `${getColLetter(i)}: ${h}` : `Col ${getColLetter(i)}`;
+                    itemIndexSelect.add(new Option(label, i));
+                    respStartIndexSelect.add(new Option(label, i));
+                });
+                itemIndexSelect.value = 0;
+                respStartIndexSelect.value = Math.min(1, headers.length - 1);
+            } else {
+                data.forEach((row, i) => {
+                    const h = row[0];
+                    const label = h ? `Row ${i+1}: ${h}` : `Row ${i+1}`;
+                    itemIndexSelect.add(new Option(label, i));
+                    respStartIndexSelect.add(new Option(label, i));
+                });
+                itemIndexSelect.value = 0;
+                respStartIndexSelect.value = Math.min(1, data.length - 1);
+            }
+        }
+
+        confirmMappingBtn.onclick = () => {
+            if (!rawExcelData) return;
+            const respStartIdx = parseInt(respStartIndexSelect.value);
+            identifiedScaleGroups.clear();
+            itemToScaleGroup.clear();
+
+            if (dataOrientation === 'horizontal') {
+                rawExcelData.slice(1).forEach((row, rowIndex) => {
+                    const options = new Set();
+                    row.slice(respStartIdx).forEach(val => {
+                        const str = String(val || "").trim();
+                        if (str !== "" && isNaN(str)) options.add(str);
+                    });
+                    if (options.size > 0) {
+                        const signature = Array.from(options).sort().join('|');
+                        if (!identifiedScaleGroups.has(signature)) {
+                            identifiedScaleGroups.set(signature, { options: Array.from(options), positives: new Set() });
+                        }
+                        itemToScaleGroup.set(rowIndex, signature);
+                    }
+                });
+            } else {
+                const itemsCount = rawExcelData[parseInt(itemIndexSelect.value)].length - 1;
+                for (let colIndex = 0; colIndex < itemsCount; colIndex++) {
+                    const options = new Set();
+                    rawExcelData.slice(respStartIdx).forEach(row => {
+                        const str = String(row[colIndex + 1] || "").trim();
+                        if (str !== "" && isNaN(str)) options.add(str);
+                    });
+                    if (options.size > 0) {
+                        const signature = Array.from(options).sort().join('|');
+                        if (!identifiedScaleGroups.has(signature)) {
+                            identifiedScaleGroups.set(signature, { options: Array.from(options), positives: new Set() });
+                        }
+                        itemToScaleGroup.set(colIndex, signature);
+                    }
+                }
+            }
+            renderScaleGroups();
+            scaleOrderSection.classList.remove('hidden');
+            actionButtons.classList.remove('hidden');
+        };
+
+        function renderScaleGroups() {
+            scaleGroupsContainer.innerHTML = '';
+            let counter = 1;
+            identifiedScaleGroups.forEach((group, sig) => {
+                const wrap = document.createElement('div');
+                wrap.className = 'bg-white p-6 rounded-3xl border-2 border-blue-200 shadow-md';
+                wrap.innerHTML = `<h3 class="font-black text-indigo-900 mb-4 uppercase tracking-tighter text-xl">${languageData[currentLang].groupLabel} ${counter++}</h3><div class="scale-list space-y-3" data-sig="${sig}"></div>`;
+                const list = wrap.querySelector('.scale-list');
+                group.options.forEach((opt, idx) => {
+                    const item = document.createElement('div');
+                    item.className = 'p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl flex justify-between items-center cursor-move hover-zoom shadow-sm';
+                    item.draggable = true;
+                    item.innerHTML = `<span class="font-black text-slate-900 text-lg">${opt}</span><label class="flex items-center cursor-pointer bg-green-100 px-4 py-2 rounded-full border border-green-200"><input type="checkbox" class="w-5 h-5 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="ml-2 text-xs font-black text-green-800 uppercase tracking-widest">${languageData[currentLang].pos}</span></label>`;
+                    item.querySelector('input').onchange = (e) => e.target.checked ? group.positives.add(opt) : group.positives.delete(opt);
+                    item.ondragstart = (e) => { e.dataTransfer.setData('idx', idx); e.dataTransfer.setData('sig', sig); };
+                    item.ondragover = (e) => e.preventDefault();
+                    item.ondrop = (e) => {
+                        const fromIdx = e.dataTransfer.getData('idx');
+                        const fromSig = e.dataTransfer.getData('sig');
+                        if(fromSig !== sig) return;
+                        const moved = group.options.splice(fromIdx, 1)[0];
+                        group.options.splice(idx, 0, moved);
+                        renderScaleGroups();
+                    };
+                    list.appendChild(item);
+                });
+                scaleGroupsContainer.appendChild(wrap);
+            });
+        }
+
+        analyzeButton.onclick = () => {
+            try {
+                const data = JSON.parse(sessionStorage.getItem('parsedData'));
+                if (!data) return;
+                resultsContainer.innerHTML = '';
+                chartContainer.innerHTML = '';
+                positiveNegativeItemsContainer.innerHTML = '';
+                chartInstances.forEach(c => c.destroy());
+                chartInstances = [];
+                const itemIdx = parseInt(itemIndexSelect.value);
+                const respStartIdx = parseInt(respStartIndexSelect.value);
+                let itemsRaw, responsesRaw;
+                if (dataOrientation === 'horizontal') {
+                    itemsRaw = data.slice(1).map(r => r[itemIdx]);
+                    responsesRaw = data.slice(1).map(r => r.slice(respStartIdx));
+                } else {
+                    itemsRaw = data[itemIdx].slice(1);
+                    responsesRaw = data[itemIdx].slice(1).map((_, i) => data.slice(respStartIdx).map(row => row[i + 1]));
+                }
+                participantCountDisplay.textContent = `${responsesRaw[0]?.length || 0} ${languageData[currentLang].participants}`;
+                participantCountDisplay.classList.remove('hidden');
+                const summaryData = [];
+                const allItemsList = [];
+                identifiedScaleGroups.forEach((groupData, sig) => {
+                    const itemsInGroup = [];
+                    itemsRaw.forEach((txt, idx) => { if(itemToScaleGroup.get(idx) === sig) itemsInGroup.push({txt, responses: responsesRaw[idx]}); });
+                    if(itemsInGroup.length === 0) return;
+                    const domainGroups = {};
+                    itemsInGroup.forEach(item => {
+                        const match = String(item.txt).match(/(.+) \[(.+)\]/);
+                        const dName = match ? match[1].trim() : (currentLang === 'en' ? 'General' : 'عام');
+                        const iText = match ? match[2].trim() : String(item.txt).trim();
+                        if (!domainGroups[dName]) domainGroups[dName] = { items: [], data: [] };
+                        domainGroups[dName].items.push(iText);
+                        domainGroups[dName].data.push(item.responses);
+                    });
+                    Object.entries(domainGroups).forEach(([dName, group]) => {
+                        const rows = group.items.map((it, idx) => {
+                            const rps = group.data[idx] || [];
+                            const freqs = {};
+                            groupData.options.forEach(o => freqs[o] = 0);
+                            let posCount = 0;
+                            rps.forEach(r => {
+                                const tr = String(r).trim();
+                                if (freqs[tr] !== undefined) freqs[tr]++;
+                                if (groupData.positives.has(tr)) posCount++;
+                            });
+                            const res = { item: it, freqs, total: rps.length, posPerc: rps.length ? (posCount/rps.length)*100 : 0 };
+                            allItemsList.push(res);
+                            return res;
+                        });
+                        renderTable(dName, rows, groupData.options, groupData.positives);
+                        renderChart(dName, rows, groupData.options);
+                        const domainFreqs = {};
+                        groupData.options.forEach(o => { domainFreqs[o] = rows.reduce((sum, r) => sum + r.freqs[o], 0); });
+                        summaryData.push({ name: dName, freqs: domainFreqs, total: rows.reduce((s, r) => s + r.total, 0), positives: groupData.positives });
+                    });
+                });
+                renderSummaryTable(summaryData);
+                renderHighlightLists(allItemsList);
+                resultsContainer.classList.remove('hidden');
+                chartContainer.classList.remove('hidden');
+                positiveNegativeItemsContainer.classList.remove('hidden');
+                resultsContainer.scrollIntoView({ behavior: 'smooth' });
+            } catch (err) { console.error(err); }
+        };
+
+        function renderTable(title, rows, opts, positives) {
+            const d = languageData[currentLang];
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-blue-100 overflow-hidden hover-zoom mb-10 domain-result-wrapper';
+            let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black uppercase tracking-tight">${title}</h2>`;
+            html += `<div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="bg-slate-100 border-b-2 border-slate-200"><tr><th class="p-6 text-center table-header-clear">${d.headers.no}</th><th class="p-6 table-header-clear">${d.headers.item}</th>${opts.map(o => `<th class="p-6 text-center table-header-clear text-indigo-700">${o}</th>`).join('')}<th class="p-6 text-center text-blue-800 font-black uppercase tracking-widest">${d.headers.positives}</th></tr></thead><tbody class="divide-y divide-slate-100">`;
+            rows.forEach((r, i) => {
+                html += `<tr class="hover:bg-blue-50/40 transition-colors"><td class="p-6 text-center text-slate-500 font-black">${i+1}</td><td class="p-6 font-bold text-slate-800">${r.item}</td>${opts.map(o => `<td class="p-6 text-center text-slate-700 font-bold">${r.total ? (r.freqs[o]/r.total*100).toFixed(1) : '0.0'}%</td>`).join('')}<td class="p-6 text-center font-black text-green-700 bg-green-50/30">${r.posPerc.toFixed(1)}%</td></tr>`;
+            });
+            const totalRes = rows.reduce((s, r) => s + r.total, 0);
+            html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td class="p-6 text-center table-header-clear uppercase" colspan="2">${d.headers.footer}</td>${opts.map(o => { const tot = rows.reduce((s, r) => s + r.freqs[o], 0); return `<td class="p-6 text-center text-indigo-800 font-black">${totalRes ? (tot/totalRes*100).toFixed(1) : '0.0'}%</td>`; }).join('')}<td class="p-6 text-center text-green-800 font-black text-lg">${totalRes ? (rows.reduce((s, r) => s + Array.from(positives).reduce((sum, opt) => sum + r.freqs[opt], 0), 0)/totalRes*100).toFixed(1) : '0.0'}%</td></tr></tfoot></table></div>`;
+            div.innerHTML = html;
+            resultsContainer.appendChild(div);
+        }
+
+        function renderSummaryTable(data) {
+            const d = languageData[currentLang];
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-200 overflow-hidden hover-zoom mt-16 summary-table-wrapper';
+            let html = `<h2 class="text-4xl thin-title p-8 bg-indigo-700 text-white font-black uppercase tracking-widest text-center shadow-inner">${d.summaryTitle}</h2><div class="overflow-x-auto"><table class="w-full text-lg text-left"><thead class="bg-indigo-50 border-b-4 border-indigo-100"><tr><th class="p-8 text-center table-header-clear">${d.headers.no}</th><th class="p-8 table-header-clear">${d.headers.domain}</th><th class="p-8 text-center table-header-clear text-green-700">${d.headers.positives}</th></tr></thead><tbody class="divide-y-2 divide-indigo-50">`;
+            data.forEach((dm, i) => {
+                const posSum = Array.from(dm.positives).reduce((s, o) => s + (dm.freqs[o] || 0), 0);
+                html += `<tr class="hover:bg-indigo-50/50"><td class="p-8 text-center font-black text-indigo-300">${i+1}</td><td class="p-8 font-black text-slate-800">${dm.name}</td><td class="p-8 text-center font-black text-green-600 text-2xl bg-green-50/20">${dm.total ? (posSum/dm.total*100).toFixed(1) : '0.0'}%</td></tr>`;
+            });
+            html += `</tbody></table></div>`;
+            div.innerHTML = html;
+            resultsContainer.appendChild(div);
+        }
+
+        function renderChart(title, rows, opts) {
+            const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
+            const div = document.createElement('div');
+            div.className = 'bg-white p-10 rounded-[2.5rem] shadow-xl border-2 border-blue-100 hover-zoom flex flex-col items-center';
+            div.innerHTML = `<h3 class="text-2xl font-black text-indigo-900 mb-8 uppercase tracking-tighter text-center">${title}</h3><div class="w-full h-96"><canvas id="${canvasId}"></canvas></div>`;
+            chartContainer.appendChild(div);
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const dataVals = opts.map(o => {
+                const sum = rows.reduce((s, r) => s + r.freqs[o], 0);
+                const total = rows.reduce((s, r) => s + r.total, 0);
+                return total ? (sum/total*100).toFixed(1) : 0;
+            });
+            const ch = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: opts, datasets: [{ data: dataVals, backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], borderRadius: 20 }] },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', color: '#0f172a', font: { weight: '900', size: 16 }, formatter: v => v+'%' } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { weight: '900', size: 14 } } } } }
+            });
+            chartInstances.push(ch);
+        }
+
+        function renderHighlightLists(items) {
+            const d = languageData[currentLang];
+            const thresh = positivesThresholdInput.value;
+            const high = items.filter(i => i.posPerc >= thresh);
+            const low = items.filter(i => i.posPerc < thresh);
+            positiveNegativeItemsContainer.innerHTML = `
+                <div class="p-10 bg-green-50 rounded-[3rem] border-4 border-green-200 shadow-lg hover-zoom w-full"><h4 class="text-3xl font-black text-green-800 mb-8 uppercase tracking-tighter flex items-center"><span class="mr-4 text-5xl">★</span> ${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold">${high.length ? high.map(i => `<li class="flex items-start bg-white/80 p-4 rounded-2xl shadow-sm border border-green-100"><span class="mr-3 text-green-500">•</span>${i.item}</li>`).join('') : `<li class="italic text-center py-8 opacity-50">${d.emptyList}</li>`}</ul></div>
+                <div class="p-10 bg-red-50 rounded-[3rem] border-4 border-red-200 shadow-lg hover-zoom w-full"><h4 class="text-3xl font-black text-red-800 mb-8 uppercase tracking-tighter flex items-center"><span class="mr-4 text-5xl">⚠</span> ${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold">${low.length ? low.map(i => `<li class="flex items-start bg-white/80 p-4 rounded-2xl shadow-sm border border-red-100"><span class="mr-3 text-red-500">•</span>${i.item}</li>`).join('') : `<li class="italic text-center py-8 opacity-50 text-slate-400">${d.emptyList}</li>`}</ul></div>`;
+        }
+
+        exportButton.onclick = () => {
+            const wb = XLSX.utils.book_new();
+            const sheetData = [["Questionnaire Analysis Report"], [`File: ${fileNameDisplay.textContent}`], [participantCountDisplay.textContent], []];
+            document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper').forEach((wrapper) => {
+                const title = wrapper.querySelector('h2').innerText;
+                sheetData.push([title.toUpperCase()]);
+                const table = wrapper.querySelector('table');
+                const rows = [];
+                table.querySelectorAll('tr').forEach(tr => {
+                    const row = [];
+                    tr.querySelectorAll('th, td').forEach(cell => row.push(cell.innerText));
+                    rows.push(row);
+                });
+                sheetData.push(...rows, []);
+            });
+            const ws = XLSX.utils.aoa_to_sheet(sheetData);
+            XLSX.utils.book_append_sheet(wb, ws, "Analysis");
+            XLSX.writeFile(wb, `${fileNameDisplay.textContent}_Report.xlsx`);
+        };
+
+        copyTableButton.onclick = () => { const text = resultsContainer.innerText; const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); };
+        document.getElementById('showVerticalTemplateBtn').onclick = () => { document.getElementById('templateGuideContainer').classList.remove('hidden'); document.getElementById('verticalTemplateContent').classList.remove('hidden'); document.getElementById('horizontalTemplateContent').classList.add('hidden'); };
+        document.getElementById('showHorizontalTemplateBtn').onclick = () => { document.getElementById('templateGuideContainer').classList.remove('hidden'); document.getElementById('horizontalTemplateContent').classList.remove('hidden'); document.getElementById('verticalTemplateContent').classList.add('hidden'); };
+        document.getElementById('closeTemplateGuideBtn').onclick = () => document.getElementById('templateGuideContainer').classList.add('hidden');
+
+        updateUI();
+    });
+    </script>
+</body>
+</html>
