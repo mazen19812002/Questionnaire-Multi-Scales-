@@ -58,6 +58,35 @@
             transform: scale(1.05);
         }
 
+        /* Transparent Copy Buttons */
+        .copy-btn-wrapper {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 30;
+        }
+        .copy-btn-inner {
+            opacity: 0.4;
+            transition: opacity 0.2s, transform 0.2s, background-color 0.2s;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+        }
+        .copy-btn-inner:hover {
+            opacity: 1;
+            background-color: #ffffff;
+            transform: scale(1.15);
+            border-color: #22c55e;
+            color: #22c55e;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #e5e7eb; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 10px; }
@@ -94,7 +123,6 @@
             border-top: 4px solid #4f46e5;
         }
 
-        /* Stronger Typography for Tables */
         .table-header-clear {
             color: #0f172a;
             font-weight: 900;
@@ -107,8 +135,8 @@
 
     <!-- Header Logos -->
     <div class="flex justify-between items-start mb-8">
-        <img src="00.png" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
-        <img src="02.jpg" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
+        <img src="https://via.placeholder.com/100/ffffff/000000?text=LOGO+1" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
+        <img src="https://via.placeholder.com/100/ffffff/000000?text=LOGO+2" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
     </div>
 
     <main class="max-w-7xl mx-auto w-full bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl flex-grow mb-12">
@@ -136,7 +164,7 @@
                     </div>
                     <input type="file" id="xlsxFile" class="hidden" accept=".xlsx, .xls">
                 </label>
-                <div id="loadingMessage" class="hidden mt-4 text-indigo-700 font-black animate-pulse text-lg italic">Processing Excel File...</div>
+                <div id="loadingMessage" class="hidden mt-4 text-indigo-700 font-black animate-pulse text-lg italic text-center">Processing Excel File...</div>
             </div>
         </div>
 
@@ -144,7 +172,7 @@
         <div id="dataConfigSection" class="hidden grid grid-cols-1 gap-8 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div class="input-card bg-blue-50/50">
                 <div class="text-center border-b border-blue-100 pb-4 mb-6">
-                    <p id="dataOrientationLabel" class="text-slate-900 font-black thin-title text-2xl mb-4 uppercase">Step 2: Data Configuration</p>
+                    <p id="dataOrientationLabel" class="text-slate-900 font-black thin-title text-2xl mb-4 uppercase text-center">Step 2: Data Configuration</p>
                     <fieldset class="flex justify-center space-x-8">
                         <label class="flex items-center cursor-pointer hover-zoom p-3 rounded-xl bg-white shadow-sm border border-blue-100">
                             <input type="radio" id="orientation-vertical" name="dataOrientation" value="horizontal" class="h-5 w-5 text-green-600" checked>
@@ -159,11 +187,11 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div class="flex flex-col">
-                        <label id="labelItemIndex" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest">Select Column containing Items</label>
+                        <label id="labelItemIndex" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center md:text-left">Select Column containing Items</label>
                         <select id="itemIndexSelect" class="p-4 border border-blue-200 rounded-2xl bg-white focus:ring-4 focus:ring-blue-100 outline-none hover-zoom font-black text-slate-900 shadow-sm"></select>
                     </div>
                     <div class="flex flex-col">
-                        <label id="labelRespIndex" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest">Select Column where Responses begin</label>
+                        <label id="labelRespIndex" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center md:text-left">Select Column where Responses begin</label>
                         <select id="respStartIndexSelect" class="p-4 border border-blue-200 rounded-2xl bg-white focus:ring-4 focus:ring-blue-100 outline-none hover-zoom font-black text-slate-900 shadow-sm"></select>
                     </div>
                 </div>
@@ -178,7 +206,7 @@
 
         <!-- Step 3: Multi-Scale Ranking Widget -->
         <div id="scaleOrderSection" class="hidden mb-10 p-8 bg-slate-100 rounded-3xl shadow-inner border border-slate-200 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 text-center md:text-left">
                 <div>
                     <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 uppercase font-black">Step 3: Define Scale Orders</h2>
                     <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic">Drag items within each group to rank them (Highest value at Top)</p>
@@ -195,8 +223,8 @@
         <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
             <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase tracking-tighter">Analyze Data Now</button>
             <div class="flex gap-4 w-full justify-center">
-                <button id="exportButton" class="px-8 py-4 btn-execute bg-blue-700 text-white text-lg font-black rounded-2xl shadow-xl hover:bg-blue-800 hover-zoom transition-all uppercase">Export Result</button>
-                <button id="copyTableButton" class="px-8 py-4 btn-execute bg-teal-700 text-white text-lg font-black rounded-2xl shadow-xl hover:bg-teal-800 hover-zoom transition-all uppercase">Copy Result</button>
+                <button id="exportButton" class="px-8 py-4 btn-execute text-white text-lg font-black rounded-2xl shadow-xl hover:bg-blue-800 hover-zoom transition-all uppercase">Export Result</button>
+                <button id="copyTableButton" class="px-8 py-4 btn-execute text-white text-lg font-black rounded-2xl shadow-xl hover:bg-teal-800 hover-zoom transition-all uppercase">Copy All Results</button>
             </div>
         </div>
 
@@ -275,7 +303,8 @@
                 strengths: 'Core Strengths',
                 improvement: 'Critical Improvement Areas',
                 emptyList: 'No items met this criteria',
-                groupLabel: 'Scale Group'
+                groupLabel: 'Scale Group',
+                copied: 'Copied!'
             },
             ar: {
                 reportTitle: 'تقرير تحليل الاستبيان',
@@ -292,9 +321,53 @@
                 strengths: 'نقاط القوة الأساسية',
                 improvement: 'مجالات التحسين الحرجة',
                 emptyList: 'لا توجد بنود تطابق هذه المعايير',
-                groupLabel: 'مجموعة المقياس'
+                groupLabel: 'مجموعة المقياس',
+                copied: 'تم النسخ!'
             }
         };
+
+        // --- CLIPBOARD HELPER (IFRAME SAFE) ---
+        function copyToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                return true;
+            } catch (err) {
+                document.body.removeChild(textArea);
+                return false;
+            }
+        }
+
+        // --- DYNAMIC COPY BUTTON GENERATOR ---
+        function attachCopyButton(container, copyLogic) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'copy-btn-wrapper';
+            wrapper.innerHTML = `
+                <div class="copy-btn-inner" title="Copy this section">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </div>
+            `;
+            wrapper.onclick = (e) => {
+                e.stopPropagation();
+                copyLogic(wrapper.querySelector('.copy-btn-inner'));
+            };
+            container.style.position = 'relative';
+            container.appendChild(wrapper);
+        }
+
+        function showStatus(btnEl) {
+            const originalHtml = btnEl.innerHTML;
+            btnEl.innerHTML = `<span class="text-[11px] font-black uppercase px-2 text-green-600">${languageData[currentLang].copied}</span>`;
+            setTimeout(() => btnEl.innerHTML = originalHtml, 2000);
+        }
 
         function updateUI() {
             const d = languageData[currentLang];
@@ -304,6 +377,13 @@
             document.getElementById('labelVertical').textContent = d.v;
             document.getElementById('labelHorizontal').textContent = d.h;
             confirmMappingBtn.textContent = d.confirm;
+            if (dataOrientation === 'horizontal') {
+                document.getElementById('labelItemIndex').textContent = d.itemLabelCol;
+                document.getElementById('labelRespIndex').textContent = d.respLabelCol;
+            } else {
+                document.getElementById('labelItemIndex').textContent = d.itemLabelRow;
+                document.getElementById('labelRespIndex').textContent = d.respLabelRow;
+            }
             langEn.classList.toggle('active-lang', currentLang === 'en');
             langAr.classList.toggle('active-lang', currentLang === 'ar');
             document.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
@@ -391,8 +471,8 @@
                     }
                 });
             } else {
-                const firstRow = rawExcelData[parseInt(itemIndexSelect.value)] || [];
-                firstRow.slice(1).forEach((_, colIndex) => {
+                const itemsCount = rawExcelData[parseInt(itemIndexSelect.value)].length - 1;
+                for (let colIndex = 0; colIndex < itemsCount; colIndex++) {
                     const options = new Set();
                     rawExcelData.slice(respStartIdx).forEach(row => {
                         const str = String(row[colIndex + 1] || "").trim();
@@ -405,9 +485,8 @@
                         }
                         itemToScaleGroup.set(colIndex, signature);
                     }
-                });
+                }
             }
-
             renderScaleGroups();
             scaleOrderSection.classList.remove('hidden');
             actionButtons.classList.remove('hidden');
@@ -419,7 +498,7 @@
             identifiedScaleGroups.forEach((group, sig) => {
                 const wrap = document.createElement('div');
                 wrap.className = 'bg-white p-6 rounded-3xl border-2 border-blue-200 shadow-md';
-                wrap.innerHTML = `<h3 class="font-black text-indigo-900 mb-4 uppercase tracking-tighter text-xl">${languageData[currentLang].groupLabel} ${counter++}</h3><div class="scale-list space-y-3" data-sig="${sig}"></div>`;
+                wrap.innerHTML = `<h3 class="font-black text-indigo-900 mb-4 uppercase tracking-tighter text-xl">${languageData[currentLang].groupLabel} ${counter++}: ${group.options.join(', ')}</h3><div class="scale-list space-y-3" data-sig="${sig}"></div>`;
                 const list = wrap.querySelector('.scale-list');
                 group.options.forEach((opt, idx) => {
                     const item = document.createElement('div');
@@ -514,14 +593,36 @@
             const d = languageData[currentLang];
             const div = document.createElement('div');
             div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-blue-100 overflow-hidden hover-zoom mb-10 domain-result-wrapper';
+            
             let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black uppercase tracking-tight">${title}</h2>`;
             html += `<div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="bg-slate-100 border-b-2 border-slate-200"><tr><th class="p-6 text-center table-header-clear">${d.headers.no}</th><th class="p-6 table-header-clear">${d.headers.item}</th>${opts.map(o => `<th class="p-6 text-center table-header-clear text-indigo-700">${o}</th>`).join('')}<th class="p-6 text-center text-blue-800 font-black uppercase tracking-widest">${d.headers.positives}</th></tr></thead><tbody class="divide-y divide-slate-100">`;
             rows.forEach((r, i) => {
                 html += `<tr class="hover:bg-blue-50/40 transition-colors"><td class="p-6 text-center text-slate-500 font-black">${i+1}</td><td class="p-6 font-bold text-slate-800">${r.item}</td>${opts.map(o => `<td class="p-6 text-center text-slate-700 font-bold">${r.total ? (r.freqs[o]/r.total*100).toFixed(1) : '0.0'}%</td>`).join('')}<td class="p-6 text-center font-black text-green-700 bg-green-50/30">${r.posPerc.toFixed(1)}%</td></tr>`;
             });
             const totalRes = rows.reduce((s, r) => s + r.total, 0);
-            html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td class="p-6 text-center table-header-clear uppercase" colspan="2">${d.headers.footer}</td>${opts.map(o => { const tot = rows.reduce((s, r) => s + r.freqs[o], 0); return `<td class="p-6 text-center text-indigo-800 font-black">${totalRes ? (tot/totalRes*100).toFixed(1) : '0.0'}%</td>`; }).join('')}<td class="p-6 text-center text-green-800 font-black text-lg">${totalRes ? (rows.reduce((s, r) => s + Array.from(positives).reduce((sum, opt) => sum + r.freqs[opt], 0), 0)/totalRes*100).toFixed(1) : '0.0'}%</td></tr></tfoot></table></div>`;
+            const domainPos = rows.reduce((s, r) => s + Array.from(positives).reduce((sum, opt) => sum + (r.freqs[opt] || 0), 0), 0);
+            const avgPos = totalRes ? (domainPos / totalRes * 100).toFixed(1) : '0.0';
+
+            html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td class="p-6 text-center table-header-clear uppercase" colspan="2">${d.headers.footer}</td>${opts.map(o => { const tot = rows.reduce((s, r) => s + r.freqs[o], 0); return `<td class="p-6 text-center text-indigo-800 font-black">${totalRes ? (tot/totalRes*100).toFixed(1) : '0.0'}%</td>`; }).join('')}<td class="p-6 text-center text-green-800 font-black text-lg">${avgPos}%</td></tr></tfoot></table></div>`;
+            
             div.innerHTML = html;
+            
+            attachCopyButton(div, (btn) => {
+                const table = div.querySelector('table');
+                let content = title + '\n';
+                table.querySelectorAll('tr').forEach(tr => {
+                    const rowText = [];
+                    tr.querySelectorAll('th, td').forEach(c => {
+                        rowText.push(c.innerText);
+                        const span = parseInt(c.getAttribute('colspan') || "1");
+                        for(let i=1; i<span; i++) rowText.push("");
+                    });
+                    content += rowText.join('\t') + '\n';
+                });
+                copyToClipboard(content);
+                showStatus(btn);
+            });
+
             resultsContainer.appendChild(div);
         }
 
@@ -529,18 +630,36 @@
             const d = languageData[currentLang];
             const div = document.createElement('div');
             div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-200 overflow-hidden hover-zoom mt-16 summary-table-wrapper';
+            
+            const grandTotal = data.reduce((s, dm) => s + dm.total, 0);
+            const grandPos = data.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
+            const grandAvg = grandTotal ? (grandPos / grandTotal * 100).toFixed(1) : '0.0';
+
             let html = `<h2 class="text-4xl thin-title p-8 bg-indigo-700 text-white font-black uppercase tracking-widest text-center shadow-inner">${d.summaryTitle}</h2><div class="overflow-x-auto"><table class="w-full text-lg text-left"><thead class="bg-indigo-50 border-b-4 border-indigo-100"><tr><th class="p-8 text-center table-header-clear">${d.headers.no}</th><th class="p-8 table-header-clear">${d.headers.domain}</th><th class="p-8 text-center table-header-clear text-green-700">${d.headers.positives}</th></tr></thead><tbody class="divide-y-2 divide-indigo-50">`;
             data.forEach((dm, i) => {
                 const posSum = Array.from(dm.positives).reduce((s, o) => s + (dm.freqs[o] || 0), 0);
                 html += `<tr class="hover:bg-indigo-50/50"><td class="p-8 text-center font-black text-indigo-300">${i+1}</td><td class="p-8 font-black text-slate-800">${dm.name}</td><td class="p-8 text-center font-black text-green-600 text-2xl bg-green-50/20">${dm.total ? (posSum/dm.total*100).toFixed(1) : '0.0'}%</td></tr>`;
             });
-            // Total Summary Average Footer
-            const grandTotal = data.reduce((s, dm) => s + dm.total, 0);
-            const grandPos = data.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
-            const grandAvg = grandTotal ? (grandPos / grandTotal * 100).toFixed(1) : '0.0';
-
             html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300"><tr><td class="p-8 text-center table-header-clear uppercase" colspan="2">${d.headers.footer}</td><td class="p-8 text-center text-green-800 text-2xl font-black">${grandAvg}%</td></tr></tfoot></table></div>`;
+            
             div.innerHTML = html;
+
+            attachCopyButton(div, (btn) => {
+                const table = div.querySelector('table');
+                let content = d.summaryTitle + '\n';
+                table.querySelectorAll('tr').forEach(tr => {
+                    const rowText = [];
+                    tr.querySelectorAll('th, td').forEach(c => {
+                        rowText.push(c.innerText);
+                        const span = parseInt(c.getAttribute('colspan') || "1");
+                        for(let i=1; i<span; i++) rowText.push("");
+                    });
+                    content += rowText.join('\t') + '\n';
+                });
+                copyToClipboard(content);
+                showStatus(btn);
+            });
+
             resultsContainer.appendChild(div);
         }
 
@@ -548,7 +667,20 @@
             const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
             const div = document.createElement('div');
             div.className = 'bg-white p-10 rounded-[2.5rem] shadow-xl border-2 border-blue-100 hover-zoom flex flex-col items-center';
+            
             div.innerHTML = `<h3 class="text-2xl font-black text-indigo-900 mb-8 uppercase tracking-tighter text-center">${title}</h3><div class="w-full h-96"><canvas id="${canvasId}"></canvas></div>`;
+            
+            attachCopyButton(div, (btn) => {
+                let text = title + '\nOption\tPercentage\n';
+                const total = rows.reduce((s, r) => s + r.total, 0);
+                opts.forEach(o => {
+                    const sum = rows.reduce((s, r) => s + r.freqs[o], 0);
+                    text += `${o}\t${total ? (sum/total*100).toFixed(1) : '0.0'}%\n`;
+                });
+                copyToClipboard(text);
+                showStatus(btn);
+            });
+
             chartContainer.appendChild(div);
             const ctx = document.getElementById(canvasId).getContext('2d');
             const dataVals = opts.map(o => {
@@ -569,32 +701,48 @@
             const thresh = positivesThresholdInput.value;
             const high = items.filter(i => i.posPerc >= thresh);
             const low = items.filter(i => i.posPerc < thresh);
-            positiveNegativeItemsContainer.innerHTML = `
-                <div class="p-10 bg-green-50 rounded-[3rem] border-4 border-green-200 shadow-lg hover-zoom w-full"><h4 class="text-3xl font-black text-green-800 mb-8 uppercase tracking-tighter flex items-center"><span class="mr-4 text-5xl">★</span> ${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold">${high.length ? high.map(i => `<li class="flex items-start bg-white/80 p-4 rounded-2xl shadow-sm border border-green-100"><span class="mr-3 text-green-500">•</span>${i.item}</li>`).join('') : `<li class="italic text-center py-8 opacity-50">${d.emptyList}</li>`}</ul></div>
-                <div class="p-10 bg-red-50 rounded-[3rem] border-4 border-red-200 shadow-lg hover-zoom w-full"><h4 class="text-3xl font-black text-red-800 mb-8 uppercase tracking-tighter flex items-center"><span class="mr-4 text-5xl">⚠</span> ${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold">${low.length ? low.map(i => `<li class="flex items-start bg-white/80 p-4 rounded-2xl shadow-sm border border-red-100"><span class="mr-3 text-red-500">•</span>${i.item}</li>`).join('') : `<li class="italic text-center py-8 opacity-50 text-slate-400">${d.emptyList}</li>`}</ul></div>`;
+            
+            const strengthsDiv = document.createElement('div');
+            strengthsDiv.className = 'p-10 bg-green-50 rounded-[3rem] border-4 border-green-200 shadow-lg hover-zoom w-full mb-4';
+            strengthsDiv.innerHTML = `<h4 class="text-3xl font-black text-green-800 mb-8 uppercase tracking-tighter flex items-center"><span class="mr-4 text-5xl">★</span> ${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold">${high.length ? high.map(i => `<li class="flex items-start bg-white/80 p-4 rounded-2xl shadow-sm border border-green-100"><span class="mr-3 text-green-500">•</span>${i.item}</li>`).join('') : `<li class="italic text-center py-8 opacity-50 font-black">${d.emptyList}</li>`}</ul>`;
+            
+            attachCopyButton(strengthsDiv, (btn) => {
+                let text = d.strengths + '\n';
+                strengthsDiv.querySelectorAll('li').forEach(li => text += '• ' + li.innerText + '\n');
+                copyToClipboard(text);
+                showStatus(btn);
+            });
+
+            const improvementDiv = document.createElement('div');
+            improvementDiv.className = 'p-10 bg-red-50 rounded-[3rem] border-4 border-red-200 shadow-lg hover-zoom w-full mb-4';
+            improvementDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8 uppercase tracking-tighter flex items-center"><span class="mr-4 text-5xl">⚠</span> ${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold">${low.length ? low.map(i => `<li class="flex items-start bg-white/80 p-4 rounded-2xl shadow-sm border border-red-100"><span class="mr-3 text-red-500">•</span>${i.item}</li>`).join('') : `<li class="italic text-center py-8 opacity-50 text-slate-400 font-black">${d.emptyList}</li>`}</ul>`;
+
+            attachCopyButton(improvementDiv, (btn) => {
+                let text = d.improvement + '\n';
+                improvementDiv.querySelectorAll('li').forEach(li => text += '• ' + li.innerText + '\n');
+                copyToClipboard(text);
+                showStatus(btn);
+            });
+
+            positiveNegativeItemsContainer.appendChild(strengthsDiv);
+            positiveNegativeItemsContainer.appendChild(improvementDiv);
         }
 
         exportButton.onclick = () => {
             const d = languageData[currentLang];
             const wb = XLSX.utils.book_new();
-            const sheetData = [
-                [d.reportTitle], 
-                [`File: ${fileNameDisplay.textContent}`], 
-                [participantCountDisplay.textContent], 
-                []
-            ];
-
+            const sheetData = [[d.reportTitle], [`File: ${fileNameDisplay.textContent}`], [participantCountDisplay.textContent], []];
+            
             document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper').forEach((wrapper) => {
                 const title = wrapper.querySelector('h2').innerText;
                 sheetData.push([title.toUpperCase()]);
                 const table = wrapper.querySelector('table');
-                
                 table.querySelectorAll('tr').forEach(tr => {
                     const row = [];
                     tr.querySelectorAll('th, td').forEach(cell => {
                         row.push(cell.innerText);
                         const colspan = parseInt(cell.getAttribute('colspan') || "1");
-                        for(let i=1; i<colspan; i++) row.push(""); // Align Excel columns
+                        for(let i=1; i<colspan; i++) row.push("");
                     });
                     sheetData.push(row);
                 });
@@ -603,10 +751,9 @@
 
             sheetData.push([d.strengths.toUpperCase()]);
             positiveNegativeItemsContainer.querySelectorAll('.bg-green-50 li').forEach(li => sheetData.push(["", li.innerText]));
-            sheetData.push([]);
-            sheetData.push([d.improvement.toUpperCase()]);
+            sheetData.push([], [d.improvement.toUpperCase()]);
             positiveNegativeItemsContainer.querySelectorAll('.bg-red-50 li').forEach(li => sheetData.push(["", li.innerText]));
-
+            
             const ws = XLSX.utils.aoa_to_sheet(sheetData);
             XLSX.utils.book_append_sheet(wb, ws, "Analysis");
             XLSX.writeFile(wb, `${fileNameDisplay.textContent}_Report.xlsx`);
@@ -614,37 +761,30 @@
 
         copyTableButton.onclick = () => {
             const d = languageData[currentLang];
-            let content = `${d.reportTitle}\n`;
-            content += `File: ${fileNameDisplay.textContent}\n`;
-            content += `${participantCountDisplay.textContent}\n\n`;
-
+            let content = `${d.reportTitle}\nFile: ${fileNameDisplay.textContent}\n${participantCountDisplay.textContent}\n\n`;
+            
             document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper').forEach((wrapper) => {
-                const title = wrapper.querySelector('h2').innerText;
-                content += `${title.toUpperCase()}\n`;
-                const table = wrapper.querySelector('table');
-                table.querySelectorAll('tr').forEach(tr => {
-                    const rowData = [];
-                    tr.querySelectorAll('th, td').forEach(cell => {
-                        rowData.push(cell.innerText);
-                        const colspan = parseInt(cell.getAttribute('colspan') || "1");
-                        for(let i=1; i<colspan; i++) rowData.push(""); // Maintain alignment via tabs
+                content += `${wrapper.querySelector('h2').innerText.toUpperCase()}\n`;
+                wrapper.querySelectorAll('table tr').forEach(tr => {
+                    const rowArr = [];
+                    tr.querySelectorAll('th, td').forEach(c => {
+                        rowArr.push(c.innerText);
+                        const span = parseInt(c.getAttribute('colspan') || "1");
+                        for(let i=1; i<span; i++) rowArr.push("");
                     });
-                    content += rowData.join('\t') + '\n';
+                    content += rowArr.join('\t') + '\n';
                 });
-                content += '\n\n';
+                content += '\n';
             });
 
             content += `${d.strengths.toUpperCase()}\n`;
             positiveNegativeItemsContainer.querySelectorAll('.bg-green-50 li').forEach(li => content += `• ${li.innerText}\n`);
             content += `\n${d.improvement.toUpperCase()}\n`;
             positiveNegativeItemsContainer.querySelectorAll('.bg-red-50 li').forEach(li => content += `• ${li.innerText}\n`);
-
-            const ta = document.createElement('textarea');
-            ta.value = content;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
+            
+            if (copyToClipboard(content)) {
+                alert(d.copied);
+            }
         };
 
         document.getElementById('showVerticalTemplateBtn').onclick = () => { document.getElementById('templateGuideContainer').classList.remove('hidden'); document.getElementById('verticalTemplateContent').classList.remove('hidden'); document.getElementById('horizontalTemplateContent').classList.add('hidden'); };
@@ -656,4 +796,3 @@
     </script>
 </body>
 </html>
-
