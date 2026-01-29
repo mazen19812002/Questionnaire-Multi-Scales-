@@ -14,7 +14,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #e0f2fe; /* Light Blue Background */
-            color: #0f172a; /* Clear Dark Slate Font */
+            color: #0f172a;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -25,16 +25,16 @@
             letter-spacing: -0.025em;
         }
 
-        /* Hover Zoom/Scale Transition */
+        /* Hover Zoom Transition */
         .hover-zoom {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
         .hover-zoom:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: scale(1.01);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Green execute buttons */
+        /* Large Styled Buttons */
         .btn-execute {
             background-color: #22c55e;
             color: white;
@@ -46,7 +46,6 @@
             transform: scale(1.05);
         }
 
-        /* Red delete/cancel buttons */
         .btn-cancel {
             background-color: #ef4444;
             color: white;
@@ -58,7 +57,7 @@
             transform: scale(1.05);
         }
 
-        /* Transparent Copy Buttons */
+        /* Transparent Copy Icons */
         .copy-btn-wrapper {
             position: absolute;
             top: 1rem;
@@ -114,20 +113,31 @@
             padding-right: 2.5rem;
         }
 
-        .dragging {
-            opacity: 0.5;
-            background-color: #f1f5f9;
-            border: 2px dashed #4f46e5;
-        }
-        .drop-target {
-            border-top: 4px solid #4f46e5;
+        /* Qualitative Result Style */
+        .suggestion-box {
+            background-color: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.8;
+            color: #1e293b;
+            min-height: 120px;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-weight: 500;
+            font-size: 1.1rem;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.03);
         }
 
-        .table-header-clear {
-            color: #0f172a;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        .domain-result-wrapper, .suggestion-wrapper {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -135,12 +145,12 @@
 
     <!-- Header Logos -->
     <div class="flex justify-between items-start mb-8">
-        <img src="00.png" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
-        <img src="02.jpg" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom">
+        <img src="00.png" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo1'">
+        <img src="02.jpg" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo2'">
     </div>
 
     <main class="max-w-7xl mx-auto w-full bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl flex-grow mb-12">
-        <h1 id="mainTitle" class="text-5xl thin-title text-center mb-2 text-slate-800 font-black">Questionnaire Results Analysis</h1>
+        <h1 id="mainTitle" class="text-5xl thin-title text-center mb-2 text-slate-800 font-black uppercase tracking-tight">Questionnaire Results Analysis</h1>
         <p class="text-center text-indigo-700 mb-8 text-xl font-bold" id="developerCredit">Developed by Dr. Mazen Badawy – Doctorate of English Teaching & Testing</p>
         
         <div class="flex flex-col items-center space-y-6 mb-10">
@@ -168,18 +178,18 @@
             </div>
         </div>
 
-        <!-- Step 2: Configuration -->
-        <div id="dataConfigSection" class="hidden grid grid-cols-1 gap-8 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <!-- Step 2: Config -->
+        <div id="dataConfigSection" class="hidden grid grid-cols-1 gap-8 mb-10">
             <div class="input-card bg-blue-50/50">
                 <div class="text-center border-b border-blue-100 pb-4 mb-6">
                     <p id="dataOrientationLabel" class="text-slate-900 font-black thin-title text-2xl mb-4 uppercase text-center">Step 2: Data Configuration</p>
                     <fieldset class="flex justify-center space-x-8">
                         <label class="flex items-center cursor-pointer hover-zoom p-3 rounded-xl bg-white shadow-sm border border-blue-100">
-                            <input type="radio" id="orientation-vertical" name="dataOrientation" value="horizontal" class="h-5 w-5 text-green-600" checked>
+                            <input type="radio" id="orientation-columns" name="dataOrientation" value="columns" class="h-5 w-5 text-green-600" checked>
                             <span class="ml-2 font-black text-slate-800" id="labelVertical">Items are in Columns</span>
                         </label>
                         <label class="flex items-center cursor-pointer hover-zoom p-3 rounded-xl bg-white shadow-sm border border-blue-100">
-                            <input type="radio" id="orientation-horizontal" name="dataOrientation" value="vertical" class="h-5 w-5 text-green-600">
+                            <input type="radio" id="orientation-rows" name="dataOrientation" value="rows" class="h-5 w-5 text-green-600">
                             <span class="ml-2 font-black text-slate-800" id="labelHorizontal">Items are in Rows</span>
                         </label>
                     </fieldset>
@@ -187,11 +197,11 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div class="flex flex-col">
-                        <label id="labelItemIndex" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center md:text-left">Select Column containing Items</label>
+                        <label id="labelItemIndex" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center md:text-left">Header Row / Item Col</label>
                         <select id="itemIndexSelect" class="p-4 border border-blue-200 rounded-2xl bg-white focus:ring-4 focus:ring-blue-100 outline-none hover-zoom font-black text-slate-900 shadow-sm"></select>
                     </div>
                     <div class="flex flex-col">
-                        <label id="labelRespIndex" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center md:text-left">Select Column where Responses begin</label>
+                        <label id="labelRespIndex" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center md:text-left">Data Starts At Row / Col</label>
                         <select id="respStartIndexSelect" class="p-4 border border-blue-200 rounded-2xl bg-white focus:ring-4 focus:ring-blue-100 outline-none hover-zoom font-black text-slate-900 shadow-sm"></select>
                     </div>
                 </div>
@@ -204,12 +214,12 @@
             </div>
         </div>
 
-        <!-- Step 3: Multi-Scale Ranking Widget -->
-        <div id="scaleOrderSection" class="hidden mb-10 p-8 bg-slate-100 rounded-3xl shadow-inner border border-slate-200 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <!-- Step 3: Scales -->
+        <div id="scaleOrderSection" class="hidden mb-10 p-8 bg-slate-100 rounded-3xl shadow-inner border border-slate-200">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 text-center md:text-left">
                 <div>
                     <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 uppercase font-black">Step 3: Define Scale Orders</h2>
-                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic">Drag items within each group to rank them (Highest value at Top)</p>
+                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic">Drag items within scale groups to rank them. Qualitative feedback is automatically separated.</p>
                 </div>
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center">
                     <label class="font-black text-xs text-slate-800 mr-4 uppercase tracking-tighter" id="labelThreshold">Positives Threshold (%):</label>
@@ -219,12 +229,11 @@
             <div id="scaleGroupsContainer" class="space-y-10"></div>
         </div>
 
-        <!-- Action Buttons -->
         <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
             <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase tracking-tighter">Analyze Data Now</button>
             <div class="flex gap-4 w-full justify-center">
-                <button id="exportButton" class="px-8 py-4 btn-execute text-white text-lg font-black rounded-2xl shadow-xl hover:bg-blue-800 hover-zoom transition-all uppercase">Export Result</button>
-                <button id="copyTableButton" class="px-8 py-4 btn-execute text-white text-lg font-black rounded-2xl shadow-xl hover:bg-teal-800 hover-zoom transition-all uppercase">Copy All Results</button>
+                <button id="exportButton" class="px-8 py-4 btn-execute text-white text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase">Export Result</button>
+                <button id="copyTableButton" class="px-8 py-4 btn-execute text-white text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase">Copy All Results</button>
             </div>
         </div>
 
@@ -236,27 +245,12 @@
         <div id="resultsContainer" class="hidden space-y-16"></div>
         <div id="chartContainer" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-10 mt-12"></div>
         <div id="positiveNegativeItemsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 mt-12"></div>
-
-        <!-- Final Recommendation Area -->
-        <div id="finalRecommendationContainer" class="hidden mt-16 animate-in fade-in slide-in-from-bottom-6 duration-700"></div>
+        <div id="finalRecommendationContainer" class="hidden mt-16"></div>
     </main>
 
     <footer class="w-full text-center py-8 mt-auto text-slate-900 font-black border-t border-blue-200 bg-blue-50/95 backdrop-blur-sm uppercase text-sm tracking-widest">
         All rights are reserved to Dr. Mazen Badawy – Doctorate of English Teaching & Testing
     </footer>
-
-    <div id="templateGuideContainer" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-        <div class="bg-white p-10 rounded-[3rem] shadow-2xl max-w-2xl w-full relative border-4 border-blue-100">
-            <button id="closeTemplateGuideBtn" class="absolute top-6 right-8 text-4xl font-light hover:text-red-500 transition-colors btn-cancel">&times;</button>
-            <h3 id="templateGuideTitle" class="text-3xl thin-title mb-8 border-b pb-4 text-slate-900 font-black uppercase">XLSX File Guide</h3>
-            <div id="verticalTemplateContent" class="hidden space-y-6 text-slate-800 font-bold">
-                <p>Select column containing the questions and the first column where responses begin.</p>
-            </div>
-            <div id="horizontalTemplateContent" class="hidden space-y-6 text-slate-800 font-bold">
-                <p>Select row containing the questions and the first row where responses begin.</p>
-            </div>
-        </div>
-    </div>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -285,7 +279,7 @@
         const confirmMappingBtn = document.getElementById('confirmMappingBtn');
 
         let currentLang = 'en';
-        let dataOrientation = 'horizontal'; 
+        let dataOrientation = 'columns'; 
         let rawExcelData = null;
         let identifiedScaleGroups = new Map(); 
         let itemToScaleGroup = new Map();
@@ -306,13 +300,14 @@
                 headers: { no: '#', item: 'Item Statement', domain: 'Domain Name', total: 'Total (%)', positives: 'Positives (%)', footer: 'Overall Averages' },
                 strengths: 'Core Strengths',
                 improvement: 'Critical Improvement Areas',
-                emptyList: 'No items met this criteria',
+                emptyList: 'No responses provided',
                 groupLabel: 'Scale Group',
                 copied: 'Copied!',
                 recommendation: 'Recommendation',
                 finalScore: 'Total Questionnaire Result',
                 evaluations: ["Excellent", "Very Good", "Good", "Acceptable", "Weak"],
-                weakPointsTitle: 'Summary of Weak Points (Areas for Attention):'
+                suggestionsTitle: 'Respondents Suggestions',
+                suggestionsHint: 'Qualitative feedback detected automatically'
             },
             ar: {
                 reportTitle: 'تقرير تحليل الاستبيان',
@@ -328,13 +323,14 @@
                 headers: { no: '#', item: 'بيان البند', domain: 'اسم المجال', total: 'الإجمالي (%)', positives: 'الإيجابيات (%)', footer: 'المتوسطات الكلية' },
                 strengths: 'نقاط القوة الأساسية',
                 improvement: 'مجالات التحسين الحرجة',
-                emptyList: 'لا توجد بنود تطابق هذه المعايير',
+                emptyList: 'لا توجد ردود مقدمة',
                 groupLabel: 'مجموعة المقياس',
                 copied: 'تم النسخ!',
                 recommendation: 'التوصية',
                 finalScore: 'نتيجة الاستبيان النهائية',
                 evaluations: ["ممتازة", "جيد جداً", "جيدة", "مقبولة", "ضعيفة"],
-                weakPointsTitle: 'ملخص نقاط الضعف (مجالات تتطلب الاهتمام):'
+                suggestionsTitle: 'مقترحات المستجيبين',
+                suggestionsHint: 'تم اكتشاف ملاحظات نوعية تلقائياً'
             }
         };
 
@@ -347,20 +343,13 @@
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-            try {
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                return true;
-            } catch (err) {
-                document.body.removeChild(textArea);
-                return false;
-            }
+            try { document.execCommand('copy'); document.body.removeChild(textArea); return true; } catch (err) { document.body.removeChild(textArea); return false; }
         }
 
         function attachCopyButton(container, copyLogic) {
             const wrapper = document.createElement('div');
             wrapper.className = 'copy-btn-wrapper';
-            wrapper.innerHTML = `<div class="copy-btn-inner" title="Copy this section"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></div>`;
+            wrapper.innerHTML = `<div class="copy-btn-inner" title="Copy section"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></div>`;
             wrapper.onclick = (e) => { e.stopPropagation(); copyLogic(wrapper.querySelector('.copy-btn-inner')); };
             container.style.position = 'relative';
             container.appendChild(wrapper);
@@ -372,15 +361,6 @@
             setTimeout(() => btnEl.innerHTML = originalHtml, 2000);
         }
 
-        function getEvaluationText(score) {
-            const evals = languageData[currentLang].evaluations;
-            if (score > 85) return evals[0];
-            if (score > 75) return evals[1];
-            if (score > 65) return evals[2];
-            if (score > 50) return evals[3];
-            return evals[4];
-        }
-
         function updateUI() {
             const d = languageData[currentLang];
             document.getElementById('mainTitle').textContent = d.title;
@@ -389,13 +369,6 @@
             document.getElementById('labelVertical').textContent = d.v;
             document.getElementById('labelHorizontal').textContent = d.h;
             confirmMappingBtn.textContent = d.confirm;
-            if (dataOrientation === 'horizontal') {
-                document.getElementById('labelItemIndex').textContent = languageData[currentLang].itemLabelCol || "Select Column Items";
-                document.getElementById('labelRespIndex').textContent = languageData[currentLang].respLabelCol || "Select Column Responses";
-            } else {
-                document.getElementById('labelItemIndex').textContent = languageData[currentLang].itemLabelRow || "Select Row Items";
-                document.getElementById('labelRespIndex').textContent = languageData[currentLang].respLabelRow || "Select Row Responses";
-            }
             langEn.classList.toggle('active-lang', currentLang === 'en');
             langAr.classList.toggle('active-lang', currentLang === 'ar');
             document.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
@@ -409,8 +382,6 @@
                 dataOrientation = e.target.value;
                 updateUI();
                 if (rawExcelData) populateHeaderSelects(rawExcelData);
-                scaleOrderSection.classList.add('hidden');
-                actionButtons.classList.add('hidden');
             };
         });
 
@@ -427,11 +398,8 @@
                 fileNameDisplay.textContent = file.name.split('.')[0];
                 fileNameDisplay.classList.remove('hidden');
                 dataConfigSection.classList.remove('hidden');
-                scaleOrderSection.classList.add('hidden');
-                actionButtons.classList.add('hidden');
                 populateHeaderSelects(rawExcelData);
                 loadingMessage.classList.add('hidden');
-                dataConfigSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             };
             reader.readAsArrayBuffer(file);
         });
@@ -439,83 +407,106 @@
         function populateHeaderSelects(data) {
             itemIndexSelect.innerHTML = '';
             respStartIndexSelect.innerHTML = '';
-            const getColLetter = (n) => { let l = ''; while(n >= 0){ l = String.fromCharCode((n % 26) + 65) + l; n = Math.floor(n/26) - 1; } return l; };
-            if (dataOrientation === 'horizontal') {
+            if (dataOrientation === 'columns') {
+                data.slice(0, 10).forEach((row, i) => {
+                    const label = row[0] ? `Row ${i+1}: ${row[0]}` : `Row ${i+1}`;
+                    itemIndexSelect.add(new Option(label, i));
+                    respStartIndexSelect.add(new Option(label, i));
+                });
+                itemIndexSelect.value = 0;
+                respStartIndexSelect.value = 1;
+            } else {
                 const headers = data[0] || [];
                 headers.forEach((h, i) => {
-                    const label = h ? `${getColLetter(i)}: ${h}` : `Col ${getColLetter(i)}`;
+                    const label = h ? `Col ${i+1}: ${h}` : `Col ${i+1}`;
                     itemIndexSelect.add(new Option(label, i));
                     respStartIndexSelect.add(new Option(label, i));
                 });
                 itemIndexSelect.value = 0;
-                respStartIndexSelect.value = Math.min(1, headers.length - 1);
-            } else {
-                data.forEach((row, i) => {
-                    const h = row[0];
-                    const label = h ? `Row ${i+1}: ${h}` : `Row ${i+1}`;
-                    itemIndexSelect.add(new Option(label, i));
-                    respStartIndexSelect.add(new Option(label, i));
-                });
-                itemIndexSelect.value = 0;
-                respStartIndexSelect.value = Math.min(1, data.length - 1);
+                respStartIndexSelect.value = 1;
             }
         }
 
         confirmMappingBtn.onclick = () => {
             if (!rawExcelData) return;
-            const respStartIdx = parseInt(respStartIndexSelect.value);
+            const headerRowIdx = parseInt(itemIndexSelect.value);
+            const dataStartIdx = parseInt(respStartIndexSelect.value);
             identifiedScaleGroups.clear();
             itemToScaleGroup.clear();
-            if (dataOrientation === 'horizontal') {
-                rawExcelData.slice(1).forEach((row, rowIndex) => {
-                    const options = new Set();
-                    row.slice(respStartIdx).forEach(val => {
-                        const str = String(val || "").trim();
-                        if (str !== "" && isNaN(str)) options.add(str);
-                    });
+            
+            if (dataOrientation === 'columns') {
+                const numCols = rawExcelData[headerRowIdx].length;
+                for (let col = 0; col < numCols; col++) {
+                    const responses = [];
+                    for (let row = dataStartIdx; row < rawExcelData.length; row++) {
+                        const val = String(rawExcelData[row][col] || "").trim();
+                        if (val !== "") responses.push(val);
+                    }
+                    const options = new Set(responses);
                     if (options.size > 0) {
+                        const avgLen = responses.length > 0 ? responses.reduce((s, r) => s + r.length, 0) / responses.length : 0;
+                        const maxLen = responses.length > 0 ? Math.max(...responses.map(r => r.length)) : 0;
+                        
+                        // DETECTION LOGIC: If many unique items OR long responses, it's suggestions
+                        const isSugg = options.size > 5 || avgLen > 18 || maxLen > 40;
+                        
                         const signature = Array.from(options).sort().join('|');
                         if (!identifiedScaleGroups.has(signature)) {
-                            identifiedScaleGroups.set(signature, { options: Array.from(options), positives: new Set() });
+                            identifiedScaleGroups.set(signature, { options: Array.from(options), positives: new Set(), isSuggestion: isSugg });
+                        }
+                        itemToScaleGroup.set(col, signature);
+                    }
+                }
+            } else {
+                rawExcelData.slice(dataStartIdx).forEach((row, rowIndex) => {
+                    const responses = row.slice(1).map(v => String(v || "").trim()).filter(v => v !== "");
+                    const options = new Set(responses);
+                    if (options.size > 0) {
+                        const avgLen = responses.length > 0 ? responses.reduce((s, r) => s + r.length, 0) / responses.length : 0;
+                        const maxLen = responses.length > 0 ? Math.max(...responses.map(r => r.length)) : 0;
+                        const isSugg = options.size > 5 || avgLen > 18 || maxLen > 40;
+                        
+                        const signature = Array.from(options).sort().join('|');
+                        if (!identifiedScaleGroups.has(signature)) {
+                            identifiedScaleGroups.set(signature, { options: Array.from(options), positives: new Set(), isSuggestion: isSugg });
                         }
                         itemToScaleGroup.set(rowIndex, signature);
                     }
                 });
-            } else {
-                const itemsCount = rawExcelData[parseInt(itemIndexSelect.value)].length - 1;
-                for (let colIndex = 0; colIndex < itemsCount; colIndex++) {
-                    const options = new Set();
-                    rawExcelData.slice(respStartIdx).forEach(row => {
-                        const str = String(row[colIndex + 1] || "").trim();
-                        if (str !== "" && isNaN(str)) options.add(str);
-                    });
-                    if (options.size > 0) {
-                        const signature = Array.from(options).sort().join('|');
-                        if (!identifiedScaleGroups.has(signature)) {
-                            identifiedScaleGroups.set(signature, { options: Array.from(options), positives: new Set() });
-                        }
-                        itemToScaleGroup.set(colIndex, signature);
-                    }
-                }
             }
             renderScaleGroups();
             scaleOrderSection.classList.remove('hidden');
             actionButtons.classList.remove('hidden');
+            scaleOrderSection.scrollIntoView({ behavior: 'smooth' });
         };
 
         function renderScaleGroups() {
             scaleGroupsContainer.innerHTML = '';
             let counter = 1;
             identifiedScaleGroups.forEach((group, sig) => {
+                if (group.isSuggestion) return; // Automatic: qualitative suggestions aren't "scaled"
+
                 const wrap = document.createElement('div');
                 wrap.className = 'bg-white p-6 rounded-3xl border-2 border-blue-200 shadow-md';
-                wrap.innerHTML = `<h3 class="font-black text-indigo-900 mb-4 uppercase tracking-tighter text-xl">${languageData[currentLang].groupLabel} ${counter++}: ${group.options.join(', ')}</h3><div class="scale-list space-y-3" data-sig="${sig}"></div>`;
+                wrap.innerHTML = `
+                    <h3 class="font-black text-indigo-900 uppercase tracking-tighter text-xl mb-4">
+                        ${languageData[currentLang].groupLabel} ${counter++}: ${group.options.join(', ')}
+                    </h3>
+                    <div class="scale-list space-y-3" data-sig="${sig}"></div>
+                `;
+
                 const list = wrap.querySelector('.scale-list');
                 group.options.forEach((opt, idx) => {
                     const item = document.createElement('div');
                     item.className = 'p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl flex justify-between items-center cursor-move hover-zoom shadow-sm';
                     item.draggable = true;
-                    item.innerHTML = `<span class="font-black text-slate-900 text-lg">${opt}</span><label class="flex items-center cursor-pointer bg-green-100 px-4 py-2 rounded-full border border-green-200"><input type="checkbox" class="w-5 h-5 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="ml-2 text-xs font-black text-green-800 uppercase tracking-widest">${languageData[currentLang].pos}</span></label>`;
+                    item.innerHTML = `
+                        <span class="font-black text-slate-900 text-lg truncate pr-4">${opt}</span>
+                        <label class="flex items-center cursor-pointer bg-green-100 px-4 py-2 rounded-full border border-green-200">
+                            <input type="checkbox" class="w-5 h-5 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}>
+                            <span class="ml-2 text-xs font-black text-green-800 uppercase tracking-widest">${languageData[currentLang].pos}</span>
+                        </label>`;
+                    
                     item.querySelector('input').onchange = (e) => e.target.checked ? group.positives.add(opt) : group.positives.delete(opt);
                     item.ondragstart = (e) => { e.dataTransfer.setData('idx', idx); e.dataTransfer.setData('sig', sig); };
                     item.ondragover = (e) => e.preventDefault();
@@ -537,70 +528,93 @@
             try {
                 const data = JSON.parse(sessionStorage.getItem('parsedData'));
                 if (!data) return;
+                
                 resultsContainer.innerHTML = '';
                 chartContainer.innerHTML = '';
                 positiveNegativeItemsContainer.innerHTML = '';
                 finalRecommendationContainer.innerHTML = '';
                 chartInstances.forEach(c => c.destroy());
                 chartInstances = [];
-                const itemIdx = parseInt(itemIndexSelect.value);
-                const respStartIdx = parseInt(respStartIndexSelect.value);
-                let itemsRaw, responsesRaw;
-                if (dataOrientation === 'horizontal') {
-                    itemsRaw = data.slice(1).map(r => r[itemIdx]);
-                    responsesRaw = data.slice(1).map(r => r.slice(respStartIdx));
+
+                const headerRowIdx = parseInt(itemIndexSelect.value);
+                const dataStartIdx = parseInt(respStartIndexSelect.value);
+                let itemsRaw = [], responsesRaw = [];
+                
+                if (dataOrientation === 'columns') {
+                    const headers = data[headerRowIdx];
+                    headers.forEach((h, col) => {
+                        itemsRaw.push(h || `Column ${col + 1}`);
+                        responsesRaw.push(data.slice(dataStartIdx).map(row => row[col]));
+                    });
                 } else {
-                    itemsRaw = data[itemIdx].slice(1);
-                    responsesRaw = data[itemIdx].slice(1).map((_, i) => data.slice(respStartIdx).map(row => row[i + 1]));
+                    data.slice(dataStartIdx).forEach(row => {
+                        itemsRaw.push(row[0] || 'Item');
+                        responsesRaw.push(row.slice(1));
+                    });
                 }
+
                 participantCountDisplay.textContent = `${responsesRaw[0]?.length || 0} ${languageData[currentLang].participants}`;
                 participantCountDisplay.classList.remove('hidden');
+
                 const summaryData = [];
                 const allItemsList = [];
+
                 identifiedScaleGroups.forEach((groupData, sig) => {
                     const itemsInGroup = [];
-                    itemsRaw.forEach((txt, idx) => { if(itemToScaleGroup.get(idx) === sig) itemsInGroup.push({txt, originalTxt: txt, responses: responsesRaw[idx]}); });
+                    itemsRaw.forEach((txt, idx) => { 
+                        if(itemToScaleGroup.get(idx) === sig) itemsInGroup.push({txt, responses: responsesRaw[idx], index: idx}); 
+                    });
+                    
                     if(itemsInGroup.length === 0) return;
-                    const domainGroups = {};
-                    itemsInGroup.forEach(item => {
-                        const match = String(item.txt).match(/(.+) \[(.+)\]/);
-                        const dName = match ? match[1].trim() : (currentLang === 'en' ? 'General' : 'عام');
-                        const iText = match ? match[2].trim() : String(item.txt).trim();
-                        if (!domainGroups[dName]) domainGroups[dName] = { items: [], data: [] };
-                        domainGroups[dName].items.push(iText);
-                        domainGroups[dName].data.push(item.responses);
-                    });
-                    Object.entries(domainGroups).forEach(([dName, group]) => {
-                        const rows = group.items.map((it, idx) => {
-                            const rps = group.data[idx] || [];
-                            const freqs = {};
-                            groupData.options.forEach(o => freqs[o] = 0);
-                            let posCount = 0;
-                            rps.forEach(r => {
-                                const tr = String(r).trim();
-                                if (freqs[tr] !== undefined) freqs[tr]++;
-                                if (groupData.positives.has(tr)) posCount++;
-                            });
-                            const res = { item: it, freqs, total: rps.length, posPerc: rps.length ? (posCount/rps.length)*100 : 0 };
-                            allItemsList.push(res);
-                            return res;
+
+                    if (groupData.isSuggestion) {
+                        itemsInGroup.forEach(item => {
+                            renderSuggestionBox(item.txt, item.responses);
                         });
-                        renderTable(dName, rows, groupData.options, groupData.positives);
-                        renderChart(dName, rows, groupData.options);
-                        const domainFreqs = {};
-                        groupData.options.forEach(o => { domainFreqs[o] = rows.reduce((sum, r) => sum + r.freqs[o], 0); });
-                        summaryData.push({ name: dName, freqs: domainFreqs, total: rows.reduce((s, r) => s + r.total, 0), positives: groupData.positives });
-                    });
+                    } else {
+                        const domainGroups = {};
+                        itemsInGroup.forEach(item => {
+                            const match = String(item.txt).match(/(.+) \[(.+)\]/);
+                            const dName = match ? match[1].trim() : (currentLang === 'en' ? 'General Assessment' : 'التقييم العام');
+                            const iText = match ? match[2].trim() : String(item.txt).trim();
+                            if (!domainGroups[dName]) domainGroups[dName] = { items: [], data: [] };
+                            domainGroups[dName].items.push(iText);
+                            domainGroups[dName].data.push(item.responses);
+                        });
+
+                        Object.entries(domainGroups).forEach(([dName, group]) => {
+                            const rows = group.items.map((it, idx) => {
+                                const rps = group.data[idx] || [];
+                                const freqs = {};
+                                groupData.options.forEach(o => freqs[o] = 0);
+                                let posCount = 0;
+                                rps.forEach(r => {
+                                    const tr = String(r || "").trim();
+                                    if (freqs[tr] !== undefined) freqs[tr]++;
+                                    if (groupData.positives.has(tr)) posCount++;
+                                });
+                                const res = { item: it, freqs, total: rps.length, posPerc: rps.length ? (posCount/rps.length)*100 : 0 };
+                                allItemsList.push(res);
+                                return res;
+                            });
+                            renderTable(dName, rows, groupData.options, groupData.positives);
+                            renderChart(dName, rows, groupData.options);
+                            
+                            const domainFreqs = {};
+                            groupData.options.forEach(o => { domainFreqs[o] = rows.reduce((sum, r) => sum + r.freqs[o], 0); });
+                            summaryData.push({ name: dName, freqs: domainFreqs, total: rows.reduce((s, r) => s + r.total, 0), positives: groupData.positives });
+                        });
+                    }
                 });
-                renderSummaryTable(summaryData);
-                renderHighlightLists(allItemsList);
-                
-                // FINAL CALCULATIONS
-                const grandTotal = summaryData.reduce((s, dm) => s + dm.total, 0);
-                const grandPos = summaryData.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
-                const grandAvg = grandTotal ? (grandPos / grandTotal * 100) : 0;
-                
-                renderFinalRecommendation(grandAvg, allItemsList.filter(i => i.posPerc < 85));
+
+                if (summaryData.length > 0) {
+                    renderSummaryTable(summaryData);
+                    renderHighlightLists(allItemsList);
+                    const grandTotal = summaryData.reduce((s, dm) => s + dm.total, 0);
+                    const grandPos = summaryData.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
+                    const grandAvg = grandTotal ? (grandPos / grandTotal * 100) : 0;
+                    renderFinalRecommendation(grandAvg, allItemsList.filter(i => i.posPerc < 85));
+                }
 
                 resultsContainer.classList.remove('hidden');
                 chartContainer.classList.remove('hidden');
@@ -609,6 +623,33 @@
                 resultsContainer.scrollIntoView({ behavior: 'smooth' });
             } catch (err) { console.error(err); }
         };
+
+        function renderSuggestionBox(title, responses) {
+            const d = languageData[currentLang];
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-100 overflow-hidden hover-zoom mb-10 suggestion-wrapper';
+            
+            const filteredResponses = responses.map(r => String(r || "").trim()).filter(r => r !== "");
+            const joinedText = filteredResponses.join(' & ');
+
+            div.innerHTML = `
+                <div class="p-8 bg-indigo-50 border-b-2 border-indigo-100">
+                    <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">${title}</h2>
+                    <p class="text-xs font-black text-indigo-500 mt-2 uppercase tracking-widest">${d.suggestionsTitle}</p>
+                </div>
+                <div class="p-8">
+                    <div class="suggestion-box">
+                        ${joinedText || `<span class="italic text-slate-400 font-bold">${d.emptyList}</span>`}
+                    </div>
+                </div>
+            `;
+
+            attachCopyButton(div, (btn) => {
+                copyToClipboard(`${title}\n---\n${joinedText}`);
+                showStatus(btn);
+            });
+            resultsContainer.appendChild(div);
+        }
 
         function renderTable(title, rows, opts, positives) {
             const d = languageData[currentLang];
@@ -626,12 +667,11 @@
             html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td class="p-6 text-center table-header-clear uppercase" colspan="2">${d.headers.footer}</td>${opts.map(o => { const tot = rows.reduce((s, r) => s + r.freqs[o], 0); return `<td class="p-6 text-center text-indigo-800 font-black">${totalRes ? (tot/totalRes*100).toFixed(1) : '0.0'}%</td>`; }).join('')}<td class="p-6 text-center text-green-800 font-black text-lg">${avgPos}%</td></tr></tfoot></table></div>`;
             div.innerHTML = html;
             attachCopyButton(div, (btn) => {
-                const table = div.querySelector('table');
                 let content = title + '\n';
-                table.querySelectorAll('tr').forEach(tr => {
-                    const rowText = [];
-                    tr.querySelectorAll('th, td').forEach(c => { rowText.push(c.innerText); const span = parseInt(c.getAttribute('colspan') || "1"); for(let i=1; i<span; i++) rowText.push(""); });
-                    content += rowText.join('\t') + '\n';
+                div.querySelectorAll('table tr').forEach(tr => {
+                    let rowArr = [];
+                    tr.querySelectorAll('th, td').forEach(c => rowArr.push(c.innerText));
+                    content += rowArr.join('\t') + '\n';
                 });
                 copyToClipboard(content);
                 showStatus(btn);
@@ -655,12 +695,11 @@
             html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300"><tr><td class="p-8 text-center table-header-clear uppercase" colspan="2">${d.headers.footer}</td><td class="p-8 text-center text-green-800 text-2xl font-black">${grandAvg}%</td></tr></tfoot></table></div>`;
             div.innerHTML = html;
             attachCopyButton(div, (btn) => {
-                const table = div.querySelector('table');
                 let content = d.summaryTitle + '\n';
-                table.querySelectorAll('tr').forEach(tr => {
-                    const rowText = [];
-                    tr.querySelectorAll('th, td').forEach(c => { rowText.push(c.innerText); const span = parseInt(c.getAttribute('colspan') || "1"); for(let i=1; i<span; i++) rowText.push(""); });
-                    content += rowText.join('\t') + '\n';
+                div.querySelectorAll('table tr').forEach(tr => {
+                    let rowArr = [];
+                    tr.querySelectorAll('th, td').forEach(c => rowArr.push(c.innerText));
+                    content += rowArr.join('\t') + '\n';
                 });
                 copyToClipboard(content);
                 showStatus(btn);
@@ -673,13 +712,6 @@
             const div = document.createElement('div');
             div.className = 'bg-white p-10 rounded-[2.5rem] shadow-xl border-2 border-blue-100 hover-zoom flex flex-col items-center';
             div.innerHTML = `<h3 class="text-2xl font-black text-indigo-900 mb-8 uppercase tracking-tighter text-center">${title}</h3><div class="w-full h-96"><canvas id="${canvasId}"></canvas></div>`;
-            attachCopyButton(div, (btn) => {
-                let text = title + '\nOption\tPercentage\n';
-                const total = rows.reduce((s, r) => s + r.total, 0);
-                opts.forEach(o => { const sum = rows.reduce((s, r) => s + r.freqs[o], 0); text += `${o}\t${total ? (sum/total*100).toFixed(1) : '0.0'}%\n`; });
-                copyToClipboard(text);
-                showStatus(btn);
-            });
             chartContainer.appendChild(div);
             const ctx = document.getElementById(canvasId).getContext('2d');
             const dataVals = opts.map(o => { const sum = rows.reduce((s, r) => s + r.freqs[o], 0); const total = rows.reduce((s, r) => s + r.total, 0); return total ? (sum/total*100).toFixed(1) : 0; });
@@ -696,124 +728,38 @@
             const thresh = positivesThresholdInput.value;
             const high = items.filter(i => i.posPerc >= thresh);
             const low = items.filter(i => i.posPerc < thresh);
-            const strengthsDiv = document.createElement('div');
-            strengthsDiv.className = 'p-10 bg-green-50 rounded-[3rem] border-4 border-green-200 shadow-lg hover-zoom w-full mb-4';
-            strengthsDiv.innerHTML = `<h4 class="text-3xl font-black text-green-800 mb-8 uppercase tracking-tighter flex items-center"><span class="mr-4 text-5xl">★</span> ${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold">${high.length ? high.map(i => `<li class="flex items-start bg-white/80 p-4 rounded-2xl shadow-sm border border-green-100"><span class="mr-3 text-green-500">•</span>${i.item}</li>`).join('') : `<li class="italic text-center py-8 opacity-50 font-black">${d.emptyList}</li>`}</ul>`;
-            attachCopyButton(strengthsDiv, (btn) => { let text = d.strengths + '\n'; strengthsDiv.querySelectorAll('li').forEach(li => text += '• ' + li.innerText + '\n'); copyToClipboard(text); showStatus(btn); });
-            const improvementDiv = document.createElement('div');
-            improvementDiv.className = 'p-10 bg-red-50 rounded-[3rem] border-4 border-red-200 shadow-lg hover-zoom w-full mb-4';
-            improvementDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8 uppercase tracking-tighter flex items-center"><span class="mr-4 text-5xl">⚠</span> ${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold">${low.length ? low.map(i => `<li class="flex items-start bg-white/80 p-4 rounded-2xl shadow-sm border border-red-100"><span class="mr-3 text-red-500">•</span>${i.item}</li>`).join('') : `<li class="italic text-center py-8 opacity-50 text-slate-400 font-black">${d.emptyList}</li>`}</ul>`;
-            attachCopyButton(improvementDiv, (btn) => { let text = d.improvement + '\n'; improvementDiv.querySelectorAll('li').forEach(li => text += '• ' + li.innerText + '\n'); copyToClipboard(text); showStatus(btn); });
-            positiveNegativeItemsContainer.appendChild(strengthsDiv);
-            positiveNegativeItemsContainer.appendChild(improvementDiv);
+            const sDiv = document.createElement('div');
+            sDiv.className = 'p-10 bg-green-50 rounded-[3rem] border-4 border-green-200 shadow-lg hover-zoom w-full mb-4';
+            sDiv.innerHTML = `<h4 class="text-3xl font-black text-green-800 mb-8 uppercase tracking-tighter flex items-center">★ ${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold">${high.length ? high.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-green-100 shadow-sm">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
+            const iDiv = document.createElement('div');
+            iDiv.className = 'p-10 bg-red-50 rounded-[3rem] border-4 border-red-200 shadow-lg hover-zoom w-full mb-4';
+            iDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8 uppercase tracking-tighter flex items-center">⚠ ${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold">${low.length ? low.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-red-100 shadow-sm">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
+            positiveNegativeItemsContainer.appendChild(sDiv);
+            positiveNegativeItemsContainer.appendChild(iDiv);
         }
 
-        // --- NEW: RENDER FINAL RECOMMENDATION ---
         function renderFinalRecommendation(score, weakItems) {
             const d = languageData[currentLang];
-            const evalText = getEvaluationText(score);
-            const scoreFormatted = score.toFixed(2) + "%";
-            
             const div = document.createElement('div');
-            div.className = 'relative p-12 bg-white rounded-[3.5rem] shadow-2xl border-4 border-indigo-400 hover-zoom mb-20 final-recommendation-wrapper';
-            
-            let weakHtml = "";
-            if (score < 85 && weakItems.length > 0) {
-                weakHtml = `<div class="mt-8 pt-8 border-t-2 border-indigo-100"><h5 class="text-xl font-black text-red-700 mb-4">${d.weakPointsTitle}</h5><ul class="space-y-2 font-bold text-slate-700">${weakItems.map(i => `<li class="flex items-start"><span class="mr-2 text-red-500">•</span>${i.item} (${i.posPerc.toFixed(1)}%)</li>`).join('')}</ul></div>`;
-            }
-
+            div.className = 'relative p-12 bg-white rounded-[3.5rem] shadow-2xl border-4 border-indigo-400 hover-zoom mb-20';
             div.innerHTML = `
                 <h2 class="text-4xl thin-title mb-10 text-center text-indigo-900 font-black uppercase tracking-widest border-b-2 border-indigo-50 pb-6">${d.recommendation}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div class="p-8 bg-indigo-50 rounded-[2.5rem] text-center border-2 border-indigo-100 flex flex-col justify-center items-center">
                         <span class="text-xs font-black text-indigo-400 uppercase tracking-widest mb-2">${d.finalScore}</span>
-                        <span class="text-6xl font-black text-indigo-800">${scoreFormatted}</span>
+                        <span class="text-6xl font-black text-indigo-800">${score.toFixed(2)}%</span>
                     </div>
                     <div class="p-8 bg-green-50 rounded-[2.5rem] text-center border-2 border-green-100 flex flex-col justify-center items-center">
-                        <span class="text-xs font-black text-green-400 uppercase tracking-widest mb-2">${currentLang === 'en' ? 'Evaluation' : 'التقييم العام'}</span>
-                        <span class="text-6xl font-black text-green-700">${evalText}</span>
+                        <span class="text-xs font-black text-green-400 uppercase tracking-widest mb-2">${currentLang === 'en' ? 'Evaluation' : 'التقييم'}</span>
+                        <span class="text-6xl font-black text-green-700">${score > 85 ? d.evaluations[0] : score > 75 ? d.evaluations[1] : d.evaluations[2]}</span>
                     </div>
                 </div>
-                ${weakHtml}
             `;
-
-            attachCopyButton(div, (btn) => {
-                let content = `${d.recommendation.toUpperCase()}\n${d.finalScore}: ${scoreFormatted}\n${currentLang === 'en' ? 'Evaluation' : 'التقييم'}: ${evalText}\n`;
-                if (score < 85 && weakItems.length > 0) {
-                    content += `\n${d.weakPointsTitle}\n` + weakItems.map(i => `• ${i.item} (${i.posPerc.toFixed(1)}%)`).join('\n');
-                }
-                copyToClipboard(content);
-                showStatus(btn);
-            });
-
             finalRecommendationContainer.appendChild(div);
         }
-
-        exportButton.onclick = () => {
-            const d = languageData[currentLang];
-            const wb = XLSX.utils.book_new();
-            const sheetData = [[d.reportTitle], [`File: ${fileNameDisplay.textContent}`], [participantCountDisplay.textContent], []];
-            document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper').forEach((wrapper) => {
-                sheetData.push([wrapper.querySelector('h2').innerText.toUpperCase()]);
-                wrapper.querySelectorAll('table tr').forEach(tr => {
-                    const row = [];
-                    tr.querySelectorAll('th, td').forEach(cell => { row.push(cell.innerText); const colspan = parseInt(cell.getAttribute('colspan') || "1"); for(let i=1; i<colspan; i++) row.push(""); });
-                    sheetData.push(row);
-                });
-                sheetData.push([], []);
-            });
-            // Final Recommendation Export logic
-            const finalWrapper = document.querySelector('.final-recommendation-wrapper');
-            if (finalWrapper) {
-                sheetData.push([d.recommendation.toUpperCase()]);
-                const score = finalWrapper.querySelector('.text-6xl.text-indigo-800').innerText;
-                const evalText = finalWrapper.querySelector('.text-6xl.text-green-700').innerText;
-                sheetData.push([d.finalScore, score]);
-                sheetData.push([currentLang === 'en' ? 'Evaluation' : 'التقييم', evalText], []);
-                const weakHeader = finalWrapper.querySelector('h5');
-                if (weakHeader) {
-                    sheetData.push([weakHeader.innerText.toUpperCase()]);
-                    finalWrapper.querySelectorAll('li').forEach(li => sheetData.push(["", li.innerText]));
-                }
-            }
-            const ws = XLSX.utils.aoa_to_sheet(sheetData);
-            XLSX.utils.book_append_sheet(wb, ws, "Analysis");
-            XLSX.writeFile(wb, `${fileNameDisplay.textContent}_Report.xlsx`);
-        };
-
-        copyTableButton.onclick = () => {
-            const d = languageData[currentLang];
-            let content = `${d.reportTitle}\nFile: ${fileNameDisplay.textContent}\n${participantCountDisplay.textContent}\n\n`;
-            document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper').forEach((wrapper) => {
-                content += `${wrapper.querySelector('h2').innerText.toUpperCase()}\n`;
-                wrapper.querySelectorAll('table tr').forEach(tr => {
-                    const rowArr = [];
-                    tr.querySelectorAll('th, td').forEach(c => { rowArr.push(c.innerText); const span = parseInt(c.getAttribute('colspan') || "1"); for(let i=1; i<span; i++) rowArr.push(""); });
-                    content += rowArr.join('\t') + '\n';
-                });
-                content += '\n';
-            });
-            const finalWrapper = document.querySelector('.final-recommendation-wrapper');
-            if (finalWrapper) {
-                content += `--- ${d.recommendation.toUpperCase()} ---\n`;
-                content += `${d.finalScore}: ${finalWrapper.querySelector('.text-6xl.text-indigo-800').innerText}\n`;
-                content += `${currentLang === 'en' ? 'Evaluation' : 'التقييم'}: ${finalWrapper.querySelector('.text-6xl.text-green-700').innerText}\n`;
-                const weakHeader = finalWrapper.querySelector('h5');
-                if (weakHeader) {
-                    content += `\n${weakHeader.innerText}\n`;
-                    finalWrapper.querySelectorAll('li').forEach(li => content += `• ${li.innerText}\n`);
-                }
-            }
-            if (copyToClipboard(content)) { alert(d.copied); }
-        };
-
-        document.getElementById('showVerticalTemplateBtn').onclick = () => { document.getElementById('templateGuideContainer').classList.remove('hidden'); document.getElementById('verticalTemplateContent').classList.remove('hidden'); document.getElementById('horizontalTemplateContent').classList.add('hidden'); };
-        document.getElementById('showHorizontalTemplateBtn').onclick = () => { document.getElementById('templateGuideContainer').classList.remove('hidden'); document.getElementById('horizontalTemplateContent').classList.remove('hidden'); document.getElementById('verticalTemplateContent').classList.add('hidden'); };
-        document.getElementById('closeTemplateGuideBtn').onclick = () => document.getElementById('templateGuideContainer').classList.add('hidden');
 
         updateUI();
     });
     </script>
 </body>
 </html>
-
