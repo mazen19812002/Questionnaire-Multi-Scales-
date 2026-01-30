@@ -13,7 +13,7 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #e0f2fe;
+            background-color: #e0f2fe; /* Light Blue Background */
             color: #0f172a;
             min-height: 100vh;
             display: flex;
@@ -25,6 +25,7 @@
             letter-spacing: -0.025em;
         }
 
+        /* Hover Zoom Transition */
         .hover-zoom {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
@@ -33,6 +34,7 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
+        /* Large Styled Buttons */
         .btn-execute {
             background-color: #22c55e;
             color: white;
@@ -41,7 +43,7 @@
         }
         .btn-execute:hover {
             background-color: #16a34a;
-            transform: scale(1.05);
+            transform: scale(1.03);
         }
 
         .btn-cancel {
@@ -52,9 +54,10 @@
         }
         .btn-cancel:hover {
             background-color: #dc2626;
-            transform: scale(1.05);
+            transform: scale(1.03);
         }
 
+        /* Transparent Copy Icons */
         .copy-btn-wrapper {
             position: absolute;
             top: 1rem;
@@ -110,6 +113,7 @@
             padding-right: 2.5rem;
         }
 
+        /* Qualitative Result Style */
         .suggestion-box {
             background-color: #f8fafc;
             border: 2px solid #e2e8f0;
@@ -127,7 +131,7 @@
             box-shadow: inset 0 2px 10px 0 rgba(0, 0, 0, 0.03);
         }
 
-        .domain-result-wrapper, .suggestion-wrapper {
+        .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper {
             animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -216,7 +220,7 @@
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 text-center md:text-left">
                 <div>
                     <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 uppercase font-black">Step 3: Define Scale Orders</h2>
-                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic">Rank scale items. Qualitative data columns (e.g. jobs, comments) are automatically separated.</p>
+                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic">Rank items within groups. Qualitative boxes (suggestions) are detected automatically.</p>
                 </div>
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center">
                     <label class="font-black text-xs text-slate-800 mr-4 uppercase tracking-tighter" id="labelThreshold">Positives Threshold (%):</label>
@@ -248,33 +252,12 @@
     <div id="templateGuideContainer" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4">
         <div class="bg-white p-10 rounded-[3rem] shadow-2xl max-w-4xl w-full relative border-4 border-indigo-100">
             <button id="closeTemplateGuideBtn" class="absolute top-6 right-8 text-white w-12 h-12 flex items-center justify-center btn-cancel rounded-full text-2xl font-black transition-all">&times;</button>
-            <h3 id="templateGuideTitle" class="text-3xl thin-title mb-8 border-b pb-4 text-slate-900 font-black uppercase tracking-widest text-center">Excel Formatting Example</h3>
+            <h3 id="templateGuideTitle" class="text-3xl thin-title mb-8 border-b pb-4 text-slate-900 font-black uppercase tracking-widest text-center">Excel Formatting Examples</h3>
             <div id="verticalTemplateContent" class="hidden space-y-6">
-                <div class="overflow-hidden rounded-2xl border border-indigo-100 shadow-inner">
-                    <table class="w-full text-sm font-bold text-slate-700">
-                        <thead class="bg-indigo-600 text-white">
-                            <tr><th class="p-3 border">Timestamp</th><th class="p-3 border bg-indigo-800">Item Name</th><th class="p-3 border bg-indigo-800">Job/Comments</th></tr>
-                        </thead>
-                        <tbody class="bg-indigo-50">
-                            <tr><td class="p-3 border">12/01/24</td><td class="p-3 border">Excellent</td><td class="p-3 border">Keep up the good work</td></tr>
-                            <tr><td class="p-3 border">12/01/24</td><td class="p-3 border">Good</td><td class="p-3 border">Need more training</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <p class="text-indigo-800 font-bold text-center italic">Qualitative columns will be aggregated automatically in the final report.</p>
+                <p class="text-indigo-800 font-bold text-center italic">Best for Google Forms / MS Forms exports. Questions are in the top header row.</p>
             </div>
             <div id="horizontalTemplateContent" class="hidden space-y-6">
-                <div class="overflow-hidden rounded-2xl border border-indigo-100 shadow-inner">
-                    <table class="w-full text-sm font-bold text-slate-700">
-                        <thead class="bg-indigo-600 text-white">
-                            <tr><th class="p-3 border">Item</th><th class="p-3 border">User 1</th><th class="p-3 border">User 2</th></tr>
-                        </thead>
-                        <tbody class="bg-indigo-50">
-                            <tr><td class="p-3 border bg-white">How is the staff?</td><td class="p-3 border">Good</td><td class="p-3 border">Excellent</td></tr>
-                            <tr><td class="p-3 border bg-white">Your Suggestions</td><td class="p-3 border">More parking</td><td class="p-3 border">Better Wi-Fi</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+                <p class="text-indigo-800 font-bold text-center italic">Items are listed in a specific column (e.g., Column A).</p>
             </div>
             <div class="mt-10 text-center">
                 <button id="closeModalAction" class="px-10 py-3 btn-execute rounded-xl font-black uppercase tracking-widest shadow-lg">Got it!</button>
@@ -340,7 +323,7 @@
                 headers: { no: '#', item: 'Item Statement', domain: 'Domain Name', total: 'Total (%)', positives: 'Positives (%)', footer: 'Overall Averages' },
                 strengths: 'Core Strengths',
                 improvement: 'Critical Improvement Areas',
-                emptyList: 'No feedback provided',
+                emptyList: 'No responses available',
                 groupLabel: 'Scale Group',
                 copied: 'Copied!',
                 recommendation: 'Recommendation',
@@ -363,7 +346,7 @@
                 headers: { no: '#', item: 'بيان البند', domain: 'اسم المجال', total: 'الإجمالي (%)', positives: 'الإيجابيات (%)', footer: 'المتوسطات الكلية' },
                 strengths: 'نقاط القوة الأساسية',
                 improvement: 'مجالات التحسين الحرجة',
-                emptyList: 'لا توجد ردود مقدمة',
+                emptyList: 'لا توجد ردود متاحة',
                 groupLabel: 'مجموعة المقياس',
                 copied: 'تم النسخ!',
                 recommendation: 'التوصية',
@@ -462,7 +445,8 @@
             respStartIndexSelect.innerHTML = '';
             if (dataOrientation === 'columns') {
                 data.slice(0, 15).forEach((row, i) => {
-                    const label = (row[0] || row[1] || row[2]) ? `Row ${i+1}: ${String(row[0] || row[1] || row[2]).substring(0, 40)}...` : `Row ${i+1}`;
+                    const rowContent = row.filter(x => x).join(' | ');
+                    const label = rowContent ? `Row ${i+1}: ${rowContent.substring(0, 45)}...` : `Row ${i+1}`;
                     itemIndexSelect.add(new Option(label, i));
                     respStartIndexSelect.add(new Option(label, i));
                 });
@@ -488,18 +472,21 @@
             itemToScaleGroup.clear();
             
             if (dataOrientation === 'columns') {
-                const rowHeader = rawExcelData[headerIdx];
-                if (!rowHeader) return;
+                const rowHeader = rawExcelData[headerIdx] || [];
                 for (let col = 0; col < rowHeader.length; col++) {
                     const resps = [];
                     for (let r = dataStartIdx; r < rawExcelData.length; r++) {
-                        const v = String(rawExcelData[r][col] || "").trim();
-                        if (v !== "") resps.push(v);
+                        if (rawExcelData[r]) {
+                            const v = String(rawExcelData[r][col] || "").trim();
+                            if (v !== "") resps.push(v);
+                        }
                     }
                     const opts = new Set(resps);
                     if (opts.size > 0) {
-                        const avgLen = resps.reduce((s, x) => s + x.length, 0) / (resps.length || 1);
-                        const isSugg = opts.size > 7 || avgLen > 15;
+                        const totalLen = resps.reduce((s, x) => s + x.length, 0);
+                        const avgLen = totalLen / (resps.length || 1);
+                        // DETECTION: More than 5 unique variations = qualitative feedback (Respondents Suggestions)
+                        const isSugg = opts.size > 5 || avgLen > 18;
                         const sig = Array.from(opts).sort().join('|');
                         if (!identifiedScaleGroups.has(sig)) {
                             identifiedScaleGroups.set(sig, { options: Array.from(opts), positives: new Set(), isSuggestion: isSugg });
@@ -509,11 +496,13 @@
                 }
             } else {
                 rawExcelData.slice(dataStartIdx).forEach((row, i) => {
+                    if (!row) return;
                     const resps = row.slice(1).map(v => String(v || "").trim()).filter(v => v !== "");
                     const opts = new Set(resps);
                     if (opts.size > 0) {
-                        const avgLen = resps.reduce((s, x) => s + x.length, 0) / (resps.length || 1);
-                        const isSugg = opts.size > 7 || avgLen > 15;
+                        const totalLen = resps.reduce((s, x) => s + x.length, 0);
+                        const avgLen = totalLen / (resps.length || 1);
+                        const isSugg = opts.size > 5 || avgLen > 18;
                         const sig = Array.from(opts).sort().join('|');
                         if (!identifiedScaleGroups.has(sig)) {
                             identifiedScaleGroups.set(sig, { options: Array.from(opts), positives: new Set(), isSuggestion: isSugg });
@@ -584,13 +573,15 @@
                 if (dataOrientation === 'columns') {
                     const headers = data[headerIdx] || [];
                     headers.forEach((h, col) => {
-                        itemsRaw.push(h || `Question ${col + 1}`);
-                        responsesRaw.push(data.slice(dataStartIdx).map(row => row[col]));
+                        itemsRaw.push(h || `Column ${col + 1}`);
+                        responsesRaw.push(data.slice(dataStartIdx).map(row => row ? row[col] : ""));
                     });
                 } else {
                     data.slice(dataStartIdx).forEach((row, i) => {
-                        itemsRaw.push(row[0] || `Item ${i + 1}`);
-                        responsesRaw.push(row.slice(1));
+                        if (row) {
+                            itemsRaw.push(row[0] || `Item ${i + 1}`);
+                            responsesRaw.push(row.slice(1));
+                        }
                     });
                 }
 
@@ -611,7 +602,7 @@
                         const domainGroups = {};
                         itemsInGroup.forEach(item => {
                             const match = String(item.txt).match(/(.+) \[(.+)\]/);
-                            const dName = match ? match[1].trim() : (currentLang === 'en' ? 'General Analysis' : 'التحليل العام');
+                            const dName = match ? match[1].trim() : (currentLang === 'en' ? 'General Assessment' : 'التحليل العام');
                             const iText = match ? match[2].trim() : String(item.txt).trim();
                             if (!domainGroups[dName]) domainGroups[dName] = { items: [], data: [] };
                             domainGroups[dName].items.push(iText);
@@ -654,7 +645,7 @@
                 positiveNegativeItemsContainer.classList.remove('hidden');
                 finalRecommendationContainer.classList.remove('hidden');
                 resultsContainer.scrollIntoView({ behavior: 'smooth' });
-            } catch (err) { console.error("Analysis Error:", err); }
+            } catch (err) { console.error("Analysis failed:", err); }
         };
 
         function renderSuggestionBox(title, responses) {
@@ -693,13 +684,13 @@
             html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td class="p-6 text-center table-header-clear uppercase" colspan="2">${d.headers.footer}</td>${opts.map(o => { const tot = rows.reduce((s, r) => s + r.freqs[o], 0); return `<td class="p-6 text-center text-indigo-800 font-black">${totalRes ? (tot/totalRes*100).toFixed(1) : '0.0'}%</td>`; }).join('')}<td class="p-6 text-center text-green-800 font-black text-lg">${avgPos}%</td></tr></tfoot></table></div>`;
             div.innerHTML = html;
             attachCopyButton(div, (btn) => {
-                let content = title + '\n';
+                let textContent = title + '\n';
                 div.querySelectorAll('table tr').forEach(tr => {
                     let rowArr = [];
                     tr.querySelectorAll('th, td').forEach(c => rowArr.push(c.innerText));
-                    content += rowArr.join('\t') + '\n';
+                    textContent += rowArr.join('\t') + '\n';
                 });
-                copyToClipboard(content);
+                copyToClipboard(textContent);
                 showStatus(btn);
             });
             resultsContainer.appendChild(div);
@@ -721,13 +712,13 @@
             html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300"><tr><td class="p-8 text-center table-header-clear uppercase" colspan="2">${d.headers.footer}</td><td class="p-8 text-center text-green-800 text-2xl font-black">${grandAvg}%</td></tr></tfoot></table></div>`;
             div.innerHTML = html;
             attachCopyButton(div, (btn) => {
-                let content = d.summaryTitle + '\n';
+                let textContent = d.summaryTitle + '\n';
                 div.querySelectorAll('table tr').forEach(tr => {
                     let rowArr = [];
                     tr.querySelectorAll('th, td').forEach(c => rowArr.push(c.innerText));
-                    content += rowArr.join('\t') + '\n';
+                    textContent += rowArr.join('\t') + '\n';
                 });
-                copyToClipboard(content);
+                copyToClipboard(textContent);
                 showStatus(btn);
             });
             resultsContainer.appendChild(div);
@@ -783,6 +774,81 @@
             `;
             finalRecommendationContainer.appendChild(div);
         }
+
+        // --- GLOBAL ACTION BUTTONS ---
+        
+        exportButton.onclick = () => {
+            const d = languageData[currentLang];
+            const wb = XLSX.utils.book_new();
+            let allData = [];
+
+            // Header info
+            allData.push([d.reportTitle]);
+            allData.push([`File: ${fileNameDisplay.textContent}`]);
+            allData.push([participantCountDisplay.textContent]);
+            allData.push([]);
+
+            // Get all sections
+            const sections = document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper');
+            if (sections.length === 0) return;
+
+            sections.forEach(section => {
+                const title = section.querySelector('h2').innerText;
+                allData.push([title.toUpperCase()]);
+
+                const table = section.querySelector('table');
+                if (table) {
+                    const rows = table.querySelectorAll('tr');
+                    rows.forEach(tr => {
+                        const rowData = [];
+                        tr.querySelectorAll('th, td').forEach(cell => rowData.push(cell.innerText));
+                        allData.push(rowData);
+                    });
+                }
+
+                const suggBox = section.querySelector('.suggestion-box');
+                if (suggBox) {
+                    allData.push([suggBox.innerText]);
+                }
+                allData.push([]); // spacer
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(allData);
+            XLSX.utils.book_append_sheet(wb, ws, "Analysis Report");
+            XLSX.writeFile(wb, `${fileNameDisplay.textContent}_Report.xlsx`);
+        };
+
+        copyTableButton.onclick = () => {
+            const d = languageData[currentLang];
+            const sections = document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper');
+            if (sections.length === 0) return;
+
+            let content = `${d.reportTitle}\nFile: ${fileNameDisplay.textContent}\n${participantCountDisplay.textContent}\n\n`;
+
+            sections.forEach(section => {
+                const title = section.querySelector('h2').innerText;
+                content += `--- ${title.toUpperCase()} ---\n`;
+
+                const table = section.querySelector('table');
+                if (table) {
+                    table.querySelectorAll('tr').forEach(tr => {
+                        let cells = [];
+                        tr.querySelectorAll('th, td').forEach(c => cells.push(c.innerText));
+                        content += cells.join('\t') + '\n';
+                    });
+                }
+
+                const suggBox = section.querySelector('.suggestion-box');
+                if (suggBox) {
+                    content += suggBox.innerText + '\n';
+                }
+                content += '\n';
+            });
+
+            if (copyToClipboard(content)) {
+                showStatus(copyTableButton);
+            }
+        };
 
         updateUI();
     });
