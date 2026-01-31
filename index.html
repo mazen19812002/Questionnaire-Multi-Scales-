@@ -13,7 +13,7 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #e0f2fe; /* Light Blue Background */
+            background-color: #e0f2fe;
             color: #0f172a;
             min-height: 100vh;
             display: flex;
@@ -25,7 +25,6 @@
             letter-spacing: -0.025em;
         }
 
-        /* Hover Zoom Transition */
         .hover-zoom {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
@@ -34,7 +33,6 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Large Styled Buttons */
         .btn-execute {
             background-color: #22c55e;
             color: white;
@@ -57,7 +55,6 @@
             transform: scale(1.03);
         }
 
-        /* Transparent Copy Icons */
         .copy-btn-wrapper {
             position: absolute;
             top: 1rem;
@@ -113,7 +110,6 @@
             padding-right: 2.5rem;
         }
 
-        /* Qualitative Result Style */
         .suggestion-box {
             background-color: #f8fafc;
             border: 2px solid #e2e8f0;
@@ -131,7 +127,7 @@
             box-shadow: inset 0 2px 10px 0 rgba(0, 0, 0, 0.03);
         }
 
-        .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper {
+        .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper, .filter-section-wrapper, .scale-order-wrapper {
             animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -147,7 +143,6 @@
     </style>
 </head>
 <body class="p-4 md:p-12">
-
     <div class="flex justify-between items-start mb-8">
         <img src="00.png" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo1'">
         <img src="02.jpg" alt="Logo" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo2'">
@@ -168,6 +163,7 @@
             </div>
         </div>
 
+        <!-- Step 1: Upload -->
         <div class="max-w-xl mx-auto mb-10">
             <div id="fileUploadSection" class="input-card flex flex-col items-center justify-center border-dashed border-2 border-blue-200 hover:border-blue-400 transition-colors">
                 <label for="xlsxFile" class="cursor-pointer w-full text-center">
@@ -181,6 +177,7 @@
             </div>
         </div>
 
+        <!-- Step 2: Config -->
         <div id="dataConfigSection" class="hidden grid grid-cols-1 gap-8 mb-10">
             <div class="input-card bg-blue-50/50">
                 <div class="text-center border-b border-blue-100 pb-4 mb-6">
@@ -210,17 +207,46 @@
 
                 <div class="flex justify-center">
                     <button id="confirmMappingBtn" class="px-10 py-4 btn-execute text-xl font-black rounded-2xl shadow-lg hover-zoom uppercase tracking-wide">
-                        Confirm Mapping & Discriminate Scales
+                        Confirm Mapping & Proceed
                     </button>
                 </div>
             </div>
         </div>
 
-        <div id="scaleOrderSection" class="hidden mb-10 p-8 bg-slate-100 rounded-3xl shadow-inner border border-slate-200">
+        <!-- Step 3: Optional Filtering -->
+        <div id="filterSection" class="hidden mb-10 filter-section-wrapper">
+            <div class="input-card bg-amber-50/50 border-amber-200">
+                <div class="text-center mb-6">
+                    <h2 id="filterTitle" class="text-3xl thin-title text-slate-900 uppercase font-black">Step 3: Optional Filter Tool</h2>
+                    <p id="filterSubtitle" class="text-amber-700 text-sm font-bold italic">Select a specific group to analyze (e.g., Department A only)</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="flex flex-col">
+                        <label id="labelFilterCol" class="text-xs font-black text-amber-800 mb-2 uppercase tracking-widest">Filter Column/Row</label>
+                        <select id="filterSourceSelect" class="p-4 border border-amber-200 rounded-2xl bg-white focus:ring-4 focus:ring-amber-100 outline-none hover-zoom font-black text-slate-900 shadow-sm">
+                            <option value="">-- No Filter --</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col">
+                        <label id="labelFilterValue" class="text-xs font-black text-amber-800 mb-2 uppercase tracking-widest">Target Value</label>
+                        <select id="filterValueSelect" class="p-4 border border-amber-200 rounded-2xl bg-white focus:ring-4 focus:ring-amber-100 outline-none hover-zoom font-black text-slate-900 shadow-sm">
+                            <option value="">-- Select a value --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-center space-x-4">
+                    <button id="clearFilterBtn" class="px-6 py-3 btn-cancel text-sm font-black rounded-xl shadow-lg hover-zoom uppercase tracking-wide">Clear Filter</button>
+                    <p id="filterStatus" class="flex items-center text-xs font-black text-indigo-700 italic uppercase">All data included</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Scale Orders -->
+        <div id="scaleOrderSection" class="hidden mb-10 p-8 bg-slate-100 rounded-3xl shadow-inner border border-slate-200 scale-order-wrapper">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 text-center md:text-left">
                 <div>
-                    <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 uppercase font-black">Step 3: Define Scale Orders</h2>
-                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic">Rank items within groups. Qualitative boxes (suggestions) are detected automatically.</p>
+                    <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 uppercase font-black">Step 4: Define Scale Orders</h2>
+                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic">Rank items within groups. Qualitative boxes are detected automatically.</p>
                 </div>
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center">
                     <label class="font-black text-xs text-slate-800 mr-4 uppercase tracking-tighter" id="labelThreshold">Positives Threshold (%):</label>
@@ -230,6 +256,7 @@
             <div id="scaleGroupsContainer" class="space-y-10"></div>
         </div>
 
+        <!-- Analysis Actions -->
         <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
             <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase tracking-tighter">Analyze Data Now</button>
             <div class="flex gap-4 w-full justify-center">
@@ -238,17 +265,21 @@
             </div>
         </div>
 
+        <!-- Display Stats -->
         <div class="text-center mb-10">
             <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 mb-2 hidden uppercase font-black"></p>
             <p id="participantCountDisplay" class="text-2xl text-indigo-800 font-black hidden uppercase tracking-tighter"></p>
+            <p id="filterAppliedDisplay" class="text-sm text-amber-600 font-bold uppercase italic mt-2 hidden"></p>
         </div>
 
+        <!-- Results Blocks -->
         <div id="resultsContainer" class="hidden space-y-16"></div>
         <div id="chartContainer" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-10 mt-12"></div>
         <div id="positiveNegativeItemsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 mt-12"></div>
         <div id="finalRecommendationContainer" class="hidden mt-16"></div>
     </main>
 
+    <!-- Template Guides -->
     <div id="templateGuideContainer" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4">
         <div class="bg-white p-10 rounded-[3rem] shadow-2xl max-w-4xl w-full relative border-4 border-indigo-100">
             <button id="closeTemplateGuideBtn" class="absolute top-6 right-8 text-white w-12 h-12 flex items-center justify-center btn-cancel rounded-full text-2xl font-black transition-all">&times;</button>
@@ -295,6 +326,14 @@
         const respStartIndexSelect = document.getElementById('respStartIndexSelect');
         const confirmMappingBtn = document.getElementById('confirmMappingBtn');
 
+        // Filter Elements
+        const filterSection = document.getElementById('filterSection');
+        const filterSourceSelect = document.getElementById('filterSourceSelect');
+        const filterValueSelect = document.getElementById('filterValueSelect');
+        const clearFilterBtn = document.getElementById('clearFilterBtn');
+        const filterStatus = document.getElementById('filterStatus');
+        const filterAppliedDisplay = document.getElementById('filterAppliedDisplay');
+
         const templateModal = document.getElementById('templateGuideContainer');
         const verticalContent = document.getElementById('verticalTemplateContent');
         const horizontalContent = document.getElementById('horizontalTemplateContent');
@@ -307,12 +346,13 @@
         let identifiedScaleGroups = new Map(); 
         let itemToScaleGroup = new Map();
         let chartInstances = [];
+        let activeFilter = null; 
 
         const languageData = {
             en: {
                 reportTitle: 'Questionnaire Analysis Report',
                 title: 'Questionnaire Results Analysis',
-                confirm: 'Confirm Mapping & Discriminate Scales',
+                confirm: 'Confirm Mapping & Proceed',
                 summaryTitle: 'Questionnaire Summary',
                 pos: 'Positive',
                 participants: 'Participants',
@@ -330,12 +370,22 @@
                 finalScore: 'Total Questionnaire Result',
                 evaluations: ["Excellent", "Very Good", "Good", "Acceptable", "Weak"],
                 suggestionsTitle: 'Respondents Suggestions',
-                suggestionsHint: 'Qualitative feedback detected automatically'
+                suggestionsHint: 'Qualitative feedback detected automatically',
+                filterTitle: 'Step 3: Optional Filter Tool',
+                filterSubtitle: 'Select a specific group to analyze (e.g., Department A only)',
+                scaleTitle: 'Step 4: Define Scale Orders',
+                filterByCol: 'Filter Column',
+                filterByRow: 'Filter Row',
+                filterVal: 'Target Value',
+                filterStatusAll: 'All data included',
+                filterStatusActive: 'Filter active',
+                filterDisplayLabel: 'Data Filtered By:',
+                clearFilter: 'Clear Filter'
             },
             ar: {
                 reportTitle: 'تقرير تحليل الاستبيان',
                 title: 'تحليل نتائج الاستبيان',
-                confirm: 'تأكيد الإعداد وتمييز المقاييس',
+                confirm: 'تأكيد الإعداد والمتابعة',
                 summaryTitle: 'ملخص الاستبيان',
                 pos: 'إيجابي',
                 participants: 'مشارك',
@@ -343,8 +393,7 @@
                 h: 'البنود مرتبة في صفوف',
                 btnText: 'الخطوة 1: اختر ملف XLSX',
                 hint: 'قم بتحميل بياناتك للبدء',
-                headers: { no: '#', item: 'بيان البند', domain: 'اسم المجال', total: 'الإجمالي (%)', positives: 'الإيجابيات (%)', footer: 'المتوسطات الكلية' },
-                strengths: 'نقاط القوة الأساسية',
+                headers: { no: '#', item: 'بيان البند', domain: 'اسم المجال', total: 'الإجمالي (%)', positives: 'الإيجابيات (%)', footer: 'المتوسطات الكلية' },                strengths: 'نقاط القوة الأساسية',
                 improvement: 'مجالات التحسين الحرجة',
                 emptyList: 'لا توجد ردود متاحة',
                 groupLabel: 'مجموعة المقياس',
@@ -353,7 +402,17 @@
                 finalScore: 'نتيجة الاستبيان النهائية',
                 evaluations: ["ممتازة", "جيد جداً", "جيدة", "مقبولة", "ضعيفة"],
                 suggestionsTitle: 'مقترحات المستجيبين',
-                suggestionsHint: 'تم اكتشاف ملاحظات نوعية تلقائياً'
+                suggestionsHint: 'تم اكتشاف ملاحظات نوعية تلقائياً',
+                filterTitle: 'الخطوة 3: أداة التصفية الاختيارية',
+                filterSubtitle: 'اختر مجموعة معينة للتحليل (مثل: قسم "أ" فقط)',
+                scaleTitle: 'الخطوة 4: تحديد ترتيب المقاييس',
+                filterByCol: 'تصفية العمود',
+                filterByRow: 'تصفية الصف',
+                filterVal: 'القيمة المستهدفة',
+                filterStatusAll: 'جميع البيانات مضمنة',
+                filterStatusActive: 'التصفية مفعلة',
+                filterDisplayLabel: 'البيانات مصفاة حسب:',
+                clearFilter: 'مسح التصفية'
             }
         };
 
@@ -379,14 +438,24 @@
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-            try { document.execCommand('copy'); document.body.removeChild(textArea); return true; } catch (err) { document.body.removeChild(textArea); return false; }
+            try { 
+                document.execCommand('copy'); 
+                document.body.removeChild(textArea); 
+                return true; 
+            } catch (err) { 
+                document.body.removeChild(textArea); 
+                return false; 
+            }
         }
 
         function attachCopyButton(container, copyLogic) {
             const wrapper = document.createElement('div');
             wrapper.className = 'copy-btn-wrapper';
             wrapper.innerHTML = `<div class="copy-btn-inner" title="Copy section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></div>`;
-            wrapper.onclick = (e) => { e.stopPropagation(); copyLogic(wrapper.querySelector('.copy-btn-inner')); };
+            wrapper.onclick = (e) => { 
+                e.stopPropagation(); 
+                copyLogic(wrapper.querySelector('.copy-btn-inner')); 
+            };
             container.style.position = 'relative';
             container.appendChild(wrapper);
         }
@@ -394,7 +463,7 @@
         function showStatus(btnEl) {
             const originalHtml = btnEl.innerHTML;
             btnEl.innerHTML = `<span class="text-[12px] font-black uppercase px-2 text-green-600">${languageData[currentLang].copied}</span>`;
-            setTimeout(() => btnEl.innerHTML = originalHtml, 2000);
+            setTimeout(() => { btnEl.innerHTML = originalHtml; }, 2000);
         }
 
         function updateUI() {
@@ -405,9 +474,26 @@
             document.getElementById('labelVertical').textContent = d.v;
             document.getElementById('labelHorizontal').textContent = d.h;
             confirmMappingBtn.textContent = d.confirm;
+            
+            document.getElementById('filterTitle').textContent = d.filterTitle;
+            document.getElementById('filterSubtitle').textContent = d.filterSubtitle;
+            document.getElementById('scaleOrderTitle').textContent = d.scaleTitle;
+            
+            document.getElementById('labelFilterCol').textContent = dataOrientation === 'columns' ? d.filterByCol : d.filterByRow;
+            document.getElementById('labelFilterValue').textContent = d.filterVal;
+            clearFilterBtn.textContent = d.clearFilter;
+            
             langEn.classList.toggle('active-lang', currentLang === 'en');
             langAr.classList.toggle('active-lang', currentLang === 'ar');
             document.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+
+            if (activeFilter) {
+                filterStatus.textContent = d.filterStatusActive;
+                filterStatus.classList.replace('text-indigo-700', 'text-green-600');
+            } else {
+                filterStatus.textContent = d.filterStatusAll;
+                filterStatus.classList.replace('text-green-600', 'text-indigo-700');
+            }
         }
 
         langEn.onclick = () => { currentLang = 'en'; updateUI(); if(rawExcelData) renderScaleGroups(); };
@@ -471,8 +557,14 @@
             identifiedScaleGroups.clear();
             itemToScaleGroup.clear();
             
+            filterSourceSelect.innerHTML = `<option value="">-- No Filter --</option>`;
             if (dataOrientation === 'columns') {
                 const rowHeader = rawExcelData[headerIdx] || [];
+                rowHeader.forEach((h, col) => {
+                    const label = h || `Column ${col+1}`;
+                    filterSourceSelect.add(new Option(label, col));
+                });
+
                 for (let col = 0; col < rowHeader.length; col++) {
                     const resps = [];
                     for (let r = dataStartIdx; r < rawExcelData.length; r++) {
@@ -485,7 +577,6 @@
                     if (opts.size > 0) {
                         const totalLen = resps.reduce((s, x) => s + x.length, 0);
                         const avgLen = totalLen / (resps.length || 1);
-                        // DETECTION: More than 5 unique variations = qualitative feedback (Respondents Suggestions)
                         const isSugg = opts.size > 5 || avgLen > 18;
                         const sig = Array.from(opts).sort().join('|');
                         if (!identifiedScaleGroups.has(sig)) {
@@ -497,7 +588,10 @@
             } else {
                 rawExcelData.slice(dataStartIdx).forEach((row, i) => {
                     if (!row) return;
-                    const resps = row.slice(1).map(v => String(v || "").trim()).filter(v => v !== "");
+                    const label = row[headerIdx] || `Row ${i+1}`;
+                    filterSourceSelect.add(new Option(label, i));
+
+                    const resps = row.slice(headerIdx + 1).map(v => String(v || "").trim()).filter(v => v !== "");
                     const opts = new Set(resps);
                     if (opts.size > 0) {
                         const totalLen = resps.reduce((s, x) => s + x.length, 0);
@@ -512,9 +606,62 @@
                 });
             }
             renderScaleGroups();
+            filterSection.classList.remove('hidden');
             scaleOrderSection.classList.remove('hidden');
             actionButtons.classList.remove('hidden');
-            scaleOrderSection.scrollIntoView({ behavior: 'smooth' });
+            updateUI();
+            filterSection.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        filterSourceSelect.onchange = () => {
+            const idx = filterSourceSelect.value;
+            filterValueSelect.innerHTML = `<option value="">-- Select a value --</option>`;
+            if (idx === "") {
+                activeFilter = null;
+                updateUI();
+                return;
+            }
+
+            const headerIdx = parseInt(itemIndexSelect.value);
+            const dataStartIdx = parseInt(respStartIndexSelect.value);
+            const uniqueValues = new Set();
+
+            if (dataOrientation === 'columns') {
+                for (let r = dataStartIdx; r < rawExcelData.length; r++) {
+                    const val = String(rawExcelData[r]?.[idx] || "").trim();
+                    if (val) uniqueValues.add(val);
+                }
+            } else {
+                const targetRow = rawExcelData[dataStartIdx + parseInt(idx)];
+                if (targetRow) {
+                    targetRow.slice(headerIdx + 1).forEach(v => {
+                        const val = String(v || "").trim();
+                        if (val) uniqueValues.add(val);
+                    });
+                }
+            }
+
+            uniqueValues.forEach(v => filterValueSelect.add(new Option(v, v)));
+        };
+
+        filterValueSelect.onchange = () => {
+            if (filterValueSelect.value) {
+                activeFilter = { 
+                    index: parseInt(filterSourceSelect.value), 
+                    value: filterValueSelect.value,
+                    label: filterSourceSelect.options[filterSourceSelect.selectedIndex].text
+                };
+            } else {
+                activeFilter = null;
+            }
+            updateUI();
+        };
+
+        clearFilterBtn.onclick = () => {
+            filterSourceSelect.value = "";
+            filterValueSelect.innerHTML = `<option value="">-- Select a value --</option>`;
+            activeFilter = null;
+            updateUI();
         };
 
         function renderScaleGroups() {
@@ -524,8 +671,9 @@
                 if (group.isSuggestion) return;
                 const wrap = document.createElement('div');
                 wrap.className = 'bg-white p-6 rounded-3xl border-2 border-blue-200 shadow-md';
+                const d = languageData[currentLang];
                 wrap.innerHTML = `
-                    <h3 class="font-black text-indigo-900 uppercase tracking-tighter text-xl mb-4">${languageData[currentLang].groupLabel} ${counter++}: ${group.options.join(', ')}</h3>
+                    <h3 class="font-black text-indigo-900 uppercase tracking-tighter text-xl mb-4">${d.groupLabel} ${counter++}: ${group.options.join(', ')}</h3>
                     <div class="scale-list space-y-3" data-sig="${sig}"></div>
                 `;
                 const list = wrap.querySelector('.scale-list');
@@ -537,10 +685,16 @@
                         <span class="font-black text-slate-900 text-lg truncate pr-4">${opt}</span>
                         <label class="flex items-center cursor-pointer bg-green-100 px-4 py-2 rounded-full border border-green-200">
                             <input type="checkbox" class="w-6 h-6 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}>
-                            <span class="ml-2 text-xs font-black text-green-800 uppercase tracking-widest">${languageData[currentLang].pos}</span>
+                            <span class="ml-2 text-xs font-black text-green-800 uppercase tracking-widest">${d.pos}</span>
                         </label>`;
-                    item.querySelector('input').onchange = (e) => e.target.checked ? group.positives.add(opt) : group.positives.delete(opt);
-                    item.ondragstart = (e) => { e.dataTransfer.setData('idx', idx); e.dataTransfer.setData('sig', sig); };
+                    item.querySelector('input').onchange = (e) => { 
+                        if(e.target.checked) group.positives.add(opt); 
+                        else group.positives.delete(opt); 
+                    };
+                    item.ondragstart = (e) => { 
+                        e.dataTransfer.setData('idx', idx); 
+                        e.dataTransfer.setData('sig', sig); 
+                    };
                     item.ondragover = (e) => e.preventDefault();
                     item.ondrop = (e) => {
                         const fromIdx = e.dataTransfer.getData('idx');
@@ -557,8 +711,10 @@
 
         analyzeButton.onclick = () => {
             try {
-                const data = JSON.parse(sessionStorage.getItem('parsedData'));
-                if (!data) return;
+                const dataStr = sessionStorage.getItem('parsedData');
+                if (!dataStr) return;
+                const data = JSON.parse(dataStr);
+                
                 resultsContainer.innerHTML = '';
                 chartContainer.innerHTML = '';
                 positiveNegativeItemsContainer.innerHTML = '';
@@ -568,19 +724,31 @@
 
                 const headerIdx = parseInt(itemIndexSelect.value);
                 const dataStartIdx = parseInt(respStartIndexSelect.value);
+                
                 let itemsRaw = [], responsesRaw = [];
                 
                 if (dataOrientation === 'columns') {
                     const headers = data[headerIdx] || [];
                     headers.forEach((h, col) => {
                         itemsRaw.push(h || `Column ${col + 1}`);
-                        responsesRaw.push(data.slice(dataStartIdx).map(row => row ? row[col] : ""));
+                        const columnData = data.slice(dataStartIdx).filter(row => {
+                            if (!activeFilter) return true;
+                            const checkVal = String(row[activeFilter.index] || "").trim();
+                            return checkVal === activeFilter.value;
+                        }).map(row => row ? row[col] : "");
+                        responsesRaw.push(columnData);
                     });
                 } else {
                     data.slice(dataStartIdx).forEach((row, i) => {
                         if (row) {
-                            itemsRaw.push(row[0] || `Item ${i + 1}`);
-                            responsesRaw.push(row.slice(1));
+                            itemsRaw.push(row[headerIdx] || `Item ${i + 1}`);
+                            const rowData = row.slice(headerIdx + 1).filter((val, colIdx) => {
+                                if (!activeFilter) return true;
+                                const filterTargetRow = data[dataStartIdx + activeFilter.index];
+                                const checkVal = String(filterTargetRow?.[colIdx + headerIdx + 1] || "").trim();
+                                return checkVal === activeFilter.value;
+                            });
+                            responsesRaw.push(rowData);
                         }
                     });
                 }
@@ -588,57 +756,90 @@
                 participantCountDisplay.textContent = `${responsesRaw[0]?.length || 0} ${languageData[currentLang].participants}`;
                 participantCountDisplay.classList.remove('hidden');
 
+                if (activeFilter) {
+                    filterAppliedDisplay.textContent = `${languageData[currentLang].filterDisplayLabel} ${activeFilter.label} = ${activeFilter.value}`;
+                    filterAppliedDisplay.classList.remove('hidden');
+                } else {
+                    filterAppliedDisplay.classList.add('hidden');
+                }
+
                 const summaryData = [];
                 const allItemsList = [];
+                const processedDomains = new Set();
 
-                identifiedScaleGroups.forEach((groupData, sig) => {
-                    const itemsInGroup = [];
-                    itemsRaw.forEach((txt, idx) => { if(itemToScaleGroup.get(idx) === sig) itemsInGroup.push({txt, responses: responsesRaw[idx]}); });
-                    if(itemsInGroup.length === 0) return;
+                for (let i = 0; i < itemsRaw.length; i++) {
+                    if (activeFilter && i === activeFilter.index) continue;
+
+                    const sig = itemToScaleGroup.get(i);
+                    const groupData = identifiedScaleGroups.get(sig);
+                    if (!groupData) continue;
+
+                    const itemText = itemsRaw[i];
+                    const itemResponses = responsesRaw[i];
 
                     if (groupData.isSuggestion) {
-                        itemsInGroup.forEach(item => renderSuggestionBox(item.txt, item.responses));
+                        renderSuggestionBox(itemText, itemResponses);
                     } else {
-                        const domainGroups = {};
-                        itemsInGroup.forEach(item => {
-                            const match = String(item.txt).match(/(.+) \[(.+)\]/);
-                            const dName = match ? match[1].trim() : (currentLang === 'en' ? 'General Assessment' : 'التحليل العام');
-                            const iText = match ? match[2].trim() : String(item.txt).trim();
-                            if (!domainGroups[dName]) domainGroups[dName] = { items: [], data: [] };
-                            domainGroups[dName].items.push(iText);
-                            domainGroups[dName].data.push(item.responses);
-                        });
-
-                        Object.entries(domainGroups).forEach(([dName, group]) => {
-                            const rows = group.items.map((it, idx) => {
-                                const rps = group.data[idx] || [];
-                                const freqs = {};
-                                groupData.options.forEach(o => freqs[o] = 0);
-                                let posCount = 0;
-                                rps.forEach(r => {
-                                    const tr = String(r || "").trim();
-                                    if (freqs[tr] !== undefined) freqs[tr]++;
-                                    if (groupData.positives.has(tr)) posCount++;
-                                });
-                                const res = { item: it, freqs, total: rps.length, posPerc: rps.length ? (posCount/rps.length)*100 : 0 };
-                                allItemsList.push(res);
-                                return res;
+                        const match = String(itemText).match(/(.+) \[(.+)\]/);
+                        const dName = match ? match[1].trim() : (currentLang === 'en' ? 'General Assessment' : 'التحليل العام');
+                        
+                        if (!processedDomains.has(dName)) {
+                            const domainItems = [];
+                            itemsRaw.forEach((txt, idx) => {
+                                if (activeFilter && idx === activeFilter.index) return;
+                                const m = String(txt).match(/(.+) \[(.+)\]/);
+                                const currentDName = m ? m[1].trim() : (currentLang === 'en' ? 'General Assessment' : 'التحليل العام');
+                                if (currentDName === dName) {
+                                    const shortText = m ? m[2].trim() : String(txt).trim();
+                                    domainItems.push({ full: txt, short: shortText, responses: responsesRaw[idx], sig: itemToScaleGroup.get(idx) });
+                                }
                             });
-                            renderTable(dName, rows, groupData.options, groupData.positives);
-                            renderChart(dName, rows, groupData.options);
-                            const domainFreqs = {};
-                            groupData.options.forEach(o => domainFreqs[o] = rows.reduce((s, r) => s + r.freqs[o], 0));
-                            summaryData.push({ name: dName, freqs: domainFreqs, total: rows.reduce((s, r) => s + r.total, 0), positives: groupData.positives });
-                        });
+
+                            if (domainItems.length > 0) {
+                                const rows = domainItems.map(di => {
+                                    const diGroup = identifiedScaleGroups.get(di.sig);
+                                    const freqs = {};
+                                    diGroup.options.forEach(o => freqs[o] = 0);
+                                    let posCount = 0;
+                                    di.responses.forEach(r => {
+                                        const tr = String(r || "").trim();
+                                        if (freqs[tr] !== undefined) freqs[tr]++;
+                                        if (diGroup.positives.has(tr)) posCount++;
+                                    });
+                                    const res = { item: di.short, freqs, total: di.responses.length, posPerc: di.responses.length ? (posCount/di.responses.length)*100 : 0 };
+                                    allItemsList.push(res);
+                                    return res;
+                                });
+
+                                renderTable(dName, rows, groupData.options, groupData.positives);
+                                renderChart(dName, rows, groupData.options);
+
+                                const domainFreqs = {};
+                                groupData.options.forEach(o => {
+                                    domainFreqs[o] = rows.reduce((s, r) => s + r.freqs[o], 0);
+                                });
+                                summaryData.push({ 
+                                    name: dName, 
+                                    freqs: domainFreqs, 
+                                    total: rows.reduce((s, r) => s + r.total, 0), 
+                                    positives: groupData.positives 
+                                });
+                                processedDomains.add(dName);
+                            }
+                        }
                     }
-                });
+                }
 
                 if (summaryData.length > 0) {
                     renderSummaryTable(summaryData);
                     renderHighlightLists(allItemsList);
                     const grandTotal = summaryData.reduce((s, dm) => s + dm.total, 0);
-                    const grandPos = summaryData.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
-                    renderFinalRecommendation(grandTotal ? (grandPos / grandTotal * 100) : 0, allItemsList.filter(i => i.posPerc < 85));
+                    const grandPos = summaryData.reduce((s, dm) => {
+                        const posSum = Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0);
+                        return s + posSum;
+                    }, 0);
+                    const finalScore = grandTotal ? (grandPos / grandTotal * 100) : 0;
+                    renderFinalRecommendation(finalScore);
                 }
                 resultsContainer.classList.remove('hidden');
                 chartContainer.classList.remove('hidden');
@@ -664,7 +865,10 @@
                     <div class="suggestion-box">${joined || `<span class="italic text-slate-400 font-bold">${d.emptyList}</span>`}</div>
                 </div>
             `;
-            attachCopyButton(div, (btn) => { copyToClipboard(`${title}\n---\n${joined}`); showStatus(btn); });
+            attachCopyButton(div, (btn) => { 
+                copyToClipboard(`${title}\n---\n${joined}`); 
+                showStatus(btn); 
+            });
             resultsContainer.appendChild(div);
         }
 
@@ -672,17 +876,28 @@
             const d = languageData[currentLang];
             const div = document.createElement('div');
             div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-blue-100 overflow-hidden hover-zoom mb-10 domain-result-wrapper';
+            
             const totalRes = rows.reduce((s, r) => s + r.total, 0);
             const domainPos = rows.reduce((s, r) => s + Array.from(positives).reduce((sum, opt) => sum + (r.freqs[opt] || 0), 0), 0);
             const avgPos = totalRes ? (domainPos / totalRes * 100).toFixed(1) : '0.0';
 
+            let optsHtml = opts.map(o => `<th class="p-6 text-center table-header-clear text-indigo-700">${o}</th>`).join('');
             let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black uppercase tracking-tight">${title}</h2>`;
-            html += `<div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="bg-slate-100 border-b-2 border-slate-200"><tr><th class="p-6 text-center table-header-clear">${d.headers.no}</th><th class="p-6 table-header-clear">${d.headers.item}</th>${opts.map(o => `<th class="p-6 text-center table-header-clear text-indigo-700">${o}</th>`).join('')}<th class="p-6 text-center text-blue-800 font-black uppercase tracking-widest">${d.headers.positives}</th></tr></thead><tbody class="divide-y divide-slate-100">`;
+            html += `<div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="bg-slate-100 border-b-2 border-slate-200"><tr><th class="p-6 text-center table-header-clear">${d.headers.no}</th><th class="p-6 table-header-clear">${d.headers.item}</th>${optsHtml}<th class="p-6 text-center text-blue-800 font-black uppercase tracking-widest">${d.headers.positives}</th></tr></thead><tbody class="divide-y divide-slate-100">`;
+            
             rows.forEach((r, i) => {
-                html += `<tr class="hover:bg-blue-50/40 transition-colors"><td class="p-6 text-center text-slate-500 font-black">${i+1}</td><td class="p-6 font-bold text-slate-800">${r.item}</td>${opts.map(o => `<td class="p-6 text-center text-slate-700 font-bold">${r.total ? (r.freqs[o]/r.total*100).toFixed(1) : '0.0'}%</td>`).join('')}<td class="p-6 text-center font-black text-green-700 bg-green-50/30">${r.posPerc.toFixed(1)}%</td></tr>`;
+                const optCells = opts.map(o => `<td class="p-6 text-center text-slate-700 font-bold">${r.total ? (r.freqs[o]/r.total*100).toFixed(1) : '0.0'}%</td>`).join('');
+                html += `<tr class="hover:bg-blue-50/40 transition-colors"><td class="p-6 text-center text-slate-500 font-black">${i+1}</td><td class="p-6 font-bold text-slate-800">${r.item}</td>${optCells}<td class="p-6 text-center font-black text-green-700 bg-green-50/30">${r.posPerc.toFixed(1)}%</td></tr>`;
             });
-            html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td class="p-6 text-center table-header-clear uppercase" colspan="2">${d.headers.footer}</td>${opts.map(o => { const tot = rows.reduce((s, r) => s + r.freqs[o], 0); return `<td class="p-6 text-center text-indigo-800 font-black">${totalRes ? (tot/totalRes*100).toFixed(1) : '0.0'}%</td>`; }).join('')}<td class="p-6 text-center text-green-800 font-black text-lg">${avgPos}%</td></tr></tfoot></table></div>`;
+            
+            const footerCells = opts.map(o => { 
+                const tot = rows.reduce((s, r) => s + r.freqs[o], 0); 
+                return `<td class="p-6 text-center text-indigo-800 font-black">${totalRes ? (tot/totalRes*100).toFixed(1) : '0.0'}%</td>`; 
+            }).join('');
+            
+            html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td class="p-6 text-center table-header-clear uppercase" colspan="2">${d.headers.footer}</td>${footerCells}<td class="p-6 text-center text-green-800 font-black text-lg">${avgPos}%</td></tr></tfoot></table></div>`;
             div.innerHTML = html;
+            
             attachCopyButton(div, (btn) => {
                 let textContent = title + '\n';
                 div.querySelectorAll('table tr').forEach(tr => {
@@ -700,17 +915,21 @@
             const d = languageData[currentLang];
             const div = document.createElement('div');
             div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-200 overflow-hidden hover-zoom mt-16 summary-table-wrapper';
+            
             const grandTotal = data.reduce((s, dm) => s + dm.total, 0);
             const grandPos = data.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
             const grandAvg = grandTotal ? (grandPos / grandTotal * 100).toFixed(1) : '0.0';
 
             let html = `<h2 class="text-4xl thin-title p-8 bg-indigo-700 text-white font-black uppercase tracking-widest text-center shadow-inner">${d.summaryTitle}</h2><div class="overflow-x-auto"><table class="w-full text-lg text-left"><thead class="bg-indigo-50 border-b-4 border-indigo-100"><tr><th class="p-8 text-center table-header-clear">${d.headers.no}</th><th class="p-8 table-header-clear">${d.headers.domain}</th><th class="p-8 text-center table-header-clear text-green-700">${d.headers.positives}</th></tr></thead><tbody class="divide-y-2 divide-indigo-50">`;
+            
             data.forEach((dm, i) => {
                 const posSum = Array.from(dm.positives).reduce((s, o) => s + (dm.freqs[o] || 0), 0);
                 html += `<tr class="hover:bg-indigo-50/50"><td class="p-8 text-center font-black text-indigo-300">${i+1}</td><td class="p-8 font-black text-slate-800">${dm.name}</td><td class="p-8 text-center font-black text-green-600 text-2xl bg-green-50/20">${dm.total ? (posSum/dm.total*100).toFixed(1) : '0.0'}%</td></tr>`;
             });
+            
             html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300"><tr><td class="p-8 text-center table-header-clear uppercase" colspan="2">${d.headers.footer}</td><td class="p-8 text-center text-green-800 text-2xl font-black">${grandAvg}%</td></tr></tfoot></table></div>`;
             div.innerHTML = html;
+            
             attachCopyButton(div, (btn) => {
                 let textContent = d.summaryTitle + '\n';
                 div.querySelectorAll('table tr').forEach(tr => {
@@ -730,35 +949,77 @@
             div.className = 'bg-white p-10 rounded-[2.5rem] shadow-xl border-2 border-blue-100 hover-zoom flex flex-col items-center';
             div.innerHTML = `<h3 class="text-2xl font-black text-indigo-900 mb-8 uppercase tracking-tighter text-center">${title}</h3><div class="w-full h-96"><canvas id="${canvasId}"></canvas></div>`;
             chartContainer.appendChild(div);
+            
             const ctx = document.getElementById(canvasId).getContext('2d');
-            const dataVals = opts.map(o => { const sum = rows.reduce((s, r) => s + r.freqs[o], 0); const total = rows.reduce((s, r) => s + r.total, 0); return total ? (sum/total*100).toFixed(1) : 0; });
+            const dataVals = opts.map(o => { 
+                const sum = rows.reduce((s, r) => s + r.freqs[o], 0); 
+                const total = rows.reduce((s, r) => s + r.total, 0); 
+                return total ? (sum/total*100).toFixed(1) : 0; 
+            });
+
             const ch = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: opts, datasets: [{ data: dataVals, backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], borderRadius: 20 }] },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', color: '#0f172a', font: { weight: '900', size: 16 }, formatter: v => v+'%' } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { weight: '900', size: 14 } } } } }
+                data: { 
+                    labels: opts, 
+                    datasets: [{ 
+                        data: dataVals, 
+                        backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], 
+                        borderRadius: 20 
+                    }] 
+                },
+                options: { 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: false }, 
+                        datalabels: { 
+                            anchor: 'end', 
+                            align: 'top', 
+                            color: '#0f172a', 
+                            font: { weight: '900', size: 16 }, 
+                            formatter: v => v+'%' 
+                        } 
+                    }, 
+                    scales: { 
+                        y: { display: false }, 
+                        x: { grid: { display: false }, ticks: { font: { weight: '900', size: 14 } } } 
+                    } 
+                }
             });
             chartInstances.push(ch);
         }
 
         function renderHighlightLists(items) {
             const d = languageData[currentLang];
-            const thresh = positivesThresholdInput.value;
+            const thresh = parseFloat(positivesThresholdInput.value || 85);
             const high = items.filter(i => i.posPerc >= thresh);
             const low = items.filter(i => i.posPerc < thresh);
+            
             const sDiv = document.createElement('div');
             sDiv.className = 'p-10 bg-green-50 rounded-[3rem] border-4 border-green-200 shadow-lg hover-zoom w-full mb-4';
-            sDiv.innerHTML = `<h4 class="text-3xl font-black text-green-800 mb-8 uppercase tracking-tighter flex items-center">★ ${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold">${high.length ? high.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-green-100 shadow-sm">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
+            const highItemsHtml = high.length 
+                ? high.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-green-100 shadow-sm">${i.item}</li>`).join('') 
+                : `<li>${d.emptyList}</li>`;
+            sDiv.innerHTML = `<h4 class="text-3xl font-black text-green-800 mb-8 uppercase tracking-tighter flex items-center">★ ${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold">${highItemsHtml}</ul>`;
+            
             const iDiv = document.createElement('div');
             iDiv.className = 'p-10 bg-red-50 rounded-[3rem] border-4 border-red-200 shadow-lg hover-zoom w-full mb-4';
-            iDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8 uppercase tracking-tighter flex items-center">⚠ ${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold">${low.length ? low.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-red-100 shadow-sm">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
+            const lowItemsHtml = low.length 
+                ? low.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-red-100 shadow-sm">${i.item}</li>`).join('') 
+                : `<li>${d.emptyList}</li>`;
+            iDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8 uppercase tracking-tighter flex items-center">⚠ ${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold">${lowItemsHtml}</ul>`;
+            
             positiveNegativeItemsContainer.appendChild(sDiv);
             positiveNegativeItemsContainer.appendChild(iDiv);
         }
 
-        function renderFinalRecommendation(score, weakItems) {
+        function renderFinalRecommendation(score) {
             const d = languageData[currentLang];
             const div = document.createElement('div');
             div.className = 'relative p-12 bg-white rounded-[3.5rem] shadow-2xl border-4 border-indigo-400 hover-zoom mb-20';
+            
+            const evalText = score > 85 ? d.evaluations[0] : score > 75 ? d.evaluations[1] : d.evaluations[2];
+            const evalLabel = currentLang === 'en' ? 'Evaluation' : 'التقييم';
+
             div.innerHTML = `
                 <h2 class="text-4xl thin-title mb-10 text-center text-indigo-900 font-black uppercase tracking-widest border-b-2 border-indigo-50 pb-6">${d.recommendation}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -767,39 +1028,36 @@
                         <span class="text-6xl font-black text-indigo-800">${score.toFixed(2)}%</span>
                     </div>
                     <div class="p-8 bg-green-50 rounded-[2.5rem] text-center border-2 border-green-100 flex flex-col justify-center items-center">
-                        <span class="text-xs font-black text-green-400 uppercase tracking-widest mb-2">${currentLang === 'en' ? 'Evaluation' : 'التقييم'}</span>
-                        <span class="text-6xl font-black text-green-700">${score > 85 ? d.evaluations[0] : score > 75 ? d.evaluations[1] : d.evaluations[2]}</span>
+                        <span class="text-xs font-black text-green-400 uppercase tracking-widest mb-2">${evalLabel}</span>
+                        <span class="text-6xl font-black text-green-700">${evalText}</span>
                     </div>
                 </div>
             `;
             finalRecommendationContainer.appendChild(div);
         }
 
-        // --- GLOBAL ACTION BUTTONS ---
-        
-        exportButton.onclick = () => {
-            const d = languageData[currentLang];
-            const wb = XLSX.utils.book_new();
-            let allData = [];
+        // --- EXPORT AND COPY LOGIC ---
 
-            // Header info
+        function buildDataReport() {
+            const d = languageData[currentLang];
+            const allData = [];
+
+            // Basic Metadata
             allData.push([d.reportTitle]);
             allData.push([`File: ${fileNameDisplay.textContent}`]);
             allData.push([participantCountDisplay.textContent]);
+            if (activeFilter) allData.push([`${d.filterDisplayLabel} ${activeFilter.label} = ${activeFilter.value}`]);
             allData.push([]);
 
-            // Get all sections
-            const sections = document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper');
-            if (sections.length === 0) return;
-
-            sections.forEach(section => {
+            // Loop through sequential results (Domains and Suggestions)
+            const resultSections = resultsContainer.querySelectorAll('.domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper');
+            resultSections.forEach(section => {
                 const title = section.querySelector('h2').innerText;
                 allData.push([title.toUpperCase()]);
 
                 const table = section.querySelector('table');
                 if (table) {
-                    const rows = table.querySelectorAll('tr');
-                    rows.forEach(tr => {
+                    table.querySelectorAll('tr').forEach(tr => {
                         const rowData = [];
                         tr.querySelectorAll('th, td').forEach(cell => rowData.push(cell.innerText));
                         allData.push(rowData);
@@ -810,39 +1068,53 @@
                 if (suggBox) {
                     allData.push([suggBox.innerText]);
                 }
-                allData.push([]); // spacer
+                allData.push([]); 
             });
 
+            // Loop through Strengths and Improvements
+            const highlightSections = positiveNegativeItemsContainer.querySelectorAll('div');
+            highlightSections.forEach(section => {
+                const title = section.querySelector('h4')?.innerText;
+                if (!title) return;
+                allData.push([title.toUpperCase()]);
+                section.querySelectorAll('li').forEach(li => {
+                    allData.push([`• ${li.innerText}`]);
+                });
+                allData.push([]);
+            });
+
+            // Final Recommendation
+            const recSection = finalRecommendationContainer.querySelector('div');
+            if (recSection) {
+                const title = recSection.querySelector('h2')?.innerText;
+                allData.push([title?.toUpperCase() || d.recommendation.toUpperCase()]);
+                recSection.querySelectorAll('.p-8').forEach(box => {
+                    const label = box.querySelector('span:first-child')?.innerText;
+                    const val = box.querySelector('span:last-child')?.innerText;
+                    allData.push([`${label}: ${val}`]);
+                });
+            }
+
+            return allData;
+        }
+
+        exportButton.onclick = () => {
+            const allData = buildDataReport();
+            if (allData.length === 0) return;
+
+            const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(allData);
             XLSX.utils.book_append_sheet(wb, ws, "Analysis Report");
-            XLSX.writeFile(wb, `${fileNameDisplay.textContent}_Report.xlsx`);
+            XLSX.writeFile(wb, `${fileNameDisplay.textContent}_Full_Report.xlsx`);
         };
 
         copyTableButton.onclick = () => {
-            const d = languageData[currentLang];
-            const sections = document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper');
-            if (sections.length === 0) return;
+            const allData = buildDataReport();
+            if (allData.length === 0) return;
 
-            let content = `${d.reportTitle}\nFile: ${fileNameDisplay.textContent}\n${participantCountDisplay.textContent}\n\n`;
-
-            sections.forEach(section => {
-                const title = section.querySelector('h2').innerText;
-                content += `--- ${title.toUpperCase()} ---\n`;
-
-                const table = section.querySelector('table');
-                if (table) {
-                    table.querySelectorAll('tr').forEach(tr => {
-                        let cells = [];
-                        tr.querySelectorAll('th, td').forEach(c => cells.push(c.innerText));
-                        content += cells.join('\t') + '\n';
-                    });
-                }
-
-                const suggBox = section.querySelector('.suggestion-box');
-                if (suggBox) {
-                    content += suggBox.innerText + '\n';
-                }
-                content += '\n';
+            let content = "";
+            allData.forEach(row => {
+                content += row.join('\t') + '\n';
             });
 
             if (copyToClipboard(content)) {
