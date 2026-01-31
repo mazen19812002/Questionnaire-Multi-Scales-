@@ -234,8 +234,11 @@
                         </select>
                     </div>
                 </div>
-                <div class="flex justify-center space-x-4">
-                    <button id="clearFilterBtn" class="px-6 py-3 btn-cancel text-sm font-black rounded-xl shadow-lg hover-zoom uppercase tracking-wide">Clear Filter</button>
+                <div class="flex flex-col items-center space-y-4">
+                    <div class="flex justify-center space-x-4">
+                        <button id="confirmFilterBtn" class="px-10 py-4 btn-execute text-xl font-black rounded-2xl shadow-lg hover-zoom uppercase tracking-wide">Confirm Filter & Proceed</button>
+                        <button id="clearFilterBtn" class="px-6 py-4 btn-cancel text-sm font-black rounded-xl shadow-lg hover-zoom uppercase tracking-wide">Clear Filter</button>
+                    </div>
                     <p id="filterStatus" class="flex items-center text-xs font-black text-indigo-700 italic uppercase">All data included</p>
                 </div>
             </div>
@@ -330,6 +333,7 @@
         const filterSection = document.getElementById('filterSection');
         const filterSourceSelect = document.getElementById('filterSourceSelect');
         const filterValueSelect = document.getElementById('filterValueSelect');
+        const confirmFilterBtn = document.getElementById('confirmFilterBtn');
         const clearFilterBtn = document.getElementById('clearFilterBtn');
         const filterStatus = document.getElementById('filterStatus');
         const filterAppliedDisplay = document.getElementById('filterAppliedDisplay');
@@ -380,7 +384,8 @@
                 filterStatusAll: 'All data included',
                 filterStatusActive: 'Filter active',
                 filterDisplayLabel: 'Data Filtered By:',
-                clearFilter: 'Clear Filter'
+                clearFilter: 'Clear Filter',
+                confirmFilter: 'Confirm Filter & Proceed'
             },
             ar: {
                 reportTitle: 'تقرير تحليل الاستبيان',
@@ -412,7 +417,8 @@
                 filterStatusAll: 'جميع البيانات مضمنة',
                 filterStatusActive: 'التصفية مفعلة',
                 filterDisplayLabel: 'البيانات مصفاة حسب:',
-                clearFilter: 'مسح التصفية'
+                clearFilter: 'مسح التصفية',
+                confirmFilter: 'تأكيد التصفية والمتابعة'
             }
         };
 
@@ -481,6 +487,7 @@
             
             document.getElementById('labelFilterCol').textContent = dataOrientation === 'columns' ? d.filterByCol : d.filterByRow;
             document.getElementById('labelFilterValue').textContent = d.filterVal;
+            confirmFilterBtn.textContent = d.confirmFilter;
             clearFilterBtn.textContent = d.clearFilter;
             
             langEn.classList.toggle('active-lang', currentLang === 'en');
@@ -607,8 +614,6 @@
             }
             renderScaleGroups();
             filterSection.classList.remove('hidden');
-            scaleOrderSection.classList.remove('hidden');
-            actionButtons.classList.remove('hidden');
             updateUI();
             filterSection.scrollIntoView({ behavior: 'smooth' });
         };
@@ -655,6 +660,12 @@
                 activeFilter = null;
             }
             updateUI();
+        };
+
+        confirmFilterBtn.onclick = () => {
+            scaleOrderSection.classList.remove('hidden');
+            actionButtons.classList.remove('hidden');
+            scaleOrderSection.scrollIntoView({ behavior: 'smooth' });
         };
 
         clearFilterBtn.onclick = () => {
@@ -1036,20 +1047,16 @@
             finalRecommendationContainer.appendChild(div);
         }
 
-        // --- EXPORT AND COPY LOGIC ---
-
         function buildDataReport() {
             const d = languageData[currentLang];
             const allData = [];
 
-            // Basic Metadata
             allData.push([d.reportTitle]);
             allData.push([`File: ${fileNameDisplay.textContent}`]);
             allData.push([participantCountDisplay.textContent]);
             if (activeFilter) allData.push([`${d.filterDisplayLabel} ${activeFilter.label} = ${activeFilter.value}`]);
             allData.push([]);
 
-            // Loop through sequential results (Domains and Suggestions)
             const resultSections = resultsContainer.querySelectorAll('.domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper');
             resultSections.forEach(section => {
                 const title = section.querySelector('h2').innerText;
@@ -1071,7 +1078,6 @@
                 allData.push([]); 
             });
 
-            // Loop through Strengths and Improvements
             const highlightSections = positiveNegativeItemsContainer.querySelectorAll('div');
             highlightSections.forEach(section => {
                 const title = section.querySelector('h4')?.innerText;
@@ -1083,7 +1089,6 @@
                 allData.push([]);
             });
 
-            // Final Recommendation
             const recSection = finalRecommendationContainer.querySelector('div');
             if (recSection) {
                 const title = recSection.querySelector('h2')?.innerText;
