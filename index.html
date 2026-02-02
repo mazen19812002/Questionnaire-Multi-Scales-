@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحليل نتائج الاستبيان - وحدة ضمان الجودة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #e0f2fe; /* خلفية زرقاء فاتحة */
+            color: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .thin-title {
+            font-weight: 300;
+        }
+
+        .hover-zoom {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .hover-zoom:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-execute {
+            background-color: #22c55e;
+            color: white;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .btn-execute:hover {
+            background-color: #16a34a;
+            transform: scale(1.05);
+        }
+
+        .btn-cancel {
+            background-color: #ef4444;
+            color: white;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .btn-cancel:hover {
+            background-color: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .copy-btn-wrapper {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 30;
+        }
+        .copy-btn-inner {
+            opacity: 0.4;
+            transition: opacity 0.2s, transform 0.2s, background-color 0.2s;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+        }
+        .copy-btn-inner:hover {
+            opacity: 1;
+            background-color: #ffffff;
+            transform: scale(1.15);
+            border-color: #22c55e;
+            color: #22c55e;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            border: 1px solid #d1e9ff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: left 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-left: 2.5rem;
+        }
+
+        .suggestion-box {
+            background-color: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            line-height: 1.8;
+            color: #1e293b;
+            min-height: 120px;
+            max-height: 600px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-weight: 500;
+            font-size: 1.1rem;
+            box-shadow: inset 0 2px 8px 0 rgba(0,0,0,0.03);
+        }
+
+        .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper {
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .active-lang {
+            background-color: #4f46e5 !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-12">
+
+    <div class="flex justify-between items-start mb-8">
+        <img src="00.png" alt="شعار المعهد" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo1'">
+        <img src="02.jpg" alt="شعار الجودة" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo2'">
+    </div>
+
+    <main class="max-w-7xl mx-auto w-full bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl flex-grow mb-12">
+        <h1 id="mainTitle" class="text-4xl thin-title text-center mb-2 text-slate-800 font-black uppercase tracking-tight">تحليل نتائج الاستبيان</h1>
+        <p class="text-center text-indigo-700 mb-8 text-xl font-bold" id="instituteTitle">المعهد العالي للهندسة والتكنولوجيا بكفر الشيخ<br>وحدة ضمان الجودة والاعتماد</p>
+        
+        <div class="flex flex-col items-center space-y-6 mb-10">
+            <div id="langToggle" class="flex rounded-xl shadow-inner bg-gray-100 p-1 cursor-pointer overflow-hidden border border-gray-200">
+                <span id="lang-ar" class="px-8 py-2 font-black transition-all rounded-lg active-lang">العربية</span>
+                <span id="lang-en" class="px-8 py-2 font-black transition-all rounded-lg">English</span>
+            </div>
+        </div>
+
+        <div class="max-w-xl mx-auto mb-10">
+            <div id="fileUploadSection" class="input-card flex flex-col items-center justify-center border-dashed border-2 border-blue-200 hover:border-blue-400 transition-colors">
+                <label for="xlsxFile" class="cursor-pointer w-full text-center">
+                    <div class="p-10 btn-execute rounded-2xl shadow-xl hover-zoom inline-block w-full">
+                        <span id="fileButtonText" class="text-2xl font-black uppercase tracking-tight">الخطوة 1: اختر ملف XLSX</span>
+                        <p class="text-xs mt-2 opacity-90 font-black" id="fileHint">قم بتحميل ملف بيانات الاستبيان</p>
+                    </div>
+                    <input type="file" id="xlsxFile" class="hidden" accept=".xlsx, .xls">
+                </label>
+                <div id="loadingMessage" class="hidden mt-4 text-indigo-700 font-black animate-pulse text-lg italic text-center">جاري المعالجة...</div>
+            </div>
+        </div>
+
+        <div id="dataConfigSection" class="hidden grid grid-cols-1 gap-8 mb-10 animate-in fade-in duration-500">
+            <div class="input-card bg-blue-50/50 border-2 border-blue-100">
+                <div class="text-center border-b border-blue-100 pb-4 mb-6">
+                    <p class="text-slate-900 font-black thin-title text-2xl mb-2 uppercase text-center">الخطوة 2: تعيين البيانات</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                    <div class="flex flex-col">
+                        <label id="labelFilterCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center">1. اختر عمود القسم / مجال العمل للتصفية</label>
+                        <select id="filterColSelect" class="p-4 border border-indigo-200 rounded-2xl bg-white focus:ring-4 focus:ring-indigo-100 outline-none hover-zoom font-black text-slate-900 shadow-sm text-center"></select>
+                    </div>
+                    <div class="flex flex-col">
+                        <label id="labelStartCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center">2. ابدأ التحليل من عمود</label>
+                        <select id="analysisStartColSelect" class="p-4 border border-green-200 rounded-2xl bg-white focus:ring-4 focus:ring-green-100 outline-none hover-zoom font-black text-slate-900 shadow-sm text-center"></select>
+                    </div>
+                </div>
+
+                <div class="flex justify-center">
+                    <button id="confirmMappingBtn" class="px-10 py-4 btn-execute text-xl font-black rounded-2xl shadow-lg hover-zoom uppercase tracking-wide">
+                        تأكيد الاختيارات وتوليد الفلاتر
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="filterSection" class="hidden max-w-2xl mx-auto mb-10 animate-in fade-in zoom-in duration-300">
+            <div class="input-card border-indigo-200 bg-indigo-50/30">
+                <div class="flex flex-col">
+                    <label id="labelDeptFilter" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center">اختر القسم المراد تحليله</label>
+                    <select id="deptFilterSelect" class="p-4 border border-indigo-300 rounded-2xl bg-white focus:ring-4 focus:ring-indigo-100 outline-none hover-zoom font-black text-slate-900 shadow-sm text-center">
+                        <option value="all">تحليل المعهد بالكامل</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="scaleOrderSection" class="hidden mb-10 p-8 bg-slate-100 rounded-3xl shadow-inner border border-slate-200">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 text-center md:text-left">
+                <div class="md:text-right">
+                    <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 font-black">الخطوة 3: ترتيب المقاييس</h2>
+                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic">قم بترتيب الخيارات (الأعلى في الأعلى). الأعمدة ذات الإجابات الكثيرة تظهر كمقترحات.</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center">
+                    <label class="font-black text-xs text-slate-800 ml-4 uppercase tracking-tighter" id="labelThreshold">حد الإيجابيات (%):</label>
+                    <input type="number" id="positivesThresholdInput" value="85" min="0" max="100" class="w-24 px-4 py-2 border rounded-xl focus:ring-2 focus:ring-green-500 outline-none font-black text-xl text-center text-indigo-700">
+                </div>
+            </div>
+            <div id="scaleGroupsContainer" class="space-y-10"></div>
+        </div>
+
+        <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
+            <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase tracking-tighter">حلل البيانات الآن</button>
+            <div class="flex gap-4 w-full justify-center">
+                <button id="exportButton" class="px-8 py-4 btn-execute text-white text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase">تصدير التقرير (Excel)</button>
+                <button id="copyTableButton" class="px-8 py-4 btn-execute text-white text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase">نسخ كافة النتائج</button>
+            </div>
+        </div>
+
+        <div class="text-center mb-10">
+            <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 mb-2 hidden uppercase font-black"></p>
+            <p id="participantCountDisplay" class="text-2xl text-indigo-800 font-black hidden uppercase tracking-tighter"></p>
+        </div>
+
+        <div id="resultsContainer" class="hidden space-y-16"></div>
+        <div id="chartContainer" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-10 mt-12"></div>
+        <div id="positiveNegativeItemsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 mt-12"></div>
+        <div id="finalRecommendationContainer" class="hidden mt-16"></div>
+    </main>
+
+    <footer class="w-full text-center py-8 mt-auto text-slate-900 font-black border-t border-blue-200 bg-blue-50/95 backdrop-blur-sm uppercase text-sm tracking-widest">
+        All rights are reserved to Dr. Mazen Badawy – Doctorate of English Teaching & Testing
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof ChartDataLabels !== 'undefined') {
+            Chart.register(ChartDataLabels);
+        }
+
+        const xlsxFile = document.getElementById('xlsxFile');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const chartContainer = document.getElementById('chartContainer');
+        const actionButtons = document.getElementById('actionButtons');
+        const analyzeButton = document.getElementById('analyzeButton');
+        const exportButton = document.getElementById('exportButton');
+        const copyTableButton = document.getElementById('copyTableButton');
+        const langEn = document.getElementById('lang-en');
+        const langAr = document.getElementById('lang-ar');
+        const scaleOrderSection = document.getElementById('scaleOrderSection');
+        const scaleGroupsContainer = document.getElementById('scaleGroupsContainer');
+        const positivesThresholdInput = document.getElementById('positivesThresholdInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const participantCountDisplay = document.getElementById('participantCountDisplay');
+        const positiveNegativeItemsContainer = document.getElementById('positiveNegativeItemsContainer');
+        const finalRecommendationContainer = document.getElementById('finalRecommendationContainer');
+        const dataConfigSection = document.getElementById('dataConfigSection');
+        const confirmMappingBtn = document.getElementById('confirmMappingBtn');
+        const filterSection = document.getElementById('filterSection');
+        const deptFilterSelect = document.getElementById('deptFilterSelect');
+        const filterColSelect = document.getElementById('filterColSelect');
+        const analysisStartColSelect = document.getElementById('analysisStartColSelect');
+
+        let currentLang = 'ar'; 
+        let rawExcelData = null;
+        let identifiedScaleGroups = new Map(); 
+        let itemToScaleGroup = new Map();
+        let chartInstances = [];
+
+        const languageData = {
+            en: {
+                title: 'Questionnaire Results Analysis',
+                devCredit: 'High Institute of Engineering and Technology in Kafr El-Sheikh\nQuality Assurance and Accreditation Unit',
+                confirm: 'Confirm Mapping & Identify Filters',
+                allInstitute: 'Analyze Whole Institute',
+                participants: 'Participants',
+                pos: 'Positive',
+                copied: 'Copied!',
+                emptyList: 'No feedback provided',
+                headers: { no: '#', item: 'Item Statement', domain: 'Domain Name', total: 'Total (%)', positives: 'Positives (%)', footer: 'Overall Averages' },
+                strengths: 'Core Strengths',
+                improvement: 'Critical Improvement Areas',
+                recommendation: 'Recommendation',
+                finalScore: 'Total Score',
+                evaluations: ["Excellent", "Very Good", "Good", "Acceptable", "Weak"],
+                suggestionsTitle: 'Respondents Suggestions',
+                groupLabel: 'Scale Group',
+                step1: 'Step 1: Choose XLSX File',
+                step1Hint: 'Upload your survey data',
+                analyzeNow: 'Analyze Now',
+                export: 'Export (Excel)',
+                copyAll: 'Copy Results',
+                loading: 'Loading...',
+                deptLabel: '1. Select Dept Column',
+                startColLabel: '2. Analyze from Column',
+                filterLabel: 'Filter by Department'
+            },
+            ar: {
+                title: 'تحليل نتائج الاستبيان',
+                devCredit: 'المعهد العالي للهندسة والتكنولوجيا بكفر الشيخ\nوحدة ضمان الجودة والاعتماد',
+                confirm: 'تأكيد الاختيارات وتحديد الفلاتر',
+                allInstitute: 'تحليل المعهد بالكامل',
+                participants: 'مشارك',
+                pos: 'إيجابي',
+                copied: 'تم النسخ!',
+                emptyList: 'لا توجد ردود متاحة',
+                headers: { no: '#', item: 'بيان البند', domain: 'اسم المجال', total: 'الإجمالي (%)', positives: 'الإيجابيات (%)', footer: 'المتوسطات الكلية' },
+                strengths: 'نقاط القوة الأساسية',
+                improvement: 'مجالات التحسين الحرجة',
+                recommendation: 'التوصية النهائية',
+                finalScore: 'نتيجة الاستبيان الإجمالية',
+                evaluations: ["ممتازة", "جيد جداً", "جيدة", "مقبولة", "ضعيفة"],
+                suggestionsTitle: 'مقترحات المستجيبين',
+                groupLabel: 'مجموعة المقياس',
+                step1: 'الخطوة 1: اختر ملف XLSX',
+                step1Hint: 'قم بتحميل ملف بيانات الاستبيان',
+                analyzeNow: 'حلل البيانات الآن',
+                export: 'تصدير التقرير (Excel)',
+                copyAll: 'نسخ كافة النتائج',
+                loading: 'جاري المعالجة...',
+                deptLabel: '1. اختر عمود القسم للتصفية',
+                startColLabel: '2. ابدأ التحليل من عمود',
+                filterLabel: 'تصفية النتائج حسب القسم'
+            }
+        };
+
+        // دالة تطهير النصوص لمنع أخطاء الإكسيل
+        function sanitizeValue(val) {
+            if (typeof val !== 'string') return val;
+            const triggers = ['=', '-', '+', '@'];
+            if (triggers.includes(val.trim().charAt(0))) {
+                return "'" + val; // إضافة علامة تنصيص لمنع المعادلات
+            }
+            return val;
+        }
+
+        function copyToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try { document.execCommand('copy'); document.body.removeChild(textArea); return true; } catch (err) { document.body.removeChild(textArea); return false; }
+        }
+
+        function attachCopyButton(container, copyLogic) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'copy-btn-wrapper';
+            wrapper.innerHTML = `<div class="copy-btn-inner" title="نسخ هذا الجزء"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></div>`;
+            wrapper.onclick = (e) => { e.stopPropagation(); copyLogic(wrapper.querySelector('.copy-btn-inner')); };
+            container.style.position = 'relative';
+            container.appendChild(wrapper);
+        }
+
+        function showStatus(btnEl) {
+            const originalHtml = btnEl.innerHTML;
+            btnEl.innerHTML = `<span class="text-[12px] font-black uppercase px-2 text-green-600">${languageData[currentLang].copied}</span>`;
+            setTimeout(() => btnEl.innerHTML = originalHtml, 2000);
+        }
+
+        function updateUI() {
+            const d = languageData[currentLang];
+            document.getElementById('mainTitle').textContent = d.title;
+            document.getElementById('instituteTitle').innerText = d.devCredit;
+            document.getElementById('fileButtonText').textContent = d.step1;
+            document.getElementById('fileHint').textContent = d.step1Hint;
+            document.getElementById('confirmMappingBtn').textContent = d.confirm;
+            document.getElementById('labelFilterCol').textContent = d.deptLabel;
+            document.getElementById('labelStartCol').textContent = d.startColLabel;
+            document.getElementById('labelDeptFilter').textContent = d.filterLabel;
+            document.getElementById('analyzeButton').textContent = d.analyzeNow;
+            document.getElementById('exportButton').textContent = d.export;
+            document.getElementById('copyTableButton').textContent = d.copyAll;
+            document.getElementById('loadingMessage').textContent = d.loading;
+            
+            const firstOpt = deptFilterSelect.options[0];
+            if(firstOpt) firstOpt.text = d.allInstitute;
+            
+            langAr.classList.toggle('active-lang', currentLang === 'ar');
+            langEn.classList.toggle('active-lang', currentLang === 'en');
+            document.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+        }
+
+        xlsxFile.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            loadingMessage.classList.remove('hidden');
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    rawExcelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+                    fileNameDisplay.textContent = file.name.split('.')[0];
+                    fileNameDisplay.classList.remove('hidden');
+                    dataConfigSection.classList.remove('hidden');
+                    populateConfigSelects(rawExcelData);
+                } catch(err) { console.error("XLSX Parse error:", err); }
+                loadingMessage.classList.add('hidden');
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function populateConfigSelects(data) {
+            filterColSelect.innerHTML = '';
+            analysisStartColSelect.innerHTML = '';
+            const headers = data[0] || [];
+            headers.forEach((h, i) => {
+                const colLetter = i < 26 ? String.fromCharCode(65 + i) : `C${i+1}`;
+                const text = h ? String(h).substring(0, 40) : "---";
+                const optLabel = `${colLetter}: ${text}`;
+                filterColSelect.add(new Option(optLabel, i));
+                analysisStartColSelect.add(new Option(optLabel, i));
+            });
+            filterColSelect.value = Math.min(1, headers.length - 1); 
+            analysisStartColSelect.value = Math.min(2, headers.length - 1); 
+        }
+
+        confirmMappingBtn.onclick = () => {
+            if (!rawExcelData) return;
+            const filterColIdx = parseInt(filterColSelect.value);
+            const startColIdx = parseInt(analysisStartColSelect.value);
+
+            identifiedScaleGroups.clear();
+            itemToScaleGroup.clear();
+            const departments = new Set();
+            const headers = rawExcelData[0] || [];
+
+            for (let r = 1; r < rawExcelData.length; r++) {
+                const val = String(rawExcelData[r][filterColIdx] || "").trim();
+                if (val !== "") departments.add(val);
+            }
+
+            for (let col = startColIdx; col < headers.length; col++) {
+                const resps = [];
+                for (let r = 1; r < rawExcelData.length; r++) {
+                    const val = String(rawExcelData[r][col] || "").trim();
+                    if (val !== "") resps.push(val);
+                }
+                const opts = new Set(resps);
+                if (opts.size > 0) {
+                    const avgLen = resps.reduce((s, x) => s + x.length, 0) / (resps.length || 1);
+                    const isSugg = opts.size > 5 || avgLen > 20;
+                    const sig = Array.from(opts).sort().join('|');
+                    if (!identifiedScaleGroups.has(sig)) {
+                        identifiedScaleGroups.set(sig, { options: Array.from(opts), positives: new Set(), isSuggestion: isSugg });
+                    }
+                    itemToScaleGroup.set(col, sig);
+                }
+            }
+            
+            deptFilterSelect.innerHTML = `<option value="all">${languageData[currentLang].allInstitute}</option>`;
+            Array.from(departments).sort().forEach(dept => deptFilterSelect.add(new Option(dept, dept)));
+            filterSection.classList.remove('hidden');
+            renderScaleGroups();
+            scaleOrderSection.classList.remove('hidden');
+            actionButtons.classList.remove('hidden');
+            scaleOrderSection.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        function renderScaleGroups() {
+            scaleGroupsContainer.innerHTML = '';
+            let counter = 1;
+            identifiedScaleGroups.forEach((group, sig) => {
+                if (group.isSuggestion) return;
+                const wrap = document.createElement('div');
+                wrap.className = 'bg-white p-6 rounded-3xl border-2 border-blue-200 shadow-md';
+                wrap.innerHTML = `
+                    <h3 class="font-black text-indigo-900 uppercase tracking-tighter text-xl mb-4 pr-4">${languageData[currentLang].groupLabel} ${counter++}: ${group.options.join(', ')}</h3>
+                    <div class="scale-list space-y-3" data-sig="${sig}"></div>
+                `;
+                const list = wrap.querySelector('.scale-list');
+                group.options.forEach((opt, idx) => {
+                    const item = document.createElement('div');
+                    item.className = 'p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl flex justify-between items-center cursor-move hover-zoom shadow-sm';
+                    item.draggable = true;
+                    item.innerHTML = `
+                        <span class="font-black text-slate-900 text-lg truncate pr-4">${opt}</span>
+                        <label class="flex items-center cursor-pointer bg-green-100 px-4 py-2 rounded-full border border-green-200">
+                            <input type="checkbox" class="w-6 h-6 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}>
+                            <span class="ml-2 text-xs font-black text-green-800 uppercase tracking-widest">${languageData[currentLang].pos}</span>
+                        </label>`;
+                    item.querySelector('input').onchange = (e) => e.target.checked ? group.positives.add(opt) : group.positives.delete(opt);
+                    item.ondragstart = (e) => { e.dataTransfer.setData('idx', idx); e.dataTransfer.setData('sig', sig); };
+                    item.ondragover = (e) => e.preventDefault();
+                    item.ondrop = (e) => {
+                        const fromIdx = e.dataTransfer.getData('idx');
+                        if(e.dataTransfer.getData('sig') !== sig) return;
+                        const moved = group.options.splice(fromIdx, 1)[0];
+                        group.options.splice(idx, 0, moved);
+                        renderScaleGroups();
+                    };
+                    list.appendChild(item);
+                });
+                scaleGroupsContainer.appendChild(wrap);
+            });
+        }
+
+        analyzeButton.onclick = () => {
+            const data = rawExcelData;
+            if (!data) return;
+            const filterColIdx = parseInt(filterColSelect.value);
+            const startColIdx = parseInt(analysisStartColSelect.value);
+            const filterValue = deptFilterSelect.value;
+
+            resultsContainer.innerHTML = '';
+            chartContainer.innerHTML = '';
+            positiveNegativeItemsContainer.innerHTML = '';
+            finalRecommendationContainer.innerHTML = '';
+            chartInstances.forEach(c => c.destroy());
+            chartInstances = [];
+
+            let rowsToProcess = data.slice(1);
+            if (filterValue !== 'all') {
+                rowsToProcess = rowsToProcess.filter(row => row && String(row[filterColIdx] || "").trim() === filterValue);
+            }
+
+            const headers = data[0] || [];
+            participantCountDisplay.textContent = `${rowsToProcess.length} ${languageData[currentLang].participants}`;
+            participantCountDisplay.classList.remove('hidden');
+
+            const summaryData = [];
+            const allItemsList = [];
+
+            identifiedScaleGroups.forEach((groupData, sig) => {
+                const itemsInGroup = [];
+                for(let col = startColIdx; col < headers.length; col++) {
+                    if(itemToScaleGroup.get(col) === sig) {
+                        itemsInGroup.push({txt: headers[col], responses: rowsToProcess.map(row => row[col])});
+                    }
+                }
+                if(itemsInGroup.length === 0) return;
+
+                if (groupData.isSuggestion) {
+                    itemsInGroup.forEach(item => renderSuggestionBox(item.txt, item.responses));
+                } else {
+                    const domainGroups = {};
+                    itemsInGroup.forEach(item => {
+                        const match = String(item.txt).match(/(.+) \[(.+)\]/);
+                        const dName = match ? match[1].trim() : (currentLang === 'en' ? 'General Assessment' : 'التقييم العام');
+                        const iText = match ? match[2].trim() : String(item.txt).trim();
+                        if (!domainGroups[dName]) domainGroups[dName] = { items: [], data: [] };
+                        domainGroups[dName].items.push(iText);
+                        domainGroups[dName].data.push(item.responses);
+                    });
+
+                    Object.entries(domainGroups).forEach(([dName, group]) => {
+                        const rows = group.items.map((it, idx) => {
+                            const rps = group.data[idx] || [];
+                            const freqs = {};
+                            groupData.options.forEach(o => freqs[o] = 0);
+                            let posCount = 0;
+                            rps.forEach(r => {
+                                const tr = String(r || "").trim();
+                                if (freqs[tr] !== undefined) freqs[tr]++;
+                                if (groupData.positives.has(tr)) posCount++;
+                            });
+                            const res = { item: it, freqs, total: rps.length, posPerc: rps.length ? (posCount/rps.length)*100 : 0 };
+                            allItemsList.push(res);
+                            return res;
+                        });
+                        renderTable(dName, rows, groupData.options, groupData.positives);
+                        renderChart(dName, rows, groupData.options);
+                        const domainFreqs = {};
+                        groupData.options.forEach(o => domainFreqs[o] = rows.reduce((s, r) => s + r.freqs[o], 0));
+                        summaryData.push({ name: dName, freqs: domainFreqs, total: rows.reduce((s, r) => s + r.total, 0), positives: groupData.positives });
+                    });
+                }
+            });
+
+            if (summaryData.length > 0) {
+                renderSummaryTable(summaryData);
+                renderHighlightLists(allItemsList);
+                const grandTotal = summaryData.reduce((s, dm) => s + dm.total, 0);
+                const grandPos = summaryData.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
+                renderFinalRecommendation(grandTotal ? (grandPos / grandTotal * 100) : 0, allItemsList.filter(i => i.posPerc < 85));
+            }
+            resultsContainer.classList.remove('hidden');
+            chartContainer.classList.remove('hidden');
+            positiveNegativeItemsContainer.classList.remove('hidden');
+            finalRecommendationContainer.classList.remove('hidden');
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        function renderSuggestionBox(title, responses) {
+            const d = languageData[currentLang];
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-100 overflow-hidden hover-zoom mb-10 suggestion-wrapper';
+            const resps = responses.map(r => String(r || "").trim()).filter(r => r !== "");
+            const joined = resps.join(' & ');
+
+            div.innerHTML = `
+                <div class="p-8 bg-indigo-50 border-b-2 border-indigo-100 text-right">
+                    <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tight">${title}</h2>
+                    <p class="text-xs font-black text-indigo-500 mt-2 uppercase tracking-widest">${d.suggestionsTitle}</p>
+                </div>
+                <div class="p-8 text-right">
+                    <div class="suggestion-box">${joined || `<span class="italic text-slate-400 font-bold">${d.emptyList}</span>`}</div>
+                </div>
+            `;
+            attachCopyButton(div, (btn) => { copyToClipboard(`${title}\n---\n${joined}`); showStatus(btn); });
+            resultsContainer.appendChild(div);
+        }
+
+        function renderTable(title, rows, opts, positives) {
+            const d = languageData[currentLang];
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-blue-100 overflow-hidden hover-zoom mb-10 domain-result-wrapper text-right';
+            const totalRes = rows.reduce((s, r) => s + r.total, 0);
+            const domainPos = rows.reduce((s, r) => s + Array.from(positives).reduce((sum, opt) => sum + (r.freqs[opt] || 0), 0), 0);
+            const avgPos = totalRes ? (domainPos / totalRes * 100).toFixed(1) : '0.0';
+
+            let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black">${title}</h2>`;
+            html += `<div class="overflow-x-auto"><table class="w-full text-sm text-right"><thead class="bg-slate-100 border-b-2 border-slate-200"><tr><th class="p-6 text-center table-header-clear">${d.headers.no}</th><th class="p-6 table-header-clear text-right">${d.headers.item}</th>${opts.map(o => `<th class="p-6 text-center table-header-clear text-indigo-700">${o}</th>`).join('')}<th class="p-6 text-center text-blue-800 font-black">${d.headers.positives}</th></tr></thead><tbody class="divide-y divide-slate-100">`;
+            rows.forEach((r, i) => {
+                html += `<tr><td class="p-6 text-center text-slate-500 font-black">${i+1}</td><td class="p-6 font-bold text-slate-800 text-right">${r.item}</td>${opts.map(o => `<td class="p-6 text-center text-slate-700 font-bold">${r.total ? (r.freqs[o]/r.total*100).toFixed(1) : '0.0'}%</td>`).join('')}<td class="p-6 text-center font-black text-green-700 bg-green-50/30">${r.posPerc.toFixed(1)}%</td></tr>`;
+            });
+            html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td class="p-6 text-center table-header-clear uppercase" colspan="2">${d.headers.footer}</td>${opts.map(o => { const tot = rows.reduce((s, r) => s + r.freqs[o], 0); return `<td class="p-6 text-center text-indigo-800 font-black">${totalRes ? (tot/totalRes*100).toFixed(1) : '0.0'}%</td>`; }).join('')}<td class="p-6 text-center text-green-800 font-black text-lg">${avgPos}%</td></tr></tfoot></table></div>`;
+            div.innerHTML = html;
+            attachCopyButton(div, (btn) => {
+                let txt = title + '\n';
+                div.querySelectorAll('table tr').forEach(tr => {
+                    let rArr = []; tr.querySelectorAll('th, td').forEach(c => rArr.push(sanitizeValue(c.innerText)));
+                    txt += rArr.join('\t') + '\n';
+                });
+                copyToClipboard(txt); showStatus(btn);
+            });
+            resultsContainer.appendChild(div);
+        }
+
+        function renderSummaryTable(data) {
+            const d = languageData[currentLang];
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-200 overflow-hidden hover-zoom mt-16 summary-table-wrapper text-right';
+            const grandTotal = data.reduce((s, dm) => s + dm.total, 0);
+            const grandPos = data.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
+            const grandAvg = grandTotal ? (grandPos / grandTotal * 100).toFixed(1) : '0.0';
+
+            let html = `<h2 class="text-4xl thin-title p-8 bg-indigo-700 text-white font-black text-center">${d.summaryTitle}</h2><div class="overflow-x-auto"><table class="w-full text-lg text-right"><thead class="bg-indigo-50 border-b-4 border-indigo-100"><tr><th class="p-8 text-center table-header-clear">${d.headers.no}</th><th class="p-8 table-header-clear text-right">${d.headers.domain}</th><th class="p-8 text-center table-header-clear text-green-700">${d.headers.positives}</th></tr></thead><tbody class="divide-y-2 divide-indigo-50">`;
+            data.forEach((dm, i) => {
+                const posSum = Array.from(dm.positives).reduce((s, o) => s + (dm.freqs[o] || 0), 0);
+                html += `<tr><td class="p-8 text-center font-black text-indigo-300">${i+1}</td><td class="p-8 font-black text-slate-800 text-right">${dm.name}</td><td class="p-8 text-center font-black text-green-600 text-2xl bg-green-50/20">${dm.total ? (posSum/dm.total*100).toFixed(1) : '0.0'}%</td></tr>`;
+            });
+            html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300"><tr><td class="p-8 text-center table-header-clear uppercase" colspan="2">${d.headers.footer}</td><td class="p-8 text-center text-green-800 text-2xl font-black">${grandAvg}%</td></tr></tfoot></table></div>`;
+            div.innerHTML = html;
+            attachCopyButton(div, (btn) => {
+                let txt = d.summaryTitle + '\n';
+                div.querySelectorAll('table tr').forEach(tr => {
+                    let rArr = []; tr.querySelectorAll('th, td').forEach(c => rArr.push(sanitizeValue(c.innerText)));
+                    txt += rArr.join('\t') + '\n';
+                });
+                copyToClipboard(txt); showStatus(btn);
+            });
+            resultsContainer.appendChild(div);
+        }
+
+        function renderChart(title, rows, opts) {
+            const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
+            const div = document.createElement('div');
+            div.className = 'bg-white p-10 rounded-[2.5rem] shadow-xl border-2 border-blue-100 hover-zoom flex flex-col items-center';
+            div.innerHTML = `<h3 class="text-2xl font-black text-indigo-900 mb-8 uppercase tracking-tighter text-center">${title}</h3><div class="w-full h-96"><canvas id="${canvasId}"></canvas></div>`;
+            chartContainer.appendChild(div);
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const dataVals = opts.map(o => { const sum = rows.reduce((s, r) => s + r.freqs[o], 0); const total = rows.reduce((s, r) => s + r.total, 0); return total ? (sum/total*100).toFixed(1) : 0; });
+            const ch = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: opts, datasets: [{ data: dataVals, backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], borderRadius: 20 }] },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', color: '#0f172a', font: { weight: '900', size: 16 }, formatter: v => v+'%' } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { weight: '900', size: 14 } } } } }
+            });
+            chartInstances.push(ch);
+        }
+
+        function renderHighlightLists(items) {
+            const d = languageData[currentLang];
+            const thresh = positivesThresholdInput.value;
+            const high = items.filter(i => i.posPerc >= thresh);
+            const low = items.filter(i => i.posPerc < thresh);
+            const sDiv = document.createElement('div');
+            sDiv.className = 'p-10 bg-green-50 rounded-[3rem] border-4 border-green-200 shadow-lg hover-zoom w-full mb-4 text-right';
+            sDiv.innerHTML = `<h4 class="text-3xl font-black text-green-800 mb-8 flex items-center justify-end">★ ${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold">${high.length ? high.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-green-100 shadow-sm">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
+            const iDiv = document.createElement('div');
+            iDiv.className = 'p-10 bg-red-50 rounded-[3rem] border-4 border-red-200 shadow-lg hover-zoom w-full mb-4 text-right';
+            iDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8 flex items-center justify-end">⚠ ${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold">${low.length ? low.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-green-100 shadow-sm">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
+            positiveNegativeItemsContainer.appendChild(sDiv);
+            positiveNegativeItemsContainer.appendChild(iDiv);
+        }
+
+        function renderFinalRecommendation(score, weakItems) {
+            const d = languageData[currentLang];
+            const div = document.createElement('div');
+            div.className = 'relative p-12 bg-white rounded-[3.5rem] shadow-2xl border-4 border-indigo-400 hover-zoom mb-20 text-right';
+            div.innerHTML = `
+                <h2 class="text-4xl thin-title mb-10 text-center text-indigo-900 font-black border-b-2 border-indigo-50 pb-6">${d.recommendation}</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div class="p-8 bg-indigo-50 rounded-[2.5rem] text-center border-2 border-indigo-100 flex flex-col justify-center items-center">
+                        <span class="text-xs font-black text-indigo-400 uppercase tracking-widest mb-2">${d.finalScore}</span>
+                        <span class="text-6xl font-black text-indigo-800">${score.toFixed(2)}%</span>
+                    </div>
+                    <div class="p-8 bg-green-50 rounded-[2.5rem] text-center border-2 border-green-100 flex flex-col justify-center items-center">
+                        <span class="text-xs font-black text-green-400 uppercase tracking-widest mb-2">${currentLang === 'en' ? 'Evaluation' : 'التقييم العام'}</span>
+                        <span class="text-6xl font-black text-green-700">${score > 85 ? d.evaluations[0] : score > 75 ? d.evaluations[1] : d.evaluations[2]}</span>
+                    </div>
+                </div>
+            `;
+            finalRecommendationContainer.appendChild(div);
+        }
+
+        exportButton.onclick = () => {
+            const d = languageData[currentLang];
+            const wb = XLSX.utils.book_new();
+            let allD = [[d.title], [`File: ${fileNameDisplay.textContent}`], [participantCountDisplay.textContent], []];
+            document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(s => {
+                allD.push([sanitizeValue(s.querySelector('h2').innerText)]);
+                const tbl = s.querySelector('table');
+                if (tbl) tbl.querySelectorAll('tr').forEach(tr => { 
+                    let r = []; 
+                    tr.querySelectorAll('th, td').forEach(c => r.push(sanitizeValue(c.innerText))); 
+                    allD.push(r); 
+                });
+                const box = s.querySelector('.suggestion-box');
+                if (box) allD.push([sanitizeValue(box.innerText)]);
+                allD.push([]);
+            });
+            const ws = XLSX.utils.aoa_to_sheet(allD);
+            XLSX.utils.book_append_sheet(wb, ws, "Analysis");
+            XLSX.writeFile(wb, `${fileNameDisplay.textContent}_Report.xlsx`);
+        };
+
+        copyTableButton.onclick = () => {
+            const d = languageData[currentLang];
+            let content = `${d.title}\nFile: ${fileNameDisplay.textContent}\n${participantCountDisplay.textContent}\n\n`;
+            document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(s => {
+                content += `--- ${s.querySelector('h2').innerText} ---\n`;
+                const tbl = s.querySelector('table');
+                if (tbl) tbl.querySelectorAll('tr').forEach(tr => { 
+                    let r = []; 
+                    tr.querySelectorAll('th, td').forEach(c => r.push(sanitizeValue(c.innerText))); 
+                    content += r.join('\t') + '\n'; 
+                });
+                const box = s.querySelector('.suggestion-box');
+                if (box) content += sanitizeValue(box.innerText) + '\n';
+                content += '\n';
+            });
+            if (copyToClipboard(content)) showStatus(copyTableButton);
+        };
+
+        updateUI();
+    });
+    </script>
+</body>
+</html>
