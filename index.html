@@ -133,15 +133,14 @@
 
     <!-- Message Box Modal -->
     <div id="messageBoxModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
-        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border-4 border-indigo-100 animate-in zoom-in duration-300 text-center">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border-4 border-indigo-100 animate-in zoom-in duration-300 text-center text-slate-800">
             <div id="messageBoxIcon" class="mb-4 text-5xl">⚠️</div>
-            <h3 id="messageBoxTitle" class="text-2xl font-black text-slate-800 mb-2">تنبيه</h3>
+            <h3 id="messageBoxTitle" class="text-2xl font-black mb-2">تنبيه</h3>
             <p id="messageBoxBody" class="text-slate-600 font-bold mb-6 leading-relaxed"></p>
             <button id="closeMessageBox" class="w-full py-4 btn-execute rounded-2xl text-xl font-black shadow-lg">حسناً</button>
         </div>
     </div>
 
-    <!-- Logos -->
     <div class="flex justify-between items-start mb-8">
         <img src="00.png" alt="Logo1" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo1'">
         <img src="02.jpg" alt="Logo2" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo2'">
@@ -149,9 +148,8 @@
 
     <main class="max-w-7xl mx-auto w-full bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl flex-grow mb-12">
         <h1 id="mainTitle" class="text-4xl thin-title text-center mb-2 text-slate-800 font-black uppercase tracking-tight">تحليل نتائج الاستبيان</h1>
-        <p class="text-center text-indigo-700 mb-8 text-xl font-bold" id="instituteTitle">المعهد العالي للهندسة والتكنولوجيا بكفر الشيخ - وحدة ضمان الجودة</p>
+        <p class="text-center text-indigo-700 mb-8 text-xl font-bold" id="instituteTitle"></p>
         
-        <!-- Language Switch -->
         <div class="flex flex-col items-center space-y-6 mb-10">
             <div id="langToggle" class="flex rounded-xl shadow-inner bg-gray-100 p-1 cursor-pointer overflow-hidden border border-gray-200">
                 <span id="lang-ar" class="px-8 py-2 font-black transition-all rounded-lg active-lang">العربية</span>
@@ -159,10 +157,9 @@
             </div>
         </div>
 
-        <!-- Step 1: Data Source -->
         <div class="max-w-4xl mx-auto mb-10">
             <div class="input-card border-2 border-blue-100">
-                <h2 id="step1Title" class="text-xl font-bold text-center mb-6 text-slate-700 font-black">الخطوة 1: اختر مصدر ملف البيانات</h2>
+                <h2 id="step1Title" class="text-xl font-bold text-center mb-6 text-slate-700 font-black"></h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <button id="srcLocalBtn" class="p-6 border-2 border-blue-200 rounded-2xl hover-zoom bg-blue-50 font-bold text-indigo-800 transition-all">📁 تحميل محلي</button>
                     <button id="srcGoogleBtn" class="p-6 border-2 border-green-200 rounded-2xl hover-zoom bg-green-50 font-bold text-green-800 transition-all">🌐 رابط جوجل شيت</button>
@@ -172,52 +169,50 @@
                 <div id="localInputPanel" class="hidden">
                     <label class="block w-full cursor-pointer text-center">
                         <div class="p-8 btn-execute rounded-2xl shadow-md hover-zoom">
-                            <span id="localFileBtnText" class="text-xl font-bold text-white">اختر ملف XLSX أو CSV من جهازك</span>
+                            <span id="localFileBtnText" class="text-xl font-bold text-white"></span>
                             <input type="file" id="xlsxFile" class="hidden" accept=".xlsx, .xls, .csv">
                         </div>
                     </label>
                 </div>
                 <div id="googleInputPanel" class="hidden space-y-4">
-                    <input type="text" id="googleLink" placeholder="ضع رابط جوجل شيت العام هنا...">
-                    <button id="fetchGoogleBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white hover-zoom">جلب البيانات</button>
+                    <input type="text" id="googleLink" placeholder="">
+                    <button id="fetchGoogleBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white"></button>
                 </div>
                 <div id="githubInputPanel" class="hidden space-y-4">
                     <input type="text" id="githubFileName" value="data.xlsx">
-                    <button id="fetchGithubBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white hover-zoom">جلب الملف من السيرفر</button>
+                    <button id="fetchGithubBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white"></button>
                 </div>
-                <div id="loadingMessage" class="hidden mt-4 text-indigo-700 font-black animate-pulse text-lg italic text-center">جاري المعالجة...</div>
+                <div id="loadingMessage" class="hidden mt-4 text-indigo-700 font-black animate-pulse text-lg italic text-center"></div>
             </div>
         </div>
 
-        <!-- Step 2: Mapping -->
         <div id="dataConfigSection" class="hidden grid grid-cols-1 gap-8 mb-10">
             <div class="input-card bg-blue-50/50 border-2 border-blue-100">
                 <div class="text-center border-b border-blue-100 pb-4 mb-6">
-                    <p id="step2Title" class="text-slate-900 font-black thin-title text-2xl uppercase">الخطوة 2: تعيين البيانات</p>
+                    <p id="step2Title" class="text-slate-900 font-black thin-title text-2xl uppercase"></p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                     <div class="flex flex-col">
-                        <label id="labelFilterCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center">عمود القسم / التصفية</label>
-                        <select id="filterColSelect" class="p-4 font-bold text-center hover-zoom"></select>
+                        <label id="labelFilterCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
+                        <select id="filterColSelect" class="p-4 font-bold text-center"></select>
                     </div>
                     <div class="flex flex-col">
-                        <label id="labelStartCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center">بداية أسئلة الاستبيان</label>
-                        <select id="analysisStartColSelect" class="p-4 font-bold text-center hover-zoom"></select>
+                        <label id="labelStartCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
+                        <select id="analysisStartColSelect" class="p-4 font-bold text-center"></select>
                     </div>
                 </div>
                 <div class="flex justify-center">
-                    <button id="confirmMappingBtn" class="px-10 py-4 btn-execute text-xl font-black rounded-2xl shadow-lg hover-zoom uppercase text-white">تأكيد الإعدادات وتوليد الفلاتر</button>
+                    <button id="confirmMappingBtn" class="px-10 py-4 btn-execute text-xl font-black rounded-2xl shadow-lg hover-zoom uppercase text-white"></button>
                 </div>
             </div>
         </div>
 
-        <!-- Step 3: Filter & Scale -->
         <div id="filterSection" class="hidden max-w-2xl mx-auto mb-10">
             <div class="input-card border-indigo-200 bg-indigo-50/30">
                 <div class="flex flex-col">
-                    <label id="labelDeptFilter" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center font-black">تصفية حسب القسم المختار</label>
-                    <select id="deptFilterSelect" class="p-4 font-bold text-center hover-zoom">
-                        <option value="all">تحليل المعهد بالكامل</option>
+                    <label id="labelDeptFilter" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center font-black"></label>
+                    <select id="deptFilterSelect" class="p-4 font-bold text-center">
+                        <option value="all"></option>
                     </select>
                 </div>
             </div>
@@ -225,19 +220,18 @@
 
         <div id="scaleOrderSection" class="hidden mb-10 p-8 bg-slate-100 rounded-3xl shadow-inner border border-slate-200">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 text-right">
-                <div id="scaleHeaderBox">
-                    <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 font-black">الخطوة 3: ترتيب المقاييس</h2>
-                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic">قم بترتيب خيارات الإجابة بسحبها (الأعلى قيمة في الأعلى).</p>
+                <div>
+                    <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 font-black"></h2>
+                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic"></p>
                 </div>
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center shadow-sm">
-                    <label id="labelThreshold" class="font-black text-xs text-slate-800 ml-4 uppercase">حد الإيجابيات (%):</label>
+                    <label id="labelThreshold" class="font-black text-xs text-slate-800 ml-4 uppercase"></label>
                     <input type="number" id="positivesThresholdInput" value="85" min="0" max="100" class="w-24 px-4 py-2 border rounded-xl font-black text-xl text-center text-indigo-700">
                 </div>
             </div>
             <div id="scaleGroupsContainer" class="space-y-10"></div>
         </div>
 
-        <!-- Final Actions -->
         <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
             <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase text-white">حلل البيانات الآن</button>
             <div class="flex gap-4 w-full justify-center">
@@ -251,7 +245,6 @@
             <p id="participantCountDisplay" class="text-2xl text-indigo-800 font-black hidden uppercase tracking-tighter"></p>
         </div>
 
-        <!-- Containers -->
         <div id="resultsContainer" class="hidden space-y-16"></div>
         <div id="chartContainer" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-10 mt-12"></div>
         <div id="positiveNegativeItemsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 mt-12"></div>
@@ -263,7 +256,7 @@
     </footer>
 
     <script>
-    // --- 1. Global Utilities ---
+    // --- 1. Global Utilities & State ---
     let currentLang = 'ar';
     let rawExcelData = null;
     let identifiedScaleGroups = new Map();
@@ -278,8 +271,8 @@
             participants: 'Participants',
             pos: 'Positive',
             copied: 'Copied!',
-            emptyList: 'No items found',
-            headers: { no: '#', item: 'Statement', total: 'Total (%)', positives: 'Positives (%)', footer: 'Average' },
+            emptyList: 'No items',
+            headers: { no: '#', item: 'Statement', checkTotal: 'Row Total (%)', total: 'Total (%)', positives: 'Positives (%)', footer: 'Average' },
             strengths: '★ Core Strengths',
             improvement: '⚠️ Critical Improvement Areas',
             recommendation: 'Final Recommendation',
@@ -291,7 +284,7 @@
             step1G: '🌐 Google Sheet',
             step1H: '🐙 GitHub File',
             localHint: 'Choose XLSX or CSV',
-            googleHint: 'Paste public link here...',
+            googleHint: 'Paste link here...',
             fetch: 'Fetch Data',
             step2: 'Step 2: Data Mapping',
             confirm: 'Confirm Mapping',
@@ -317,7 +310,7 @@
             pos: 'إيجابي',
             copied: 'تم النسخ!',
             emptyList: 'لا توجد بنود',
-            headers: { no: '#', item: 'بيان البند', total: 'الإجمالي (%)', positives: 'الإيجابيات (%)', footer: 'المتوسط' },
+            headers: { no: '#', item: 'بيان البند', checkTotal: 'إجمالي الصف (%)', total: 'الإجمالي (%)', positives: 'الإيجابيات (%)', footer: 'المتوسط' },
             strengths: '★ نقاط القوة الأساسية',
             improvement: '⚠️ مجالات التحسين الحرجة',
             recommendation: 'التوصية النهائية',
@@ -362,14 +355,6 @@
         setTimeout(() => btnEl.innerHTML = originalHtml, 2000);
     }
 
-    function showMessage(title, text, type = 'warning') {
-        const modal = document.getElementById('messageBoxModal');
-        modal.querySelector('#messageBoxTitle').textContent = title;
-        modal.querySelector('#messageBoxBody').textContent = text;
-        modal.querySelector('#messageBoxIcon').textContent = type === 'error' ? '❌' : (type === 'success' ? '✅' : '⚠️');
-        modal.classList.remove('hidden');
-    }
-
     function copyToClipboard(text) {
         const textArea = document.createElement("textarea");
         textArea.value = text;
@@ -391,7 +376,7 @@
         container.appendChild(wrapper);
     }
 
-    // --- 2. Render Functions ---
+    // --- 2. Logic Functions ---
 
     function renderScaleGroups() {
         const container = document.getElementById('scaleGroupsContainer');
@@ -434,50 +419,40 @@
         const avgPos = totalRes ? (domainPos / totalRes * 100).toFixed(1) : '0.0';
         const alignClass = currentLang === 'ar' ? 'text-right' : 'text-left';
         
-        let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black ${alignClass}">${title}</h2><div class="overflow-x-auto"><table class="w-full text-sm ${alignClass}"><thead class="bg-slate-100"><tr><th class="p-6">#</th><th class="p-6 text-right">${d.headers.item}</th>${opts.map(o => `<th class="p-6 text-center text-indigo-700">${o}</th>`).join('')}<th class="p-6 text-center font-black">${d.headers.positives}</th></tr></thead><tbody>`;
+        let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black ${alignClass}">${title}</h2><div class="overflow-x-auto"><table class="w-full text-sm ${alignClass}"><thead class="bg-slate-100"><tr><th class="p-6">#</th><th class="p-6 text-right">${d.headers.item}</th>${opts.map(o => `<th class="p-6 text-center text-indigo-700 font-black">${o}</th>`).join('')}<th class="p-6 text-center font-bold text-blue-600">${d.headers.checkTotal}</th><th class="p-6 text-center font-black">${d.headers.positives}</th></tr></thead><tbody>`;
+        
         rows.forEach((r, i) => { 
-            html += `<tr class="border-b border-slate-50"><td class="p-6 text-center text-slate-500">${i+1}</td><td class="p-6 font-bold text-slate-800 text-right">${r.item}</td>${opts.map(o => `<td class="p-6 text-center">${(r.freqs[o]/r.total*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center font-black text-green-700 bg-green-50">${r.posPerc.toFixed(1)}%</td></tr>`; 
+            // Correct calculation: sum raw values, then round to 1 decimal place to show 100.0
+            const rowCheckSum = opts.reduce((acc, o) => acc + (r.freqs[o] / r.total * 100), 0);
+            html += `<tr class="border-b border-slate-50"><td class="p-6 text-center text-slate-500 font-bold">${i+1}</td><td class="p-6 font-bold text-slate-800 text-right">${r.item}</td>${opts.map(o => `<td class="p-6 text-center">${(r.freqs[o]/r.total*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center font-bold text-blue-500 bg-blue-50/30">${rowCheckSum.toFixed(1)}%</td><td class="p-6 text-center font-black text-green-700 bg-green-50">${r.posPerc.toFixed(1)}%</td></tr>`; 
         });
-        html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td colspan="2" class="p-6 text-center uppercase">${d.headers.footer}</td>${opts.map(o => `<td class="p-6 text-center">${((rows.reduce((s, r) => s + r.freqs[o], 0)/totalRes)*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center text-green-800 text-lg">${avgPos}%</td></tr></tfoot></table></div>`;
+        
+        html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td colspan="2" class="p-6 text-center uppercase">${d.headers.footer}</td>${opts.map(o => `<td class="p-6 text-center">${((rows.reduce((s, r) => s + r.freqs[o], 0)/totalRes)*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center">100.0%</td><td class="p-6 text-center text-green-800 text-lg font-black">${avgPos}%</td></tr></tfoot></table></div>`;
         div.innerHTML = html;
         attachCopyButton(div, (btn) => {
             let content = title + '\n';
             div.querySelectorAll('table tr').forEach(tr => {
-                let rowArr = []; 
+                let rArr = []; 
                 tr.querySelectorAll('th, td').forEach(c => {
                     const cs = parseInt(c.getAttribute('colspan') || 1);
-                    rowArr.push(sanitizeValue(c.innerText));
-                    for(let k=1; k < cs; k++) rowArr.push(""); 
+                    rArr.push(sanitizeValue(c.innerText.trim()));
+                    for(let k=1; k < cs; k++) rArr.push(""); 
                 });
-                content += rowArr.join('\t') + '\n';
+                content += rArr.join('\t') + '\n';
             });
             copyToClipboard(content); showStatus(btn);
         });
         container.appendChild(div);
     }
 
-    function renderSummaryTable(summaryDataList) {
+    function renderFinalRecommendation(score) {
         const d = languageData[currentLang];
-        const container = document.getElementById('resultsContainer');
+        const container = document.getElementById('finalRecommendationContainer');
         const div = document.createElement('div');
-        div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-200 overflow-hidden hover-zoom mt-16 summary-table-wrapper';
-        const gTotal = summaryDataList.reduce((s, dm) => s + dm.total, 0);
-        const gPos = summaryDataList.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
-        const alignClass = currentLang === 'ar' ? 'text-right' : 'text-left';
-
-        let html = `<h2 class="text-3xl thin-title p-8 bg-indigo-700 text-white font-black text-center">Summary</h2><table class="w-full text-lg ${alignClass}"><thead class="bg-indigo-50"><tr><th class="p-8 text-center">#</th><th class="p-8">Domain</th><th class="p-8 text-center">${d.headers.positives}</th></tr></thead><tbody>`;
-        summaryDataList.forEach((dm, i) => { const pSum = Array.from(dm.positives).reduce((s,o)=>s+(dm.freqs[o]||0),0); html += `<tr class="border-b border-indigo-50"><td class="p-8 text-center text-indigo-300 font-black">${i+1}</td><td class="p-8 font-black text-slate-800">${dm.name}</td><td class="p-8 text-center font-black text-green-600">${(pSum/dm.total*100).toFixed(1)}%</td></tr>`; });
-        html += `</tbody><tfoot class="bg-indigo-100 font-black"><tr><td colspan="2" class="p-8 text-center uppercase">Total Average</td><td class="p-8 text-center text-green-800 text-2xl font-black">${(gPos/gTotal*100).toFixed(1)}%</td></tr></tfoot></table>`;
-        div.innerHTML = html;
-        attachCopyButton(div, (btn) => {
-            let txt = 'Summary\n';
-            div.querySelectorAll('table tr').forEach(tr => {
-                let rArr=[]; tr.querySelectorAll('th, td').forEach(c=>{ const cs = parseInt(c.getAttribute('colspan') || 1); rArr.push(sanitizeValue(c.innerText)); for(let k=1; k < cs; k++) rArr.push(""); });
-                txt += rArr.join('\t') + '\n';
-            });
-            copyToClipboard(txt); showStatus(btn);
-        });
-        container.appendChild(div);
+        div.className = 'relative p-12 bg-white rounded-[3.5rem] shadow-2xl border-4 border-indigo-400 hover-zoom mb-20 text-center animate-in fade-in duration-700';
+        let evalTxt = score > 85 ? d.evaluations[0] : score > 75 ? d.evaluations[1] : score > 65 ? d.evaluations[2] : score > 50 ? d.evaluations[3] : d.evaluations[4];
+        div.innerHTML = `<h2 class="text-4xl thin-title mb-10 text-center text-indigo-900 font-black border-b-2 border-indigo-50 pb-6">${d.recommendation}</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-10"><div class="p-8 bg-indigo-50 rounded-[2.5rem] text-center border-2 border-indigo-100 flex flex-col justify-center items-center"><span class="text-xs font-black text-indigo-400 mb-2 uppercase font-black">${d.finalResult}</span><span class="text-6xl font-black text-indigo-800">${score.toFixed(2)}%</span></div><div class="p-8 bg-green-50 rounded-[2.5rem] text-center border-2 border-green-100 flex flex-col justify-center items-center"><span class="text-xs font-black text-green-400 mb-2 uppercase font-black">${d.evalLabel}</span><span class="text-6xl font-black text-green-700">${evalTxt}</span></div></div>`;
+        container.innerHTML = ''; container.appendChild(div); container.classList.remove('hidden');
     }
 
     function renderHighlightLists(items) {
@@ -495,32 +470,23 @@
         sDiv.innerHTML = `<h4 class="text-3xl font-black text-green-800 mb-8 flex items-center ${iconAlign}">${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold">${high.length ? high.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-green-100 shadow-sm">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
         const iDiv = document.createElement('div');
         iDiv.className = `p-10 bg-red-50 rounded-[3rem] border-4 border-red-200 shadow-lg hover-zoom w-full ${textAlign}`;
-        iDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8 flex items-center ${iconAlign}">${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold">${low.length ? low.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-green-100 shadow-sm">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
+        iDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8 flex items-center ${iconAlign}">${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold">${low.length ? low.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-red-100 shadow-sm">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
         container.appendChild(sDiv); container.appendChild(iDiv);
         container.classList.remove('hidden');
     }
 
-    function renderFinalRecommendation(score) {
-        const d = languageData[currentLang];
-        const container = document.getElementById('finalRecommendationContainer');
-        const div = document.createElement('div');
-        div.className = 'relative p-12 bg-white rounded-[3.5rem] shadow-2xl border-4 border-indigo-400 hover-zoom mb-20 text-center animate-in fade-in duration-700';
-        let evalTxt = score > 85 ? d.evaluations[0] : score > 75 ? d.evaluations[1] : score > 65 ? d.evaluations[2] : score > 50 ? d.evaluations[3] : d.evaluations[4];
-        div.innerHTML = `<h2 class="text-4xl thin-title mb-10 text-center text-indigo-900 font-black border-b-2 border-indigo-50 pb-6">${d.recommendation}</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-10"><div class="p-8 bg-indigo-50 rounded-[2.5rem] text-center border-2 border-indigo-100 flex flex-col justify-center items-center"><span class="text-xs font-black text-indigo-400 mb-2 uppercase">${d.finalResult}</span><span class="text-6xl font-black text-indigo-800">${score.toFixed(2)}%</span></div><div class="p-8 bg-green-50 rounded-[2.5rem] text-center border-2 border-green-100 flex flex-col justify-center items-center"><span class="text-xs font-black text-green-400 mb-2 uppercase">${d.evalLabel}</span><span class="text-6xl font-black text-green-700">${evalTxt}</span></div></div>`;
-        container.innerHTML = ''; container.appendChild(div); container.classList.remove('hidden');
-    }
-
-    // --- 4. Main Controller Logic ---
+    // --- 3. DOM Controllers ---
 
     document.addEventListener('DOMContentLoaded', () => {
-        if (typeof ChartDataLabels !== 'undefined') { Chart.register(ChartDataLabels); }
-
-        // Logic functions localized to DOM ready
         function updateUI() {
             const d = languageData[currentLang];
             document.getElementById('mainTitle').textContent = d.title;
             document.getElementById('instituteTitle').innerText = d.devCredit;
             document.getElementById('step1Title').textContent = d.step1;
+            document.getElementById('analyzeButton').textContent = d.analyzeNow;
+            document.getElementById('exportButton').textContent = d.export;
+            document.getElementById('copyTableButton').textContent = d.copyAll;
+            document.getElementById('deptFilterSelect').options[0].text = d.allInstitute;
             document.getElementById('srcLocalBtn').textContent = d.step1Btn;
             document.getElementById('srcGoogleBtn').textContent = d.step1G;
             document.getElementById('srcGithubBtn').textContent = d.step1H;
@@ -536,10 +502,7 @@
             document.getElementById('scaleOrderTitle').textContent = d.step3;
             document.getElementById('scaleOrderSubtitle').textContent = d.step3Hint;
             document.getElementById('labelThreshold').textContent = d.threshold;
-            document.getElementById('analyzeButton').textContent = d.analyzeNow;
-            document.getElementById('exportButton').textContent = d.export;
-            document.getElementById('copyTableButton').textContent = d.copyAll;
-            document.getElementById('deptFilterSelect').options[0].text = d.allInstitute;
+            
             document.getElementById('lang-ar').classList.toggle('active-lang', currentLang === 'ar');
             document.getElementById('lang-en').classList.toggle('active-lang', currentLang === 'en');
             document.getElementById('mainHtml').dir = currentLang === 'ar' ? 'rtl' : 'ltr';
@@ -555,16 +518,16 @@
             document.getElementById('fileNameDisplay').classList.remove('hidden');
             document.getElementById('dataConfigSection').classList.remove('hidden');
             const headers = rawExcelData[0] || [];
-            document.getElementById('filterColSelect').innerHTML = ''; 
-            document.getElementById('analysisStartColSelect').innerHTML = '';
+            const fs = document.getElementById('filterColSelect');
+            const as = document.getElementById('analysisStartColSelect');
+            fs.innerHTML = ''; as.innerHTML = '';
             headers.forEach((h, i) => {
                 const colLetter = i < 26 ? String.fromCharCode(65 + i) : `C${i+1}`;
                 const opt = new Option(`${colLetter}: ${h || '---'}`, i);
-                document.getElementById('filterColSelect').add(opt.cloneNode(true));
-                document.getElementById('analysisStartColSelect').add(opt);
+                fs.add(opt.cloneNode(true)); as.add(opt);
             });
-            document.getElementById('filterColSelect').value = Math.min(1, headers.length - 1); 
-            document.getElementById('analysisStartColSelect').value = Math.min(2, headers.length - 1); 
+            fs.value = Math.min(1, headers.length - 1); 
+            as.value = Math.min(2, headers.length - 1); 
             loadingMessage.classList.add('hidden');
         }
 
@@ -587,7 +550,7 @@
                 const match = link.match(/[-\w]{25,}/); if (!match) throw new Error();
                 const resp = await fetch(`https://docs.google.com/spreadsheets/d/${match[0]}/export?format=csv`);
                 if (!resp.ok) throw new Error();
-                processWorkbook(XLSX.read(await resp.text(), { type: 'string' }), "Google Data");
+                processWorkbook(XLSX.read(await resp.text(), { type: 'string' }), "Google Sheet");
             } catch(e) { showMessage(languageData[currentLang].googleErrorTitle, languageData[currentLang].googleErrorBody); loadingMessage.classList.add('hidden'); }
         };
 
@@ -597,7 +560,7 @@
             try {
                 const resp = await fetch(fName);
                 processWorkbook(XLSX.read(new Uint8Array(await resp.arrayBuffer()), { type: 'array' }), fName);
-            } catch(e) { showMessage('خطأ', 'الملف غير موجود.'); loadingMessage.classList.add('hidden'); }
+            } catch(e) { showMessage('Error', 'File not found.'); loadingMessage.classList.add('hidden'); }
         };
 
         document.getElementById('confirmMappingBtn').onclick = () => {
@@ -661,11 +624,11 @@
                 
                 if (groupData.isSuggestion) {
                     itemsInGroup.forEach(item => {
-                        const d = languageData[currentLang];
                         const div = document.createElement('div');
                         div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-100 overflow-hidden hover-zoom mb-10 suggestion-wrapper';
                         const joined = item.responses.map(r => String(r || "").trim()).filter(r => r !== "").join(' & ');
-                        div.innerHTML = `<div class="p-8 bg-indigo-50 border-b-2 border-indigo-100"><h2 class="text-3xl font-black">${item.txt}</h2><p class="text-xs font-black text-indigo-500 mt-2 uppercase tracking-widest">${d.suggestionsTitle}</p></div><div class="p-8"><div class="suggestion-box">${joined || `<span class="italic text-slate-400 font-bold">${d.emptyList}</span>`}</div></div>`;
+                        const align = currentLang === 'ar' ? 'text-right' : 'text-left';
+                        div.innerHTML = `<div class="p-8 bg-indigo-50 border-b-2 border-indigo-100 ${align}"><h2 class="text-3xl font-black">${item.txt}</h2><p class="text-xs font-black text-indigo-500 mt-2 uppercase tracking-widest">${languageData[currentLang].suggestionsTitle}</p></div><div class="p-8 ${align}"><div class="suggestion-box">${joined || `<span class="italic text-slate-400 font-bold">${languageData[currentLang].emptyList}</span>`}</div></div>`;
                         attachCopyButton(div, (btn) => { copyToClipboard(`${item.txt}\n---\n${joined}`); showStatus(btn); });
                         document.getElementById('resultsContainer').appendChild(div);
                     });
@@ -692,15 +655,27 @@
                             const res = { item: it, freqs, total: rps.length, posPerc: rps.length ? (posCount/rps.length)*100 : 0 };
                             allItemsList.push(res); return res;
                         });
+                        
                         renderTable(dName, rowsData, groupData.options, groupData.positives);
+                        
+                        // Charts
                         const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
                         const divC = document.createElement('div');
                         divC.className = 'bg-white p-10 rounded-[2.5rem] shadow-xl border-2 border-blue-100 hover-zoom flex flex-col items-center';
-                        divC.innerHTML = `<h3 class="text-2xl font-black mb-8 text-center text-indigo-900">${dName}</h3><div class="w-full h-96"><canvas id="${canvasId}"></canvas></div>`;
+                        divC.innerHTML = `<h3 class="text-2xl font-black mb-8 text-center text-indigo-900 font-black">${dName}</h3><div class="w-full h-96"><canvas id="${canvasId}"></canvas></div>`;
                         document.getElementById('chartContainer').appendChild(divC);
                         const ctx = document.getElementById(canvasId).getContext('2d');
-                        const dataVals = groupData.options.map(o => { const sum = rowsData.reduce((s, r) => s + r.freqs[o], 0); const total = rowsData.reduce((s, r) => s + r.total, 0); return total ? (sum/total*100).toFixed(1) : 0; });
-                        chartInstances.push(new Chart(ctx, { type: 'bar', data: { labels: groupData.options, datasets: [{ data: dataVals, backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], borderRadius: 15 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', font: { weight: 'bold' }, formatter: v => v+'%' } } } }));
+                        const dataVals = groupData.options.map(o => {
+                            const sum = rowsData.reduce((s, r) => s + r.freqs[o], 0);
+                            const total = rowsData.reduce((s, r) => s + r.total, 0);
+                            return total ? (sum/total*100).toFixed(1) : 0;
+                        });
+                        chartInstances.push(new Chart(ctx, {
+                            type: 'bar',
+                            data: { labels: groupData.options, datasets: [{ data: dataVals, backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], borderRadius: 15 }] },
+                            options: { maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', font: { weight: 'bold' }, formatter: v => v+'%' } } }
+                        }));
+
                         const dFreqs = {}; groupData.options.forEach(o => dFreqs[o] = rowsData.reduce((s, r) => s + r.freqs[o], 0));
                         summaryDataList.push({ name: dName, freqs: dFreqs, total: rowsData.reduce((s, r) => s + r.total, 0), positives: groupData.positives });
                     });
@@ -714,34 +689,31 @@
                 const gPos = allItemsList.reduce((s, i) => s + (i.posPerc/100 * i.total), 0);
                 renderFinalRecommendation(gTotal ? (gPos / gTotal * 100) : 0);
             }
-            document.getElementById('resultsContainer').classList.remove('hidden'); 
-            document.getElementById('chartContainer').classList.remove('hidden'); 
+            document.getElementById('resultsContainer').classList.remove('hidden'); document.getElementById('chartContainer').classList.remove('hidden'); 
             document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth' });
         };
 
+        // --- Copy & Export ---
         document.getElementById('copyTableButton').onclick = () => {
             const d = languageData[currentLang];
             let content = `--- ${d.title} ---\n${d.devCredit}\n\n`;
             document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(block => {
                 const h2 = block.querySelector('h2'); if (h2) content += `\n[ ${h2.innerText} ]\n`;
                 const table = block.querySelector('table');
-                if (table) {
-                    table.querySelectorAll('tr').forEach(tr => {
-                        let rD = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); rD.push(sanitizeValue(c.innerText.trim())); for(let k=1; k < cs; k++) rD.push(""); });
-                        content += rD.join('\t') + '\n';
-                    });
-                }
+                if (table) table.querySelectorAll('tr').forEach(tr => {
+                    let rD = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); rD.push(c.innerText.trim()); for(let k=1; k < cs; k++) rD.push(""); });
+                    content += rD.join('\t') + '\n';
+                });
                 const sb = block.querySelector('.suggestion-box'); if (sb) content += sb.innerText + '\n';
             });
             document.querySelectorAll('#positiveNegativeItemsContainer > div').forEach(box => {
-                const h4 = box.querySelector('h4'); if (h4) content += `\n[ ${h4.innerText} ]\n`;
-                box.querySelectorAll('li').forEach(li => content += `- ${li.innerText}\n`);
+                const h4 = box.querySelector('h4'); if (h4) { content += `\n[ ${h4.innerText} ]\n`; box.querySelectorAll('li').forEach(li => content += `- ${li.innerText}\n`); }
             });
             const rec = document.querySelector('#finalRecommendationContainer div');
             if (rec) {
                 const h2 = rec.querySelector('h2'); if (h2) content += `\n*** ${h2.innerText} ***\n`;
                 const stats = rec.querySelectorAll('.text-6xl'); const lbls = rec.querySelectorAll('.text-xs');
-                stats.forEach((stat, i) => { content += `${lbls[i] ? lbls[i].innerText : 'Result'}: ${stat.innerText}\n`; });
+                stats.forEach((stat, i) => { content += `${lbls[i].innerText}: ${stat.innerText}\n`; });
             }
             if (copyToClipboard(content)) { showStatus(document.getElementById('copyTableButton')); }
         };
@@ -749,23 +721,46 @@
         document.getElementById('exportButton').onclick = () => {
             const d = languageData[currentLang];
             const wb = XLSX.utils.book_new(); let allD = [[d.title], [d.devCredit], []];
+            
             document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(s => {
                 allD.push([sanitizeValue(s.querySelector('h2').innerText)]);
                 const tbl = s.querySelector('table');
-                if (tbl) tbl.querySelectorAll('tr').forEach(tr => { let r = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); r.push(sanitizeValue(c.innerText)); for(let k=1; k < cs; k++) r.push(""); }); allD.push(r); });
+                if (tbl) {
+                    tbl.querySelectorAll('tr').forEach(tr => {
+                        let r = [];
+                        tr.querySelectorAll('th, td').forEach(c => {
+                            const cs = parseInt(c.getAttribute('colspan') || 1);
+                            let val = c.innerText.trim();
+                            if (val.endsWith('%')) {
+                                let num = parseFloat(val.replace('%', ''));
+                                if (!isNaN(num)) r.push(num); else r.push(val);
+                            } else {
+                                r.push(sanitizeValue(val));
+                            }
+                            for(let k=1; k < cs; k++) r.push("");
+                        });
+                        allD.push(r);
+                    });
+                }
                 const box = s.querySelector('.suggestion-box'); if (box) allD.push([sanitizeValue(box.innerText)]);
                 allD.push([]);
             });
+
             document.querySelectorAll('#positiveNegativeItemsContainer > div').forEach(box => {
                 const h4 = box.querySelector('h4'); if (h4) { allD.push([sanitizeValue(h4.innerText)]); box.querySelectorAll('li').forEach(li => allD.push(["-", sanitizeValue(li.innerText)])); allD.push([]); }
             });
+
             const rec = document.querySelector('#finalRecommendationContainer div');
             if (rec) {
                 const h2 = rec.querySelector('h2'); if (h2) allD.push([sanitizeValue(h2.innerText)]);
                 const stats = rec.querySelectorAll('.text-6xl'); const lbls = rec.querySelectorAll('.text-xs');
-                stats.forEach((stat, i) => { allD.push([sanitizeValue(lbls[i].innerText), sanitizeValue(stat.innerText)]); });
+                stats.forEach((stat, i) => { 
+                    let val = stat.innerText.replace('%', '');
+                    allD.push([sanitizeValue(lbls[i].innerText), isNaN(parseFloat(val)) ? val : parseFloat(val)]); 
+                });
             }
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(allD), "Report");
+
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(allD), "Analysis");
             XLSX.writeFile(wb, `Survey_Report.xlsx`);
         };
 
@@ -774,6 +769,31 @@
 
         updateUI();
     });
+
+    // Helper functions for Summary table in Analyze loop
+    function renderSummaryTable(summaryDataList) {
+        const d = languageData[currentLang];
+        const container = document.getElementById('resultsContainer');
+        const div = document.createElement('div');
+        div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-200 overflow-hidden hover-zoom mt-16 summary-table-wrapper';
+        const gTotal = summaryDataList.reduce((s, dm) => s + dm.total, 0);
+        const gPos = summaryDataList.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
+        const alignClass = currentLang === 'ar' ? 'text-right' : 'text-left';
+
+        let html = `<h2 class="text-3xl thin-title p-8 bg-indigo-700 text-white font-black text-center">Summary</h2><table class="w-full text-lg ${alignClass}"><thead class="bg-indigo-50"><tr><th class="p-8 text-center">#</th><th class="p-8">Domain</th><th class="p-8 text-center font-black">${d.headers.positives}</th></tr></thead><tbody>`;
+        summaryDataList.forEach((dm, i) => { const pSum = Array.from(dm.positives).reduce((s,o)=>s+(dm.freqs[o]||0),0); html += `<tr class="border-b border-indigo-50"><td class="p-8 text-center text-indigo-300 font-black">${i+1}</td><td class="p-8 font-black text-slate-800">${dm.name}</td><td class="p-8 text-center font-black text-green-600">${(pSum/dm.total*100).toFixed(1)}%</td></tr>`; });
+        html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300"><tr><td colspan="2" class="p-8 text-center uppercase">Total Average</td><td class="p-8 text-center text-green-800 text-2xl font-black">${(gPos/gTotal*100).toFixed(1)}%</td></tr></tfoot></table>`;
+        div.innerHTML = html;
+        attachCopyButton(div, (btn) => {
+            let txt = 'Summary\n';
+            div.querySelectorAll('table tr').forEach(tr => {
+                let rArr=[]; tr.querySelectorAll('th, td').forEach(c=>{ const cs = parseInt(c.getAttribute('colspan') || 1); rArr.push(sanitizeValue(c.innerText)); for(let k=1; k < cs; k++) rArr.push(""); });
+                txt += rArr.join('\t') + '\n';
+            });
+            copyToClipboard(txt); showStatus(btn);
+        });
+        container.appendChild(div);
+    }
     </script>
 </body>
 </html>
