@@ -74,15 +74,56 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        select, input[type="text"], input[type="number"] {
-            appearance: none;
+        /* Custom Multi-select styles */
+        .multi-select-container {
+            position: relative;
+            width: 100%;
+        }
+        .multi-select-trigger {
             background-color: white;
             border: 1px solid #cbd5e1;
             padding: 1rem;
             border-radius: 1rem;
-            outline: none;
-            width: 100%;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             font-weight: 600;
+            min-height: 3.5rem;
+        }
+        .multi-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 1rem;
+            margin-top: 5px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 50;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        .multi-select-dropdown.active {
+            display: block;
+        }
+        .multi-select-item {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .multi-select-item:hover {
+            background-color: #f1f5f9;
+        }
+        .multi-select-item input {
+            width: 1.2rem;
+            height: 1.2rem;
+            cursor: pointer;
         }
 
         .active-lang {
@@ -118,7 +159,7 @@
             align-items: center;
         }
 
-        /* Floating Nav Styles */
+        /* Floating Nav */
         .floating-nav {
             position: fixed;
             top: 50%;
@@ -134,7 +175,6 @@
             border: 1px solid rgba(255, 255, 255, 0.6);
             box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.15);
         }
-
         [dir="rtl"] .floating-nav { left: 1rem; }
         [dir="ltr"] .floating-nav { right: 1rem; }
 
@@ -152,13 +192,7 @@
             position: relative;
             color: #4f46e5;
         }
-
-        .nav-dot:hover {
-            background: #4f46e5;
-            color: white;
-            transform: scale(1.15);
-        }
-
+        .nav-dot:hover { background: #4f46e5; color: white; transform: scale(1.15); }
         .nav-tooltip {
             position: absolute;
             white-space: nowrap;
@@ -173,18 +207,12 @@
             transition: all 0.3s;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-
         [dir="rtl"] .nav-tooltip { left: 55px; }
         [dir="ltr"] .nav-tooltip { right: 55px; }
-
         .nav-dot:hover .nav-tooltip { opacity: 1; }
 
-        /* Printing Control */
         @media print {
-            @page {
-                size: A4;
-                margin: 15mm;
-            }
+            @page { size: A4; margin: 15mm; }
             body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 11pt !important; }
             .input-card, #langToggle, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .flex.justify-between.items-start.mb-8 {
                 display: none !important;
@@ -193,92 +221,67 @@
             #mainTitle { font-size: 24pt !important; font-weight: 900 !important; margin-bottom: 5mm !important; text-align: center !important; }
             #instituteTitle { font-size: 14pt !important; text-align: center !important; margin-bottom: 10mm !important; }
             #fileNameDisplay { font-size: 18pt !important; display: block !important; margin-bottom: 5mm !important; text-align: center !important; }
-            
             .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper, #positiveNegativeItemsContainer > div, #finalRecommendationContainer > div, #chartContainer > div {
-                break-inside: avoid !important; 
-                page-break-inside: avoid !important; 
-                margin-bottom: 10mm !important; 
-                border: 1px solid #ddd !important; 
-                padding: 10mm !important;
-                background: white !important;
-                box-shadow: none !important;
+                break-inside: avoid !important; page-break-inside: avoid !important; margin-bottom: 10mm !important; border: 1px solid #ddd !important; padding: 10mm !important;
             }
             .copy-btn-wrapper { display: none !important; }
-            table { width: 100% !important; border-collapse: collapse !important; margin-top: 5mm !important; }
-            th, td { border: 1px solid #000 !important; padding: 6pt !important; text-align: center !important; color: black !important; }
-            .bg-blue-50, .bg-indigo-50, .bg-green-50, .bg-red-50, .bg-slate-50, .bg-indigo-700 {
-                background-color: #f9f9f9 !important;
-                -webkit-print-color-adjust: exact;
-            }
+            table { width: 100% !important; border-collapse: collapse !important; }
+            th, td { border: 1px solid #000 !important; padding: 6pt !important; }
         }
 
         .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper {
             animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="p-4 md:p-12 text-right" dir="rtl">
 
-    <!-- Floating Navigation - Organized by Page Flow -->
     <nav class="floating-nav" id="floatingNav">
-        <!-- 1. Source -->
         <a href="#step1Title" class="nav-dot hover-zoom">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
             <span class="nav-tooltip" id="tip-step1"></span>
         </a>
-        <!-- 2. Mapping -->
         <a href="#step2Title" class="nav-dot hover-zoom">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
             <span class="nav-tooltip" id="tip-step2"></span>
         </a>
-        <!-- 3. Filters -->
         <a href="#filterSection" class="nav-dot hover-zoom">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
             <span class="nav-tooltip" id="tip-filter"></span>
         </a>
-        <!-- 4. Scales -->
         <a href="#scaleOrderSection" class="nav-dot hover-zoom">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
             <span class="nav-tooltip" id="tip-step3"></span>
         </a>
-        <!-- 5. Tables -->
         <a href="#resultsContainer" class="nav-dot hover-zoom">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
             <span class="nav-tooltip" id="tip-results"></span>
         </a>
-        <!-- 6. Charts -->
         <a href="#chartContainer" class="nav-dot hover-zoom">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v10l8.5 2"></path></svg>
             <span class="nav-tooltip" id="tip-charts"></span>
         </a>
-        <!-- 7. Points -->
         <a href="#positiveNegativeItemsContainer" class="nav-dot hover-zoom">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14l2 2 4-4"></path></svg>
             <span class="nav-tooltip" id="tip-highlights"></span>
         </a>
-        <!-- 8. Eval -->
         <a href="#finalRecommendationContainer" class="nav-dot hover-zoom">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
             <span class="nav-tooltip" id="tip-final"></span>
         </a>
     </nav>
 
-    <!-- Modal Box -->
     <div id="messageBoxModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[110]">
         <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border-4 border-indigo-100 text-center font-black">
-            <div id="messageBoxIcon" class="mb-4 text-center text-5xl">⚠️</div>
-            <h3 id="messageBoxTitle" class="text-2xl font-black mb-2 text-slate-800">تنبيه</h3>
-            <p id="messageBoxBody" class="text-slate-600 font-bold mb-6 leading-relaxed"></p>
+            <div id="messageBoxIcon" class="mb-4 text-5xl">⚠️</div>
+            <h3 id="messageBoxTitle" class="text-2xl mb-2 text-slate-800">تنبيه</h3>
+            <p id="messageBoxBody" class="text-slate-600 mb-6 leading-relaxed"></p>
             <button id="closeMessageBox" class="w-full py-4 btn-execute rounded-2xl text-xl font-black shadow-lg">حسناً</button>
         </div>
     </div>
 
-    <!-- Headers -->
     <div class="flex justify-between items-start mb-8">
         <img src="00.png" alt="Logo1" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo1'">
         <img src="02.jpg" alt="Logo2" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo2'">
@@ -288,7 +291,6 @@
         <h1 id="mainTitle" class="text-4xl thin-title text-center mb-2 text-slate-800 font-black uppercase tracking-tight">تحليل نتائج الاستبيان</h1>
         <p class="text-center text-indigo-700 mb-8 text-xl font-bold font-black" id="instituteTitle"></p>
         
-        <!-- Language -->
         <div class="flex flex-col items-center space-y-6 mb-10">
             <div id="langToggle" class="flex rounded-xl shadow-inner bg-gray-100 p-1 cursor-pointer border border-gray-200">
                 <span id="lang-ar" class="px-8 py-2 font-black transition-all rounded-lg active-lang">العربية</span>
@@ -296,49 +298,48 @@
             </div>
         </div>
 
-        <!-- Inputs Section -->
         <div class="max-w-4xl mx-auto mb-10">
             <div class="input-card border-2 border-blue-100">
                 <h2 id="step1Title" class="text-xl font-bold text-center mb-6 text-slate-700 font-black">الخطوة 1: اختر مصدر ملف البيانات</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <button id="srcLocalBtn" class="p-6 border-2 border-blue-200 rounded-2xl hover-zoom bg-blue-50 font-bold text-indigo-800 transition-all font-black">📁 تحميل ملف محلي</button>
-                    <button id="srcGoogleBtn" class="p-6 border-2 border-green-200 rounded-2xl hover-zoom bg-green-50 font-bold text-green-800 transition-all font-black">🌐 رابط جوجل شيت</button>
-                    <button id="srcGithubBtn" class="p-6 border-2 border-slate-200 rounded-2xl hover-zoom bg-slate-50 font-bold text-slate-800 transition-all font-black">🐙 ملف من السيرفر</button>
+                    <button id="srcLocalBtn" class="p-6 border-2 border-blue-200 rounded-2xl hover-zoom bg-blue-50 font-bold text-indigo-800 transition-all">📁 تحميل ملف محلي</button>
+                    <button id="srcGoogleBtn" class="p-6 border-2 border-green-200 rounded-2xl hover-zoom bg-green-50 font-bold text-green-800 transition-all">🌐 رابط جوجل شيت</button>
+                    <button id="srcGithubBtn" class="p-6 border-2 border-slate-200 rounded-2xl hover-zoom bg-slate-50 font-bold text-slate-800 transition-all">🐙 ملف من السيرفر</button>
                 </div>
 
                 <div id="localInputPanel" class="hidden">
                     <label class="block w-full cursor-pointer text-center">
-                        <div class="p-8 btn-execute rounded-2xl shadow-md hover-zoom font-black">
-                            <span id="localFileBtnText" class="text-xl font-bold text-white font-black">اختر ملف XLSX أو CSV</span>
+                        <div class="p-8 btn-execute rounded-2xl shadow-md hover-zoom">
+                            <span id="localFileBtnText" class="text-xl font-bold text-white">اختر ملف XLSX أو CSV</span>
                             <input type="file" id="xlsxFile" class="hidden" accept=".xlsx, .xls, .csv">
                         </div>
                     </label>
                 </div>
                 <div id="googleInputPanel" class="hidden space-y-4">
                     <input type="text" id="googleLink" placeholder="">
-                    <button id="fetchGoogleBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white font-black"></button>
+                    <button id="fetchGoogleBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white"></button>
                 </div>
                 <div id="githubInputPanel" class="hidden space-y-4">
                     <input type="text" id="githubFileName" value="data.xlsx">
-                    <button id="fetchGithubBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white font-black"></button>
+                    <button id="fetchGithubBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white"></button>
                 </div>
-                <div id="loadingMessage" class="hidden mt-4 text-indigo-700 font-black animate-pulse text-lg italic text-center font-black"></div>
+                <div id="loadingMessage" class="hidden mt-4 text-indigo-700 font-black animate-pulse text-lg italic text-center"></div>
             </div>
         </div>
 
         <div id="dataConfigSection" class="hidden grid grid-cols-1 gap-8 mb-10">
             <div class="input-card bg-blue-50/50 border-2 border-blue-100">
                 <div class="text-center border-b border-blue-100 pb-4 mb-6">
-                    <p id="step2Title" class="text-slate-900 font-black thin-title text-2xl uppercase font-black">الخطوة 2: تعيين البيانات</p>
+                    <p id="step2Title" class="text-slate-900 font-black thin-title text-2xl uppercase">الخطوة 2: تعيين البيانات</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                     <div class="flex flex-col">
                         <label id="labelFilterCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center font-black"></label>
-                        <select id="filterColSelect" class="p-4 font-bold text-center hover-zoom font-black"></select>
+                        <select id="filterColSelect" class="p-4 font-bold text-center hover-zoom"></select>
                     </div>
                     <div class="flex flex-col">
-                        <label id="labelStartCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center font-black font-black"></label>
-                        <select id="analysisStartColSelect" class="p-4 font-bold text-center hover-zoom font-black"></select>
+                        <label id="labelStartCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center font-black"></label>
+                        <select id="analysisStartColSelect" class="p-4 font-bold text-center hover-zoom"></select>
                     </div>
                 </div>
                 <div class="flex justify-center">
@@ -349,46 +350,50 @@
 
         <div id="filterSection" class="hidden max-w-2xl mx-auto mb-10">
             <div class="input-card border-indigo-200 bg-indigo-50/30">
-                <div class="flex flex-col font-black">
-                    <label id="labelDeptFilter" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center font-black font-black font-black"></label>
-                    <select id="deptFilterSelect" class="p-4 font-bold text-center hover-zoom font-black font-black">
-                        <option value="all"></option>
-                    </select>
+                <div class="flex flex-col">
+                    <label id="labelDeptFilter" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center font-black"></label>
+                    <!-- Custom Multi-Select -->
+                    <div class="multi-select-container mt-2">
+                        <div class="multi-select-trigger hover-zoom" id="deptMultiTrigger">
+                            <span id="deptSelectedText">...</span>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="multi-select-dropdown" id="deptMultiDropdown">
+                            <!-- Items populated via JS -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Step 3 -->
         <div id="scaleOrderSection" class="hidden mb-10 p-8 bg-slate-100 rounded-3xl shadow-inner border border-slate-200">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 text-right">
                 <div id="scaleHeaderBox">
-                    <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 font-black font-black font-black"></h2>
-                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic font-black font-black"></p>
+                    <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 font-black font-black"></h2>
+                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic font-black"></p>
                 </div>
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center shadow-sm">
-                    <label id="labelThreshold" class="font-black text-xs text-slate-800 ml-4 uppercase font-black">حد الإيجابيات (%):</label>
-                    <input type="number" id="positivesThresholdInput" value="85" min="0" max="100" class="w-24 px-4 py-2 border rounded-xl font-black text-xl text-center text-indigo-700 font-black font-black">
+                    <label id="labelThreshold" class="font-black text-xs text-slate-800 ml-4 uppercase">حد الإيجابيات (%):</label>
+                    <input type="number" id="positivesThresholdInput" value="85" min="0" max="100" class="w-24 px-4 py-2 border rounded-xl font-black text-xl text-center text-indigo-700 font-black">
                 </div>
             </div>
             <div id="scaleGroupsContainer" class="space-y-10"></div>
         </div>
 
         <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
-            <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase text-white font-black font-black font-black">حلل البيانات الآن</button>
+            <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase text-white font-black">حلل البيانات الآن</button>
             <div class="flex flex-wrap gap-4 w-full justify-center">
-                <button id="exportButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white font-black font-black font-black"></button>
-                <button id="printButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white font-black font-black font-black"></button>
-                <button id="copyTableButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white font-black font-black font-black"></button>
+                <button id="exportButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white font-black"></button>
+                <button id="printButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white font-black"></button>
+                <button id="copyTableButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white font-black"></button>
             </div>
         </div>
 
-        <!-- Report Scope -->
         <div id="reportPrintScope">
             <div class="text-center mb-10">
-                <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 mb-2 hidden font-black uppercase font-black font-black font-black"></p>
-                <p id="participantCountDisplay" class="text-2xl text-indigo-800 font-black hidden uppercase tracking-tighter font-black font-black font-black"></p>
+                <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 mb-2 hidden font-black uppercase font-black"></p>
+                <p id="participantCountDisplay" class="text-2xl text-indigo-800 font-black hidden uppercase tracking-tighter font-black"></p>
             </div>
-
             <div id="resultsContainer" class="hidden space-y-16"></div>
             <div id="chartContainer" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-10 mt-12"></div>
             <div id="positiveNegativeItemsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 mt-12"></div>
@@ -407,12 +412,13 @@
     let identifiedScaleGroups = new Map();
     let itemToScaleGroup = new Map();
     let chartInstances = [];
+    let selectedDepts = new Set();
 
     const languageData = {
         en: {
             title: 'Questionnaire Results Analysis',
             devCredit: 'High Institute of Engineering and Technology in Kafr El-Sheikh\nQuality Assurance and Accreditation Unit',
-            allInstitute: 'Analyze Whole Institute',
+            allInstitute: 'All Institute',
             participants: 'Participants',
             pos: 'Positive',
             copied: 'Copied!',
@@ -434,16 +440,16 @@
             fetch: 'Fetch Data',
             step2: 'Step 2: Data Mapping',
             confirm: 'Confirm Mapping',
-            filterLabel: 'Filter by Department',
+            filterLabel: 'Filter by Department(s)',
             deptLabel: 'Select Dept Column',
             startColLabel: 'Analyze from Column',
             step3: 'Step 3: Define Scale Orders',
             step3Hint: 'Rank choices (Highest on top).',
             threshold: 'Threshold (%):',
             analyzeNow: 'Analyze Now',
-            export: 'Export Result (Excel)',
-            print: 'Print Report (PDF)',
-            copyAll: 'Copy All Results',
+            export: 'Export (Excel)',
+            print: 'Print (PDF)',
+            copyAll: 'Copy All',
             finalResult: 'Overall Percentage',
             evalLabel: 'General Evaluation',
             googleErrorTitle: 'Google Sheets Error',
@@ -457,12 +463,13 @@
                 charts: 'Charts',
                 highlights: 'Points',
                 final: 'Evaluation'
-            }
+            },
+            selectAll: 'Select All'
         },
         ar: {
             title: 'تحليل نتائج الاستبيان',
             devCredit: 'المعهد العالي للهندسة والتكنولوجيا بكفر الشيخ\nوحدة ضمان الجودة والاعتماد',
-            allInstitute: 'تحليل المعهد بالكامل',
+            allInstitute: 'المعهد بالكامل',
             participants: 'مشارك',
             pos: 'إيجابي',
             copied: 'تم النسخ!',
@@ -470,7 +477,7 @@
             headers: { no: '#', item: 'بيان البند', checkTotal: 'إجمالي الصف (%)', total: 'الإجمالي (%)', positives: 'إيجابيات (%)', footer: 'المتوسط' },
             strengths: '★ نقاط القوة الأساسية',
             improvement: '⚠️ مجالات التحسين الحرجة',
-            recommendation: 'التقييم النهائي',
+            recommendation: 'التوصية النهائية',
             evaluations: ["ممتازة", "جيد جداً", "جيدة", "مقبولة", "ضعيفة"],
             suggestionsTitle: 'ملخص الملاحظات (بالذكاء الاصطناعي)',
             loadingAI: 'جاري التحليل بالذكاء الاصطناعي...',
@@ -484,7 +491,7 @@
             fetch: 'جلب البيانات',
             step2: 'الخطوة 2: تعيين البيانات',
             confirm: 'تأكيد الإعدادات',
-            filterLabel: 'تصفية حسب القسم',
+            filterLabel: 'تصفية حسب القسم (اختيار متعدد)',
             deptLabel: 'اختر عمود القسم',
             startColLabel: 'ابدأ التحليل من عمود',
             step3: 'الخطوة 3: ترتيب المقاييس',
@@ -507,11 +514,12 @@
                 charts: 'الرسوم',
                 highlights: 'النقاط',
                 final: 'التقييم'
-            }
+            },
+            selectAll: 'اختيار الكل'
         }
     };
 
-    // --- AI Summarizer Logic ---
+    // --- AI ---
     async function summarizeWithAI(text, lang) {
         const apiKey = "AIzaSyBt0DtjhTpAZRQMYeMv_GFGogVYf1hLRNs";
         const modelName = "gemini-2.5-flash-preview-09-2025";
@@ -541,14 +549,6 @@
         setTimeout(() => btnEl.innerHTML = originalHtml, 2000);
     }
 
-    function showMessage(title, text, type = 'warning') {
-        const modal = document.getElementById('messageBoxModal');
-        modal.querySelector('#messageBoxTitle').textContent = title;
-        modal.querySelector('#messageBoxBody').textContent = text;
-        modal.querySelector('#messageBoxIcon').textContent = type === 'error' ? '❌' : (type === 'success' ? '✅' : '⚠️');
-        modal.classList.remove('hidden');
-    }
-
     function copyToClipboard(text) {
         const textArea = document.createElement("textarea");
         textArea.value = text; textArea.style.position = "fixed"; textArea.style.left = "-9999px"; textArea.style.top = "0";
@@ -566,7 +566,7 @@
         container.appendChild(wrapper);
     }
 
-    // --- Core Logic ---
+    // --- Components Rendering ---
 
     function renderScaleGroups() {
         const container = document.getElementById('scaleGroupsContainer');
@@ -574,14 +574,14 @@
         identifiedScaleGroups.forEach((group, sig) => {
             if (group.isSuggestion) return;
             const wrap = document.createElement('div');
-            wrap.className = 'bg-white p-6 rounded-3xl border-2 border-blue-200 shadow-md hover-zoom font-black';
+            wrap.className = 'bg-white p-6 rounded-3xl border-2 border-blue-200 shadow-md hover-zoom';
             wrap.innerHTML = `<h3 class="font-black text-indigo-900 uppercase tracking-tighter text-xl mb-4 pr-4 font-black">${languageData[currentLang].groupLabel}: ${group.options.join(', ')}</h3><div class="scale-list space-y-3 font-black" data-sig="${sig}"></div>`;
             const list = wrap.querySelector('.scale-list');
             group.options.forEach((opt, idx) => {
                 const item = document.createElement('div');
-                item.className = 'p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl flex justify-between items-center cursor-move font-black';
+                item.className = 'p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl flex justify-between items-center cursor-move font-black font-black';
                 item.draggable = true;
-                item.innerHTML = `<span class="font-bold text-slate-900 font-black">${opt}</span><label class="flex items-center cursor-pointer font-black"><input type="checkbox" class="w-6 h-6 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="mr-2 text-xs font-black text-indigo-800 font-black">${languageData[currentLang].pos}</span></label>`;
+                item.innerHTML = `<span class="font-bold text-slate-900 font-black">${opt}</span><label class="flex items-center cursor-pointer font-black font-black"><input type="checkbox" class="w-6 h-6 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="mr-2 text-xs font-black text-indigo-800 font-black">${languageData[currentLang].pos}</span></label>`;
                 item.querySelector('input').onchange = (e) => e.target.checked ? group.positives.add(opt) : group.positives.delete(opt);
                 item.ondragstart = (e) => { e.dataTransfer.setData('idx', idx); e.dataTransfer.setData('sig', sig); };
                 item.ondragover = (e) => e.preventDefault();
@@ -605,14 +605,14 @@
         const avgPos = totalRes ? (domainPos / totalRes * 100).toFixed(1) : '0.0';
         const align = currentLang === 'ar' ? 'text-right' : 'text-left';
         
-        let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black ${align} font-black font-black font-black">${title}</h2><div class="overflow-x-auto"><table class="w-full text-sm ${align} font-black"><thead class="bg-slate-100"><tr><th class="p-6 text-center font-black">#</th><th class="p-6 text-right font-black font-black font-black">${d.headers.item}</th>${opts.map(o => `<th class="p-6 text-center text-indigo-700 font-black font-black">${o}</th>`).join('')}<th class="p-6 text-center font-bold text-blue-600 font-black font-black font-black font-black">${d.headers.checkTotal}</th><th class="p-6 text-center font-black font-black font-black font-black font-black font-black">${d.headers.positives}</th></tr></thead><tbody>`;
+        let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black ${align} font-black">${title}</h2><div class="overflow-x-auto"><table class="w-full text-sm ${align} font-black"><thead class="bg-slate-100"><tr><th class="p-6 text-center font-black">#</th><th class="p-6 text-right font-black font-black font-black">${d.headers.item}</th>${opts.map(o => `<th class="p-6 text-center text-indigo-700 font-black font-black font-black">${o}</th>`).join('')}<th class="p-6 text-center font-bold text-blue-600 font-black font-black font-black">${d.headers.checkTotal}</th><th class="p-6 text-center font-black font-black font-black font-black font-black">${d.headers.positives}</th></tr></thead><tbody>`;
         
         rows.forEach((r, i) => { 
             const rowCheckSum = opts.reduce((acc, o) => acc + (r.freqs[o] / r.total * 100), 0);
-            html += `<tr class="border-b border-slate-50 font-black"><td class="p-6 text-center text-slate-500 font-bold font-black font-black font-black">${i+1}</td><td class="p-6 font-bold text-slate-800 text-right font-black font-black font-black font-black">${r.item}</td>${opts.map(o => `<td class="p-6 text-center font-black font-black font-black font-black">${(r.freqs[o]/r.total*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center font-bold text-blue-500 bg-blue-50/30 font-black font-black font-black font-black">${rowCheckSum.toFixed(1)}%</td><td class="p-6 text-center font-black text-green-700 bg-green-50 font-black font-black font-black font-black font-black">${r.posPerc.toFixed(1)}%</td></tr>`; 
+            html += `<tr class="border-b border-slate-50 font-black"><td class="p-6 text-center text-slate-500 font-bold font-black">${i+1}</td><td class="p-6 font-bold text-slate-800 text-right font-black font-black">${r.item}</td>${opts.map(o => `<td class="p-6 text-center font-black font-black">${(r.freqs[o]/r.total*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center font-bold text-blue-500 bg-blue-50/30 font-black font-black">${rowCheckSum.toFixed(1)}%</td><td class="p-6 text-center font-black text-green-700 bg-green-50 font-black font-black">${r.posPerc.toFixed(1)}%</td></tr>`; 
         });
         
-        html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td colspan="2" class="p-6 text-center uppercase font-black font-black font-black font-black font-black">${d.headers.footer}</td>${opts.map(o => `<td class="p-6 text-center font-black font-black font-black font-black font-black">${((rows.reduce((s, r) => s + r.freqs[o], 0)/totalRes)*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center font-black font-black font-black font-black font-black">100.0%</td><td class="p-6 text-center text-green-800 text-lg font-black font-black font-black font-black font-black font-black font-black">${avgPos}%</td></tr></tfoot></table></div>`;
+        html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td colspan="2" class="p-6 text-center uppercase font-black font-black">${d.headers.footer}</td>${opts.map(o => `<td class="p-6 text-center font-black font-black font-black">${((rows.reduce((s, r) => s + r.freqs[o], 0)/totalRes)*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center font-black font-black">100.0%</td><td class="p-6 text-center text-green-800 text-lg font-black font-black font-black font-black">${avgPos}%</td></tr></tfoot></table></div>`;
         div.innerHTML = html;
         attachCopyButton(div, (btn) => {
             let tableContent = title + '\n';
@@ -633,7 +633,7 @@
         const div = document.createElement('div');
         div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-100 overflow-hidden hover-zoom mb-10 suggestion-wrapper';
         const align = currentLang === 'ar' ? 'text-right' : 'text-left';
-        div.innerHTML = `<div class="p-8 bg-indigo-50 border-b-2 border-indigo-100 ${align} font-black font-black font-black font-black"><h2 class="text-3xl font-black font-black font-black font-black">${title}</h2><div class="mt-2 flex items-center font-black font-black font-black font-black font-black"><span class="ai-badge font-black font-black">Gemini AI</span> <span class="text-xs font-black text-indigo-500 uppercase tracking-widest font-black font-black font-black font-black">${d.suggestionsTitle}</span></div></div><div class="p-8 ${align} font-black font-black font-black font-black font-black"><div class="suggestion-box italic text-slate-400 font-black font-black font-black font-black">${d.loadingAI}</div></div>`;
+        div.innerHTML = `<div class="p-8 bg-indigo-50 border-b-2 border-indigo-100 ${align} font-black font-black font-black"><h2 class="text-3xl font-black font-black font-black font-black">${title}</h2><div class="mt-2 flex items-center font-black font-black font-black"><span class="ai-badge font-black">Gemini AI</span> <span class="text-xs font-black text-indigo-500 uppercase tracking-widest font-black font-black">${d.suggestionsTitle}</span></div></div><div class="p-8 ${align} font-black font-black"><div class="suggestion-box italic text-slate-400 font-black font-black font-black">${d.loadingAI}</div></div>`;
         container.appendChild(div);
         const summary = await summarizeWithAI(rawText, currentLang);
         const aiOutputEl = div.querySelector('.suggestion-box');
@@ -646,13 +646,13 @@
         const d = languageData[currentLang];
         const container = document.getElementById('resultsContainer');
         const div = document.createElement('div');
-        div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-200 overflow-hidden hover-zoom mt-16 summary-table-wrapper font-black font-black font-black font-black';
+        div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-200 overflow-hidden hover-zoom mt-16 summary-table-wrapper font-black font-black font-black';
         const gTotal = summaryDataList.reduce((s, dm) => s + dm.total, 0);
         const gPos = summaryDataList.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
         const align = currentLang === 'ar' ? 'text-right' : 'text-left';
-        let html = `<h2 class="text-3xl thin-title p-8 bg-indigo-700 text-white font-black text-center font-black font-black font-black font-black font-black">Summary of All Domains</h2><table class="w-full text-lg ${align} font-black font-black font-black font-black font-black font-black"><thead class="bg-indigo-50 font-black font-black font-black font-black"><tr><th class="p-8 text-center font-black font-black font-black font-black font-black font-black font-black">#</th><th class="p-8 font-black font-black font-black font-black font-black font-black font-black">Domain</th><th class="p-8 text-center font-black font-black font-black font-black font-black font-black font-black font-black font-black">${d.headers.positives}</th></tr></thead><tbody>`;
-        summaryDataList.forEach((dm, i) => { const pSum = Array.from(dm.positives).reduce((s,o)=>s+(dm.freqs[o]||0),0); html += `<tr class="border-b border-indigo-50 font-black font-black font-black font-black font-black font-black font-black font-black"><td class="p-8 text-center text-indigo-300 font-black font-black font-black font-black font-black">${i+1}</td><td class="p-8 font-black text-slate-800 font-black font-black font-black font-black font-black font-black font-black">${dm.name}</td><td class="p-8 text-center font-black text-green-600 font-black font-black font-black font-black font-black font-black font-black font-black">${(pSum/dm.total*100).toFixed(1)}%</td></tr>`; });
-        html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300 font-black font-black font-black font-black font-black font-black"><tr><td colspan="2" class="p-8 text-center uppercase font-black font-black font-black font-black font-black font-black">Total Average</td><td class="p-8 text-center text-green-800 text-2xl font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${(gPos/gTotal*100).toFixed(1)}%</td></tr></tfoot></table>`;
+        let html = `<h2 class="text-3xl thin-title p-8 bg-indigo-700 text-white font-black text-center font-black font-black font-black font-black font-black">Summary of All Domains</h2><table class="w-full text-lg ${align} font-black font-black font-black font-black"><thead class="bg-indigo-50 font-black font-black font-black"><tr><th class="p-8 text-center font-black font-black font-black font-black font-black">#</th><th class="p-8 font-black font-black font-black font-black font-black">Domain</th><th class="p-8 text-center font-black font-black font-black font-black font-black font-black font-black">${d.headers.positives}</th></tr></thead><tbody>`;
+        summaryDataList.forEach((dm, i) => { const pSum = Array.from(dm.positives).reduce((s,o)=>s+(dm.freqs[o]||0),0); html += `<tr class="border-b border-indigo-50 font-black font-black font-black font-black font-black font-black font-black font-black"><td class="p-8 text-center text-indigo-300 font-black font-black font-black font-black font-black font-black">${i+1}</td><td class="p-8 font-black text-slate-800 font-black font-black font-black font-black font-black">${dm.name}</td><td class="p-8 text-center font-black text-green-600 font-black font-black font-black font-black font-black font-black font-black">${(pSum/dm.total*100).toFixed(1)}%</td></tr>`; });
+        html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300 font-black font-black font-black font-black font-black font-black font-black"><tr><td colspan="2" class="p-8 text-center uppercase font-black font-black font-black font-black font-black font-black">Total Average</td><td class="p-8 text-center text-green-800 text-2xl font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${(gPos/gTotal*100).toFixed(1)}%</td></tr></tfoot></table>`;
         div.innerHTML = html;
         attachCopyButton(div, (btn) => {
             let summaryContent = 'Summary\n';
@@ -674,10 +674,10 @@
         container.innerHTML = '';
         const sDiv = document.createElement('div');
         sDiv.className = `p-10 bg-green-50 rounded-[3rem] border-4 border-green-200 shadow-lg hover-zoom w-full font-black font-black font-black font-black font-black`;
-        sDiv.innerHTML = `<h4 class="text-3xl font-black text-green-800 mb-8 font-black font-black font-black font-black font-black">${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold font-black font-black font-black font-black">${high.length ? high.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-green-100 shadow-sm font-black font-black font-black font-black font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
+        sDiv.innerHTML = `<h4 class="text-3xl font-black text-green-800 mb-8 font-black font-black font-black font-black font-black">${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold font-black font-black font-black font-black">${high.length ? high.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-green-100 shadow-sm font-black font-black font-black font-black font-black font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
         const iDiv = document.createElement('div');
         iDiv.className = `p-10 bg-red-50 rounded-[3rem] border-4 border-red-200 shadow-lg hover-zoom w-full font-black font-black font-black font-black font-black`;
-        iDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8 font-black font-black font-black font-black font-black">${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold font-black font-black font-black font-black font-black font-black">${low.length ? low.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-red-100 shadow-sm font-black font-black font-black font-black font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
+        iDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8 font-black font-black font-black font-black font-black font-black">${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold font-black font-black font-black font-black font-black font-black">${low.length ? low.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-red-100 shadow-sm font-black font-black font-black font-black font-black font-black font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
         container.appendChild(sDiv); container.appendChild(iDiv);
         container.classList.remove('hidden');
     }
@@ -688,11 +688,11 @@
         const div = document.createElement('div');
         div.className = 'relative p-12 bg-white rounded-[3.5rem] shadow-2xl border-4 border-indigo-400 hover-zoom mb-20 text-center animate-in fade-in duration-700 font-black font-black font-black font-black font-black font-black';
         let evalTxt = score > 85 ? d.evaluations[0] : score > 75 ? d.evaluations[1] : score > 65 ? d.evaluations[2] : score > 50 ? d.evaluations[3] : d.evaluations[4];
-        div.innerHTML = `<h2 class="text-4xl thin-title mb-10 text-center text-indigo-900 font-black border-b-2 border-indigo-50 pb-6 font-black font-black font-black font-black font-black font-black font-black font-black">${d.recommendation}</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-10 font-black font-black font-black font-black font-black font-black font-black font-black"><div class="p-8 bg-indigo-50 rounded-[2.5rem] text-center border-2 border-indigo-100 flex flex-col justify-center items-center font-black font-black font-black font-black font-black font-black font-black font-black"><span class="text-xs font-black text-indigo-400 mb-2 uppercase font-black font-black font-black font-black font-black font-black font-black">${d.finalResult}</span><span class="text-6xl font-black text-indigo-800 font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${score.toFixed(2)}%</span></div><div class="p-8 bg-green-50 rounded-[2.5rem] text-center border-2 border-green-100 flex flex-col justify-center items-center font-black font-black font-black font-black font-black font-black font-black font-black"><span class="text-xs font-black text-green-400 mb-2 uppercase font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${d.evalLabel}</span><span class="text-6xl font-black text-green-700 font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${evalTxt}</span></div></div>`;
+        div.innerHTML = `<h2 class="text-4xl thin-title mb-10 text-center text-indigo-900 font-black border-b-2 border-indigo-50 pb-6 font-black font-black font-black font-black font-black font-black font-black font-black font-black">${d.recommendation}</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-10 font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black"><div class="p-8 bg-indigo-50 rounded-[2.5rem] text-center border-2 border-indigo-100 flex flex-col justify-center items-center font-black font-black font-black font-black font-black font-black font-black font-black font-black"><span class="text-xs font-black text-indigo-400 mb-2 uppercase font-black font-black font-black font-black font-black font-black font-black font-black font-black">${d.finalResult}</span><span class="text-6xl font-black text-indigo-800 font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${score.toFixed(2)}%</span></div><div class="p-8 bg-green-50 rounded-[2.5rem] text-center border-2 border-green-100 flex flex-col justify-center items-center font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black"><span class="text-xs font-black text-green-400 mb-2 uppercase font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${d.evalLabel}</span><span class="text-6xl font-black text-green-700 font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${evalTxt}</span></div></div>`;
         container.innerHTML = ''; container.appendChild(div); container.classList.remove('hidden');
     }
 
-    // --- Main Initializer ---
+    // --- Logic & Controllers ---
 
     document.addEventListener('DOMContentLoaded', () => {
         if (typeof ChartDataLabels !== 'undefined') { Chart.register(ChartDataLabels); }
@@ -721,7 +721,6 @@
             document.getElementById('exportButton').textContent = d.export;
             document.getElementById('printButton').textContent = d.print;
             document.getElementById('copyTableButton').textContent = d.copyAll;
-            document.getElementById('deptFilterSelect').options[0].text = d.allInstitute;
             document.getElementById('lang-ar').classList.toggle('active-lang', currentLang === 'ar');
             document.getElementById('lang-en').classList.toggle('active-lang', currentLang === 'en');
             document.getElementById('mainHtml').dir = currentLang === 'ar' ? 'rtl' : 'ltr';
@@ -735,7 +734,12 @@
             document.getElementById('tip-charts').textContent = d.nav.charts;
             document.getElementById('tip-highlights').textContent = d.nav.highlights;
             document.getElementById('tip-final').textContent = d.nav.final;
+            
+            updateDeptSelectedText();
         }
+
+        const xlsxFile = document.getElementById('xlsxFile');
+        const loadingMessage = document.getElementById('loadingMessage');
 
         function processWorkbook(workbook, fileName) {
             rawExcelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
@@ -752,16 +756,16 @@
             });
             fs.value = Math.min(1, rawExcelData[0].length - 1); 
             as.value = Math.min(2, rawExcelData[0].length - 1); 
-            document.getElementById('loadingMessage').classList.add('hidden');
+            loadingMessage.classList.add('hidden');
         }
 
         document.getElementById('srcLocalBtn').onclick = () => { document.getElementById('localInputPanel').classList.toggle('hidden'); document.getElementById('googleInputPanel').classList.add('hidden'); document.getElementById('githubInputPanel').classList.add('hidden'); };
         document.getElementById('srcGoogleBtn').onclick = () => { document.getElementById('googleInputPanel').classList.toggle('hidden'); document.getElementById('localInputPanel').classList.add('hidden'); document.getElementById('githubInputPanel').classList.add('hidden'); };
         document.getElementById('srcGithubBtn').onclick = () => { document.getElementById('githubInputPanel').classList.toggle('hidden'); document.getElementById('localInputPanel').classList.add('hidden'); document.getElementById('googleInputPanel').classList.add('hidden'); };
 
-        document.getElementById('xlsxFile').addEventListener('change', (e) => {
+        xlsxFile.addEventListener('change', (e) => {
             const file = e.target.files[0]; if (!file) return;
-            document.getElementById('loadingMessage').classList.remove('hidden');
+            loadingMessage.classList.remove('hidden');
             const reader = new FileReader();
             reader.onload = (ev) => processWorkbook(XLSX.read(new Uint8Array(ev.target.result), { type: 'array' }), file.name.split('.')[0]);
             reader.readAsArrayBuffer(file);
@@ -769,34 +773,91 @@
 
         document.getElementById('fetchGoogleBtn').onclick = async () => {
             const link = document.getElementById('googleLink').value; if(!link) return;
-            document.getElementById('loadingMessage').classList.remove('hidden');
+            loadingMessage.classList.remove('hidden');
             try {
                 const match = link.match(/[-\w]{25,}/); if (!match) throw new Error();
                 const resp = await fetch(`https://docs.google.com/spreadsheets/d/${match[0]}/export?format=csv`);
                 if (!resp.ok) throw new Error();
                 processWorkbook(XLSX.read(await resp.text(), { type: 'string' }), "Google Data");
-            } catch(e) { showMessage(languageData[currentLang].googleErrorTitle, languageData[currentLang].googleErrorBody); document.getElementById('loadingMessage').classList.add('hidden'); }
+            } catch(e) { showMessage(languageData[currentLang].googleErrorTitle, languageData[currentLang].googleErrorBody); loadingMessage.classList.add('hidden'); }
         };
 
         document.getElementById('fetchGithubBtn').onclick = async () => {
             const fName = document.getElementById('githubFileName').value;
-            document.getElementById('loadingMessage').classList.remove('hidden');
+            loadingMessage.classList.remove('hidden');
             try {
                 const resp = await fetch(fName);
                 processWorkbook(XLSX.read(new Uint8Array(await resp.arrayBuffer()), { type: 'array' }), fName);
-            } catch(e) { showMessage('Error', 'File not found.'); document.getElementById('loadingMessage').classList.add('hidden'); }
+            } catch(e) { showMessage('Error', 'File not found.'); loadingMessage.classList.add('hidden'); }
         };
+
+        // Multi-select Dropdown toggle
+        const trigger = document.getElementById('deptMultiTrigger');
+        const dropdown = document.getElementById('deptMultiDropdown');
+        trigger.onclick = (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('active');
+        };
+        document.addEventListener('click', () => dropdown.classList.remove('active'));
+        dropdown.onclick = (e) => e.stopPropagation();
+
+        function updateDeptSelectedText() {
+            const d = languageData[currentLang];
+            const textEl = document.getElementById('deptSelectedText');
+            if (selectedDepts.size === 0) {
+                textEl.textContent = d.allInstitute;
+            } else {
+                textEl.textContent = Array.from(selectedDepts).join(', ');
+            }
+        }
 
         document.getElementById('confirmMappingBtn').onclick = () => {
             if (!rawExcelData) return;
             identifiedScaleGroups.clear(); itemToScaleGroup.clear();
             const filterColIdx = parseInt(document.getElementById('filterColSelect').value);
             const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
+            
             const departments = new Set();
             for (let r = 1; r < rawExcelData.length; r++) {
                 const val = String(rawExcelData[r][filterColIdx] || "").trim();
                 if (val !== "") departments.add(val);
             }
+
+            // Populate Multi-select
+            dropdown.innerHTML = '';
+            selectedDepts.clear();
+
+            // "Select All" Option
+            const allItem = document.createElement('div');
+            allItem.className = 'multi-select-item border-b border-gray-100 font-black';
+            allItem.innerHTML = `<input type="checkbox" id="selectAllDepts"><span>${languageData[currentLang].selectAll}</span>`;
+            allItem.querySelector('input').onchange = (e) => {
+                const checked = e.target.checked;
+                const checkboxes = dropdown.querySelectorAll('.dept-checkbox');
+                checkboxes.forEach(cb => {
+                    cb.checked = checked;
+                    if (checked) selectedDepts.add(cb.value);
+                    else selectedDepts.delete(cb.value);
+                });
+                updateDeptSelectedText();
+            };
+            dropdown.appendChild(allItem);
+
+            Array.from(departments).sort().forEach(dept => {
+                const item = document.createElement('div');
+                item.className = 'multi-select-item font-bold';
+                item.innerHTML = `<input type="checkbox" class="dept-checkbox" value="${dept}"><span>${dept}</span>`;
+                item.querySelector('input').onchange = (e) => {
+                    if (e.target.checked) selectedDepts.add(dept);
+                    else {
+                        selectedDepts.delete(dept);
+                        document.getElementById('selectAllDepts').checked = false;
+                    }
+                    updateDeptSelectedText();
+                };
+                dropdown.appendChild(item);
+            });
+
             for (let col = startColIdx; col < rawExcelData[0].length; col++) {
                 const resps = [];
                 for (let r = 1; r < rawExcelData.length; r++) {
@@ -813,9 +874,6 @@
                     itemToScaleGroup.set(col, sigStr);
                 }
             }
-            const df = document.getElementById('deptFilterSelect');
-            df.innerHTML = `<option value="all">${languageData[currentLang].allInstitute}</option>`;
-            Array.from(departments).sort().forEach(dept => df.add(new Option(dept, dept)));
             document.getElementById('filterSection').classList.remove('hidden'); 
             renderScaleGroups();
             document.getElementById('scaleOrderSection').classList.remove('hidden'); document.getElementById('actionButtons').classList.remove('hidden');
@@ -826,7 +884,6 @@
             const allItemsList = []; const summaryDataList = []; 
             const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
             const filterColIdx = parseInt(document.getElementById('filterColSelect').value);
-            const filterValue = document.getElementById('deptFilterSelect').value;
             
             const resultsContainer = document.getElementById('resultsContainer');
             resultsContainer.innerHTML = ''; 
@@ -836,7 +893,10 @@
             chartInstances.forEach(c => c.destroy()); chartInstances = [];
             
             let rows = rawExcelData.slice(1);
-            if (filterValue !== 'all') rows = rows.filter(r => r && String(r[filterColIdx] || "").trim() === filterValue);
+            if (selectedDepts.size > 0) {
+                rows = rows.filter(r => r && selectedDepts.has(String(r[filterColIdx] || "").trim()));
+            }
+            
             document.getElementById('participantCountDisplay').textContent = `${rows.length} ${languageData[currentLang].participants}`;
             document.getElementById('participantCountDisplay').classList.remove('hidden');
 
@@ -943,12 +1003,7 @@
                 allD.push([sanitizeValue(s.querySelector('h2').innerText)]);
                 const tbl = s.querySelector('table');
                 if (tbl) tbl.querySelectorAll('tr').forEach(tr => {
-                    let r = []; tr.querySelectorAll('th, td').forEach(c => {
-                        const cs = parseInt(c.getAttribute('colspan') || 1);
-                        let val = c.innerText.trim();
-                        if (val.endsWith('%')) { let num = parseFloat(val.replace('%', '')); r.push(isNaN(num) ? val : num); } else { r.push(sanitizeValue(val)); }
-                        for(let k=1; k < cs; k++) r.push("");
-                    });
+                    let r = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); let val = c.innerText.trim(); if (val.endsWith('%')) { let num = parseFloat(val.replace('%', '')); r.push(isNaN(num) ? val : num); } else { r.push(sanitizeValue(val)); } for(let k=1; k < cs; k++) r.push(""); });
                     allD.push(r);
                 });
                 const box = s.querySelector('.suggestion-box'); if (box) allD.push([sanitizeValue(box.innerText)]);
@@ -975,4 +1030,3 @@
     </script>
 </body>
 </html>
-
