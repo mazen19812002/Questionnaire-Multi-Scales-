@@ -18,6 +18,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            scroll-behavior: smooth;
         }
 
         .thin-title { font-weight: 300; letter-spacing: -0.01em; }
@@ -31,34 +32,16 @@
         }
 
         .btn-execute {
-            background-color: #22c55e; /* Green for Execute */
+            background-color: #22c55e;
             color: white;
             font-weight: 700;
             transition: all 0.2s;
             padding: 1rem 2rem;
             border-radius: 1.5rem;
         }
-        .btn-execute:hover {
-            background-color: #16a34a;
-        }
+        .btn-execute:hover { background-color: #16a34a; }
 
-        .btn-cancel {
-            background-color: #ef4444; /* Red for Cancel */
-            color: white;
-            font-weight: 700;
-            transition: all 0.2s;
-            padding: 1rem 2rem;
-            border-radius: 1.5rem;
-        }
-        .btn-cancel:hover {
-            background-color: #dc2626;
-        }
-
-        .copy-btn-wrapper {
-            position: absolute;
-            top: 1rem;
-            z-index: 30;
-        }
+        .copy-btn-wrapper { position: absolute; top: 1rem; z-index: 30; }
         [dir="rtl"] .copy-btn-wrapper { left: 1rem; }
         [dir="ltr"] .copy-btn-wrapper { right: 1rem; }
 
@@ -111,7 +94,7 @@
             background-color: #f8fafc;
             border: 2px solid #e2e8f0;
             border-radius: 1.5rem;
-            padding: 2.5rem;
+            padding: 2rem;
             line-height: 1.8;
             color: #1e293b;
             min-height: 80px;
@@ -135,6 +118,88 @@
             align-items: center;
         }
 
+        /* Floating Nav Styles */
+        .floating-nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 100;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-blur-lg;
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.15);
+        }
+
+        [dir="rtl"] .floating-nav { left: 1rem; }
+        [dir="ltr"] .floating-nav { right: 1rem; }
+
+        .nav-dot {
+            width: 48px;
+            height: 48px;
+            background: white;
+            border: 2px solid #4f46e5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            color: #4f46e5;
+        }
+
+        .nav-dot:hover {
+            background: #4f46e5;
+            color: white;
+            transform: scale(1.15);
+        }
+
+        .nav-tooltip {
+            position: absolute;
+            white-space: nowrap;
+            background: #1e293b;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 900;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        [dir="rtl"] .nav-tooltip { left: 60px; }
+        [dir="ltr"] .nav-tooltip { right: 60px; }
+
+        .nav-dot:hover .nav-tooltip {
+            opacity: 1;
+        }
+
+        @media print {
+            @page { size: A4; margin: 15mm; }
+            body { background-color: white !important; padding: 0 !important; color: black !important; }
+            .input-card, #langToggle, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .flex.justify-between.items-start.mb-8 {
+                display: none !important;
+            }
+            main { box-shadow: none !important; padding: 0 !important; background-color: transparent !important; max-width: 100% !important; margin: 0 !important; }
+            .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper, #positiveNegativeItemsContainer > div, #finalRecommendationContainer > div, #chartContainer > div {
+                break-inside: avoid !important; 
+                page-break-inside: avoid !important; 
+                margin-bottom: 10mm !important; 
+                border: 1px solid #ddd !important; 
+                padding: 10mm !important;
+            }
+            .copy-btn-wrapper { display: none !important; }
+            table { width: 100% !important; border-collapse: collapse !important; }
+            th, td { border: 1px solid #000 !important; padding: 6pt !important; }
+        }
+
         .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper {
             animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -147,11 +212,43 @@
 </head>
 <body class="p-4 md:p-12 text-right" dir="rtl">
 
-    <div id="messageBoxModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
-        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border-4 border-indigo-100 text-center">
-            <div id="messageBoxIcon" class="mb-4 text-center text-5xl">⚠️</div>
-            <h3 id="messageBoxTitle" class="text-2xl font-black mb-2 text-slate-800">تنبيه</h3>
-            <p id="messageBoxBody" class="text-slate-600 font-bold mb-6 text-center leading-relaxed"></p>
+    <!-- Floating Navigation -->
+    <nav class="floating-nav" id="floatingNav">
+        <a href="#step1Title" class="nav-dot hover-zoom">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+            <span class="nav-tooltip" id="tip-step1"></span>
+        </a>
+        <a href="#step2Title" class="nav-dot hover-zoom">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span class="nav-tooltip" id="tip-step2"></span>
+        </a>
+        <a href="#scaleOrderSection" class="nav-dot hover-zoom">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            <span class="nav-tooltip" id="tip-step3"></span>
+        </a>
+        <a href="#chartContainer" class="nav-dot hover-zoom">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+            <span class="nav-tooltip" id="tip-charts"></span>
+        </a>
+        <a href="#resultsContainer" class="nav-dot hover-zoom">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <span class="nav-tooltip" id="tip-results"></span>
+        </a>
+        <a href="#positiveNegativeItemsContainer" class="nav-dot hover-zoom">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            <span class="nav-tooltip" id="tip-highlights"></span>
+        </a>
+        <a href="#finalRecommendationContainer" class="nav-dot hover-zoom">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+            <span class="nav-tooltip" id="tip-final"></span>
+        </a>
+    </nav>
+
+    <div id="messageBoxModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[110]">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border-4 border-indigo-100 text-center font-black">
+            <div id="messageBoxIcon" class="mb-4 text-5xl">⚠️</div>
+            <h3 id="messageBoxTitle" class="text-2xl font-black mb-2 text-slate-800 font-black">تنبيه</h3>
+            <p id="messageBoxBody" class="text-slate-600 font-bold mb-6 leading-relaxed font-black"></p>
             <button id="closeMessageBox" class="w-full py-4 btn-execute rounded-2xl text-xl font-black shadow-lg">حسناً</button>
         </div>
     </div>
@@ -163,7 +260,7 @@
 
     <main class="max-w-7xl mx-auto w-full bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl flex-grow mb-12">
         <h1 id="mainTitle" class="text-4xl thin-title text-center mb-2 text-slate-800 font-black uppercase tracking-tight">تحليل نتائج الاستبيان</h1>
-        <p class="text-center text-indigo-700 mb-8 text-xl font-bold" id="instituteTitle"></p>
+        <p class="text-center text-indigo-700 mb-8 text-xl font-bold font-black" id="instituteTitle"></p>
         
         <div class="flex flex-col items-center space-y-6 mb-10">
             <div id="langToggle" class="flex rounded-xl shadow-inner bg-gray-100 p-1 cursor-pointer border border-gray-200">
@@ -174,50 +271,50 @@
 
         <div class="max-w-4xl mx-auto mb-10">
             <div class="input-card border-2 border-blue-100">
-                <h2 id="step1Title" class="text-xl font-bold text-center mb-6 text-slate-700 font-black">الخطوة 1: اختر مصدر ملف البيانات</h2>
+                <h2 id="step1Title" class="text-xl font-bold text-center mb-6 text-slate-700 font-black font-black">الخطوة 1: اختر مصدر ملف البيانات</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <button id="srcLocalBtn" class="p-6 border-2 border-blue-200 rounded-2xl hover-zoom bg-blue-50 font-bold text-indigo-800">📁 تحميل ملف محلي</button>
-                    <button id="srcGoogleBtn" class="p-6 border-2 border-green-200 rounded-2xl hover-zoom bg-green-50 font-bold text-green-800">🌐 رابط جوجل شيت</button>
-                    <button id="srcGithubBtn" class="p-6 border-2 border-slate-200 rounded-2xl hover-zoom bg-slate-50 font-bold text-slate-800">🐙 ملف من السيرفر</button>
+                    <button id="srcLocalBtn" class="p-6 border-2 border-blue-200 rounded-2xl hover-zoom bg-blue-50 font-bold text-indigo-800 transition-all font-black">📁 تحميل ملف محلي</button>
+                    <button id="srcGoogleBtn" class="p-6 border-2 border-green-200 rounded-2xl hover-zoom bg-green-50 font-bold text-green-800 transition-all font-black">🌐 رابط جوجل شيت</button>
+                    <button id="srcGithubBtn" class="p-6 border-2 border-slate-200 rounded-2xl hover-zoom bg-slate-50 font-bold text-slate-800 transition-all font-black">🐙 ملف من السيرفر</button>
                 </div>
 
                 <div id="localInputPanel" class="hidden">
                     <label class="block w-full cursor-pointer text-center">
                         <div class="p-8 btn-execute rounded-2xl shadow-md hover-zoom">
-                            <span id="localFileBtnText" class="text-xl font-bold text-white">اختر ملف XLSX أو CSV من جهازك</span>
+                            <span id="localFileBtnText" class="text-xl font-bold text-white font-black font-black">اختر ملف XLSX أو CSV</span>
                             <input type="file" id="xlsxFile" class="hidden" accept=".xlsx, .xls, .csv">
                         </div>
                     </label>
                 </div>
                 <div id="googleInputPanel" class="hidden space-y-4">
-                    <input type="text" id="googleLink" placeholder="ضع رابط جوجل شيت العام هنا...">
-                    <button id="fetchGoogleBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white hover-zoom">جلب البيانات</button>
+                    <input type="text" id="googleLink" placeholder="">
+                    <button id="fetchGoogleBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white font-black"></button>
                 </div>
                 <div id="githubInputPanel" class="hidden space-y-4">
                     <input type="text" id="githubFileName" value="data.xlsx">
-                    <button id="fetchGithubBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white hover-zoom">جلب الملف من السيرفر</button>
+                    <button id="fetchGithubBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white font-black"></button>
                 </div>
-                <div id="loadingMessage" class="hidden mt-4 text-indigo-700 font-black animate-pulse text-lg italic text-center">جاري المعالجة...</div>
+                <div id="loadingMessage" class="hidden mt-4 text-indigo-700 font-black animate-pulse text-lg italic text-center font-black"></div>
             </div>
         </div>
 
         <div id="dataConfigSection" class="hidden grid grid-cols-1 gap-8 mb-10">
             <div class="input-card bg-blue-50/50 border-2 border-blue-100">
                 <div class="text-center border-b border-blue-100 pb-4 mb-6">
-                    <p id="step2Title" class="text-slate-900 font-black thin-title text-2xl uppercase">الخطوة 2: تعيين البيانات</p>
+                    <p id="step2Title" class="text-slate-900 font-black thin-title text-2xl uppercase font-black font-black">الخطوة 2: تعيين البيانات</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                     <div class="flex flex-col">
                         <label id="labelFilterCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center font-black"></label>
-                        <select id="filterColSelect" class="p-4 font-bold text-center hover-zoom"></select>
+                        <select id="filterColSelect" class="p-4 font-bold text-center hover-zoom font-black"></select>
                     </div>
                     <div class="flex flex-col">
-                        <label id="labelStartCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center font-black"></label>
-                        <select id="analysisStartColSelect" class="p-4 font-bold text-center hover-zoom"></select>
+                        <label id="labelStartCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center font-black font-black"></label>
+                        <select id="analysisStartColSelect" class="p-4 font-bold text-center hover-zoom font-black"></select>
                     </div>
                 </div>
                 <div class="flex justify-center">
-                    <button id="confirmMappingBtn" class="px-10 py-4 btn-execute text-xl font-black rounded-2xl shadow-lg hover-zoom uppercase text-white">تأكيد الإعدادات</button>
+                    <button id="confirmMappingBtn" class="px-10 py-4 btn-execute text-xl font-black rounded-2xl shadow-lg hover-zoom uppercase text-white font-black"></button>
                 </div>
             </div>
         </div>
@@ -225,53 +322,58 @@
         <div id="filterSection" class="hidden max-w-2xl mx-auto mb-10">
             <div class="input-card border-indigo-200 bg-indigo-50/30">
                 <div class="flex flex-col">
-                    <label id="labelDeptFilter" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center font-black"></label>
-                    <select id="deptFilterSelect" class="p-4 font-bold text-center hover-zoom font-black">
+                    <label id="labelDeptFilter" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center font-black font-black font-black font-black"></label>
+                    <select id="deptFilterSelect" class="p-4 font-bold text-center hover-zoom font-black font-black">
                         <option value="all"></option>
                     </select>
                 </div>
             </div>
         </div>
 
+        <!-- Step 3 -->
         <div id="scaleOrderSection" class="hidden mb-10 p-8 bg-slate-100 rounded-3xl shadow-inner border border-slate-200">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 text-right">
-                <div>
-                    <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 font-black"></h2>
-                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic"></p>
+                <div id="scaleHeaderBox">
+                    <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 font-black font-black"></h2>
+                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic font-black font-black"></p>
                 </div>
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center shadow-sm">
-                    <label id="labelThreshold" class="font-black text-xs text-slate-800 ml-4 uppercase"></label>
-                    <input type="number" id="positivesThresholdInput" value="85" min="0" max="100" class="w-24 px-4 py-2 border rounded-xl font-black text-xl text-center text-indigo-700">
+                    <label id="labelThreshold" class="font-black text-xs text-slate-800 ml-4 uppercase font-black font-black">حد الإيجابيات (%):</label>
+                    <input type="number" id="positivesThresholdInput" value="85" min="0" max="100" class="w-24 px-4 py-2 border rounded-xl font-black text-xl text-center text-indigo-700 font-black font-black">
                 </div>
             </div>
             <div id="scaleGroupsContainer" class="space-y-10"></div>
         </div>
 
         <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
-            <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase text-white">حلل البيانات الآن</button>
-            <div class="flex gap-4 w-full justify-center">
-                <button id="exportButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white"></button>
-                <button id="copyTableButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white"></button>
+            <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase text-white font-black font-black font-black font-black">حلل البيانات الآن</button>
+            <div class="flex flex-wrap gap-4 w-full justify-center">
+                <button id="exportButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white font-black font-black font-black font-black"></button>
+                <button id="printButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white font-black font-black font-black font-black"></button>
+                <button id="copyTableButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white font-black font-black font-black font-black"></button>
             </div>
         </div>
 
-        <div class="text-center mb-10">
-            <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 mb-2 hidden font-black uppercase"></p>
-            <p id="participantCountDisplay" class="text-2xl text-indigo-800 font-black hidden uppercase tracking-tighter"></p>
-        </div>
+        <!-- Report Scope -->
+        <div id="reportPrintScope">
+            <div class="text-center mb-10">
+                <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 mb-2 hidden font-black uppercase font-black font-black font-black font-black font-black"></p>
+                <p id="participantCountDisplay" class="text-2xl text-indigo-800 font-black hidden uppercase tracking-tighter font-black font-black font-black font-black font-black"></p>
+            </div>
 
-        <div id="resultsContainer" class="hidden space-y-16"></div>
-        <div id="chartContainer" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-10 mt-12"></div>
-        <div id="positiveNegativeItemsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 mt-12"></div>
-        <div id="finalRecommendationContainer" class="hidden mt-16"></div>
+            <div id="resultsContainer" class="hidden space-y-16"></div>
+            <div id="chartContainer" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-10 mt-12"></div>
+            <div id="positiveNegativeItemsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 mt-12"></div>
+            <div id="finalRecommendationContainer" class="hidden mt-16"></div>
+        </div>
     </main>
 
-    <footer class="w-full text-center py-10 mt-auto text-slate-900 font-black border-t border-blue-200 bg-blue-100/95 backdrop-blur-sm uppercase text-sm tracking-widest">
+    <footer class="w-full text-center py-10 mt-auto text-slate-900 font-black border-t border-blue-200 bg-blue-100/95 backdrop-blur-sm uppercase text-sm tracking-widest font-black font-black font-black">
         All rights are reserved to Dr. Mazen Badawy – Doctorate of English Teaching & Testing
     </footer>
 
     <script>
-    // --- 1. Global Utilities ---
+    // --- 1. Global Utilities & State ---
     let currentLang = 'ar';
     let rawExcelData = null;
     let identifiedScaleGroups = new Map();
@@ -292,8 +394,8 @@
             improvement: '⚠️ Critical Improvement Areas',
             recommendation: 'Final Recommendation',
             evaluations: ["Excellent", "Very Good", "Good", "Acceptable", "Weak"],
-            suggestionsTitle: 'AI-Summarized Suggestions',
-            loadingAI: 'Summarizing using Gemini AI...',
+            suggestionsTitle: 'AI-Summarized Feedback',
+            loadingAI: 'AI is analyzing suggestions...',
             groupLabel: 'Scale Group',
             step1: 'Step 1: Data Source',
             step1Btn: 'Local Upload',
@@ -311,10 +413,22 @@
             step3Hint: 'Rank choices (Highest on top).',
             threshold: 'Threshold (%):',
             analyzeNow: 'Analyze Now',
-            export: 'Export Result (Excel)',
-            copyAll: 'Copy All Results',
+            export: 'Export (Excel)',
+            print: 'Print (PDF)',
+            copyAll: 'Copy All',
             finalResult: 'Overall Percentage',
-            evalLabel: 'General Evaluation'
+            evalLabel: 'General Evaluation',
+            googleErrorTitle: 'Google Sheets Error',
+            googleErrorBody: 'Ensure the file is Published to Web.',
+            nav: {
+                step1: 'Source',
+                step2: 'Mapping',
+                step3: 'Scales',
+                charts: 'Charts',
+                results: 'Tables',
+                highlights: 'Highlights',
+                final: 'Evaluation'
+            }
         },
         ar: {
             title: 'تحليل نتائج الاستبيان',
@@ -329,8 +443,8 @@
             improvement: '⚠️ مجالات التحسين الحرجة',
             recommendation: 'التوصية النهائية',
             evaluations: ["ممتازة", "جيد جداً", "جيدة", "مقبولة", "ضعيفة"],
-            suggestionsTitle: 'ملخص المقترحات (بالذكاء الاصطناعي)',
-            loadingAI: 'جاري التلخيص باستخدام Gemini AI...',
+            suggestionsTitle: 'ملخص الملاحظات (بالذكاء الاصطناعي)',
+            loadingAI: 'جاري التحليل بالذكاء الاصطناعي...',
             groupLabel: 'مجموعة المقياس',
             step1: 'الخطوة 1: مصدر البيانات',
             step1Btn: 'تحميل ملف محلي',
@@ -349,36 +463,35 @@
             threshold: 'حد الإيجابيات (%):',
             analyzeNow: 'حلل البيانات الآن',
             export: 'تصدير (Excel)',
-            copyAll: 'نسخ كافة النتائج',
+            print: 'طباعة (PDF)',
+            copyAll: 'نسخ الكل',
             finalResult: 'النسبة الإجمالية',
-            evalLabel: 'التقييم العام للمعهد'
+            evalLabel: 'التقييم العام للمعهد',
+            googleErrorTitle: 'خطأ في بيانات جوجل',
+            googleErrorBody: 'تأكد أن الملف متاح للجميع ومنشور على الويب.',
+            nav: {
+                step1: 'المصدر',
+                step2: 'التعيين',
+                step3: 'المقاييس',
+                charts: 'الرسوم',
+                results: 'الجداول',
+                highlights: 'النتائج',
+                final: 'التقييم'
+            }
         }
     };
 
     function sanitizeValue(val) {
         if (typeof val !== 'string') return val;
-        const triggers = ['=', '-', '+', '@'];
-        if (triggers.includes(val.trim().charAt(0))) return "'" + val;
+        if (['=', '-', '+', '@'].includes(val.trim().charAt(0))) return "'" + val;
         return val;
     }
 
     function showStatus(btnEl) {
         if (!btnEl) return;
         const originalHtml = btnEl.innerHTML;
-        btnEl.innerHTML = `<span class="text-[12px] font-black uppercase px-2 text-green-600">${languageData[currentLang].copied}</span>`;
+        btnEl.innerHTML = `<span class="text-[12px] font-black uppercase px-2 text-green-600 font-black">${languageData[currentLang].copied}</span>`;
         setTimeout(() => btnEl.innerHTML = originalHtml, 2000);
-    }
-
-    function copyToClipboard(text) {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-9999px";
-        textArea.style.top = "0";
-        document.body.appendChild(textArea);
-        textArea.focus(); textArea.select();
-        try { const ok = document.execCommand('copy'); document.body.removeChild(textArea); return ok; } 
-        catch (err) { if (document.body.contains(textArea)) document.body.removeChild(textArea); return false; }
     }
 
     function showMessage(title, text, type = 'warning') {
@@ -387,6 +500,14 @@
         modal.querySelector('#messageBoxBody').textContent = text;
         modal.querySelector('#messageBoxIcon').textContent = type === 'error' ? '❌' : (type === 'success' ? '✅' : '⚠️');
         modal.classList.remove('hidden');
+    }
+
+    function copyToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text; textArea.style.position = "fixed"; textArea.style.left = "-9999px"; textArea.style.top = "0";
+        document.body.appendChild(textArea); textArea.focus(); textArea.select();
+        try { const ok = document.execCommand('copy'); document.body.removeChild(textArea); return ok; } 
+        catch (err) { if (document.body.contains(textArea)) document.body.removeChild(textArea); return false; }
     }
 
     function attachCopyButton(container, copyLogic) {
@@ -402,16 +523,18 @@
         const apiKey = "AIzaSyBt0DtjhTpAZRQMYeMv_GFGogVYf1hLRNs";
         const modelName = "gemini-2.5-flash-preview-09-2025";
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-        const systemPrompt = lang === 'ar' ? "قم بتلخيص المقترحات في نقاط مهنية واضحة." : "Summarize suggestions into clear professional points.";
+        const systemPrompt = lang === 'ar' 
+            ? "أنت خبير في تحليل البيانات التعليمية. قم بتلخيص المقترحات التالية في نقاط واضحة ومهنية باللغة العربية. ابدأ مباشرة بالنقاط دون مقدمات."
+            : "You are an educational data expert. Summarize feedback suggestions into clear professional bullet points.";
         const payload = { contents: [{ parts: [{ text: text }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
         try {
-            const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            const res = await resp.json();
-            return res.candidates?.[0]?.content?.parts?.[0]?.text || text;
-        } catch (e) { return text; }
+            const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const result = await response.json();
+            return result.candidates?.[0]?.content?.parts?.[0]?.text || text;
+        } catch (err) { return text; }
     }
 
-    // --- Render Components ---
+    // --- Render Logics ---
 
     function renderScaleGroups() {
         const container = document.getElementById('scaleGroupsContainer');
@@ -420,23 +543,19 @@
             if (group.isSuggestion) return;
             const wrap = document.createElement('div');
             wrap.className = 'bg-white p-6 rounded-3xl border-2 border-blue-200 shadow-md hover-zoom';
-            wrap.innerHTML = `<h3 class="font-black text-indigo-900 uppercase tracking-tighter text-xl mb-4 pr-4">${languageData[currentLang].groupLabel}: ${group.options.join(', ')}</h3><div class="scale-list space-y-3" data-sig="${sig}"></div>`;
+            wrap.innerHTML = `<h3 class="font-black text-indigo-900 uppercase tracking-tighter text-xl mb-4 pr-4 font-black">${languageData[currentLang].groupLabel}: ${group.options.join(', ')}</h3><div class="scale-list space-y-3 font-black" data-sig="${sig}"></div>`;
             const list = wrap.querySelector('.scale-list');
             group.options.forEach((opt, idx) => {
                 const item = document.createElement('div');
-                item.className = 'p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl flex justify-between items-center cursor-move';
+                item.className = 'p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl flex justify-between items-center cursor-move font-black';
                 item.draggable = true;
-                item.innerHTML = `<span class="font-bold text-slate-900">${opt}</span><label class="flex items-center cursor-pointer"><input type="checkbox" class="w-6 h-6 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="mr-2 text-xs font-black text-indigo-800 font-black">${languageData[currentLang].pos}</span></label>`;
+                item.innerHTML = `<span class="font-bold text-slate-900 font-black">${opt}</span><label class="flex items-center cursor-pointer font-black"><input type="checkbox" class="w-6 h-6 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="mr-2 text-xs font-black text-indigo-800">${languageData[currentLang].pos}</span></label>`;
                 item.querySelector('input').onchange = (e) => e.target.checked ? group.positives.add(opt) : group.positives.delete(opt);
                 item.ondragstart = (e) => { e.dataTransfer.setData('idx', idx); e.dataTransfer.setData('sig', sig); };
                 item.ondragover = (e) => e.preventDefault();
                 item.ondrop = (e) => {
-                    const fromIdx = e.dataTransfer.getData('idx');
-                    const sigDrop = e.dataTransfer.getData('sig');
-                    if(sigDrop !== sig) return;
-                    const moved = group.options.splice(fromIdx, 1)[0];
-                    group.options.splice(idx, 0, moved);
-                    renderScaleGroups();
+                    const fromIdx = e.dataTransfer.getData('idx'); if(e.dataTransfer.getData('sig') !== sig) return;
+                    const moved = group.options.splice(fromIdx, 1)[0]; group.options.splice(idx, 0, moved); renderScaleGroups();
                 };
                 list.appendChild(item);
             });
@@ -454,14 +573,12 @@
         const avgPos = totalRes ? (domainPos / totalRes * 100).toFixed(1) : '0.0';
         const align = currentLang === 'ar' ? 'text-right' : 'text-left';
         
-        let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black ${align}">${title}</h2><div class="overflow-x-auto"><table class="w-full text-sm ${align}"><thead class="bg-slate-100"><tr><th class="p-6 text-center">#</th><th class="p-6">${d.headers.item}</th>${opts.map(o => `<th class="p-6 text-center text-indigo-700 font-black">${o}</th>`).join('')}<th class="p-6 text-center font-bold text-blue-600">${d.headers.checkTotal}</th><th class="p-6 text-center font-black">${d.headers.positives}</th></tr></thead><tbody>`;
-        
+        let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black ${align} font-black">${title}</h2><div class="overflow-x-auto"><table class="w-full text-sm ${align} font-black"><thead class="bg-slate-100"><tr><th class="p-6 text-center font-black">#</th><th class="p-6 text-right font-black font-black">${d.headers.item}</th>${opts.map(o => `<th class="p-6 text-center text-indigo-700 font-black font-black">${o}</th>`).join('')}<th class="p-6 text-center font-bold text-blue-600 font-black font-black font-black">${d.headers.checkTotal}</th><th class="p-6 text-center font-black font-black font-black font-black font-black">${d.headers.positives}</th></tr></thead><tbody>`;
         rows.forEach((r, i) => { 
-            const rowCheckSum = opts.reduce((acc, o) => acc + (r.freqs[o] / r.total * 100), 0);
-            html += `<tr class="border-b border-slate-50"><td class="p-6 text-center text-slate-500 font-bold">${i+1}</td><td class="p-6 font-bold text-slate-800">${r.item}</td>${opts.map(o => `<td class="p-6 text-center">${(r.freqs[o]/r.total*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center font-bold text-blue-500 bg-blue-50/30">${rowCheckSum.toFixed(1)}%</td><td class="p-6 text-center font-black text-green-700 bg-green-50">${r.posPerc.toFixed(1)}%</td></tr>`; 
+            const rowSum = opts.reduce((acc, o) => acc + (r.freqs[o] / r.total * 100), 0);
+            html += `<tr class="border-b border-slate-50 font-black"><td class="p-6 text-center text-slate-500 font-bold font-black">${i+1}</td><td class="p-6 font-bold text-slate-800 text-right font-black font-black font-black">${r.item}</td>${opts.map(o => `<td class="p-6 text-center font-black font-black">${(r.freqs[o]/r.total*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center font-bold text-blue-500 bg-blue-50/30 font-black font-black font-black">${rowSum.toFixed(1)}%</td><td class="p-6 text-center font-black text-green-700 bg-green-50 font-black font-black font-black font-black">${r.posPerc.toFixed(1)}%</td></tr>`; 
         });
-        
-        html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td colspan="2" class="p-6 text-center uppercase">${d.headers.footer}</td>${opts.map(o => `<td class="p-6 text-center">${((rows.reduce((s, r) => s + r.freqs[o], 0)/totalRes)*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center">100.0%</td><td class="p-6 text-center text-green-800 text-lg font-black">${avgPos}%</td></tr></tfoot></table></div>`;
+        html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200 font-black"><tr><td colspan="2" class="p-6 text-center uppercase font-black font-black font-black">${d.headers.footer}</td>${opts.map(o => `<td class="p-6 text-center font-black font-black">${((rows.reduce((s, r) => s + r.freqs[o], 0)/totalRes)*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center font-black font-black">100.0%</td><td class="p-6 text-center text-green-800 text-lg font-black font-black font-black font-black font-black">${avgPos}%</td></tr></tfoot></table></div>`;
         div.innerHTML = html;
         attachCopyButton(div, (btn) => {
             let content = title + '\n';
@@ -482,7 +599,7 @@
         const div = document.createElement('div');
         div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-100 overflow-hidden hover-zoom mb-10 suggestion-wrapper';
         const align = currentLang === 'ar' ? 'text-right' : 'text-left';
-        div.innerHTML = `<div class="p-8 bg-indigo-50 border-b-2 border-indigo-100 ${align}"><h2 class="text-3xl font-black">${title}</h2><div class="mt-2 flex items-center"><span class="ai-badge">Gemini AI</span> <span class="text-xs font-black text-indigo-500 uppercase tracking-widest font-black">${d.suggestionsTitle}</span></div></div><div class="p-8 ${align}"><div class="suggestion-box italic text-slate-400">${d.loadingAI}</div></div>`;
+        div.innerHTML = `<div class="p-8 bg-indigo-50 border-b-2 border-indigo-100 ${align} font-black"><h2 class="text-3xl font-black font-black font-black">${title}</h2><div class="mt-2 flex items-center font-black font-black"><span class="ai-badge font-black">Gemini AI</span> <span class="text-xs font-black text-indigo-500 uppercase tracking-widest font-black">${d.suggestionsTitle}</span></div></div><div class="p-8 ${align} font-black"><div class="suggestion-box italic text-slate-400 font-black font-black">${d.loadingAI}</div></div>`;
         container.appendChild(div);
         const summary = await summarizeWithAI(rawText, currentLang);
         const aiOutputEl = div.querySelector('.suggestion-box');
@@ -495,13 +612,13 @@
         const d = languageData[currentLang];
         const container = document.getElementById('resultsContainer');
         const div = document.createElement('div');
-        div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-200 overflow-hidden hover-zoom mt-16 summary-table-wrapper';
+        div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-200 overflow-hidden hover-zoom mt-16 summary-table-wrapper font-black';
         const gTotal = summaryDataList.reduce((s, dm) => s + dm.total, 0);
         const gPos = summaryDataList.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
         const align = currentLang === 'ar' ? 'text-right' : 'text-left';
-        let html = `<h2 class="text-3xl thin-title p-8 bg-indigo-700 text-white font-black text-center">Summary of All Domains</h2><table class="w-full text-lg ${align}"><thead class="bg-indigo-50"><tr><th class="p-8 text-center">#</th><th class="p-8">Domain</th><th class="p-8 text-center font-black">${d.headers.positives}</th></tr></thead><tbody>`;
-        summaryDataList.forEach((dm, i) => { const pSum = Array.from(dm.positives).reduce((s,o)=>s+(dm.freqs[o]||0),0); html += `<tr class="border-b border-indigo-50"><td class="p-8 text-center text-indigo-300 font-black">${i+1}</td><td class="p-8 font-black text-slate-800">${dm.name}</td><td class="p-8 text-center font-black text-green-600">${(pSum/dm.total*100).toFixed(1)}%</td></tr>`; });
-        html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300"><tr><td colspan="2" class="p-8 text-center uppercase">Total Average</td><td class="p-8 text-center text-green-800 text-2xl font-black">${(gPos/gTotal*100).toFixed(1)}%</td></tr></tfoot></table>`;
+        let html = `<h2 class="text-3xl thin-title p-8 bg-indigo-700 text-white font-black text-center font-black font-black font-black">Summary of All Domains</h2><table class="w-full text-lg ${align} font-black"><thead class="bg-indigo-50 font-black"><tr><th class="p-8 text-center font-black font-black font-black font-black">#</th><th class="p-8 font-black font-black font-black font-black font-black">Domain</th><th class="p-8 text-center font-black font-black font-black font-black font-black font-black">${d.headers.positives}</th></tr></thead><tbody>`;
+        summaryDataList.forEach((dm, i) => { const pSum = Array.from(dm.positives).reduce((s,o)=>s+(dm.freqs[o]||0),0); html += `<tr class="border-b border-indigo-50 font-black"><td class="p-8 text-center text-indigo-300 font-black font-black font-black">${i+1}</td><td class="p-8 font-black text-slate-800 font-black font-black font-black">${dm.name}</td><td class="p-8 text-center font-black text-green-600 font-black font-black font-black font-black">${(pSum/dm.total*100).toFixed(1)}%</td></tr>`; });
+        html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300 font-black font-black"><tr><td colspan="2" class="p-8 text-center uppercase font-black font-black font-black font-black">Total Average</td><td class="p-8 text-center text-green-800 text-2xl font-black font-black font-black font-black font-black font-black font-black font-black">${(gPos/gTotal*100).toFixed(1)}%</td></tr></tfoot></table>`;
         div.innerHTML = html;
         attachCopyButton(div, (btn) => {
             let txt = 'Summary\n';
@@ -520,15 +637,13 @@
         const thresh = parseInt(document.getElementById('positivesThresholdInput').value || 85);
         const high = items.filter(i => i.posPerc >= thresh);
         const low = items.filter(i => i.posPerc < thresh);
-        const textAlign = currentLang === 'ar' ? 'text-right' : 'text-left';
-        const iconAlign = currentLang === 'ar' ? 'justify-end' : 'justify-start';
         container.innerHTML = '';
         const sDiv = document.createElement('div');
-        sDiv.className = `p-10 bg-green-50 rounded-[3rem] border-4 border-green-200 shadow-lg hover-zoom w-full ${textAlign}`;
-        sDiv.innerHTML = `<h4 class="text-3xl font-black text-green-800 mb-8 flex items-center ${iconAlign}">${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold font-black">${high.length ? high.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-green-100 shadow-sm">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
+        sDiv.className = `p-10 bg-green-50 rounded-[3rem] border-4 border-green-200 shadow-lg hover-zoom w-full font-black font-black`;
+        sDiv.innerHTML = `<h4 class="text-3xl font-black text-green-800 mb-8 font-black font-black">${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold font-black">${high.length ? high.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-green-100 shadow-sm">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
         const iDiv = document.createElement('div');
-        iDiv.className = `p-10 bg-red-50 rounded-[3rem] border-4 border-red-200 shadow-lg hover-zoom w-full ${textAlign}`;
-        iDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8 flex items-center ${iconAlign}">${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold font-black">${low.length ? low.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-red-100 shadow-sm">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
+        iDiv.className = `p-10 bg-red-50 rounded-[3rem] border-4 border-red-200 shadow-lg hover-zoom w-full font-black font-black`;
+        iDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8 font-black font-black">${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold font-black font-black font-black">${low.length ? low.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-red-100 shadow-sm">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
         container.appendChild(sDiv); container.appendChild(iDiv);
         container.classList.remove('hidden');
     }
@@ -537,26 +652,25 @@
         const d = languageData[currentLang];
         const container = document.getElementById('finalRecommendationContainer');
         const div = document.createElement('div');
-        div.className = 'relative p-12 bg-white rounded-[3.5rem] shadow-2xl border-4 border-indigo-400 hover-zoom mb-20 text-center animate-in fade-in duration-700';
+        div.className = 'relative p-12 bg-white rounded-[3.5rem] shadow-2xl border-4 border-indigo-400 hover-zoom mb-20 text-center animate-in fade-in duration-700 font-black';
         let evalTxt = score > 85 ? d.evaluations[0] : score > 75 ? d.evaluations[1] : score > 65 ? d.evaluations[2] : score > 50 ? d.evaluations[3] : d.evaluations[4];
-        div.innerHTML = `<h2 class="text-4xl thin-title mb-10 text-center text-indigo-900 font-black border-b-2 border-indigo-50 pb-6">${d.recommendation}</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-10"><div class="p-8 bg-indigo-50 rounded-[2.5rem] text-center border-2 border-indigo-100 flex flex-col justify-center items-center"><span class="text-xs font-black text-indigo-400 mb-2 uppercase font-black">${d.finalResult}</span><span class="text-6xl font-black text-indigo-800">${score.toFixed(2)}%</span></div><div class="p-8 bg-green-50 rounded-[2.5rem] text-center border-2 border-green-100 flex flex-col justify-center items-center"><span class="text-xs font-black text-green-400 mb-2 uppercase font-black">${d.evalLabel}</span><span class="text-6xl font-black text-green-700">${evalTxt}</span></div></div>`;
+        div.innerHTML = `<h2 class="text-4xl thin-title mb-10 text-center text-indigo-900 font-black border-b-2 border-indigo-50 pb-6 font-black font-black font-black font-black font-black">${d.recommendation}</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-10 font-black"><div class="p-8 bg-indigo-50 rounded-[2.5rem] text-center border-2 border-indigo-100 flex flex-col justify-center items-center font-black font-black font-black"><span class="text-xs font-black text-indigo-400 mb-2 uppercase font-black font-black font-black font-black">${d.finalResult}</span><span class="text-6xl font-black text-indigo-800 font-black font-black font-black font-black font-black font-black">${score.toFixed(2)}%</span></div><div class="p-8 bg-green-50 rounded-[2.5rem] text-center border-2 border-green-100 flex flex-col justify-center items-center font-black font-black font-black"><span class="text-xs font-black text-green-400 mb-2 uppercase font-black font-black font-black font-black">${d.evalLabel}</span><span class="text-6xl font-black text-green-700 font-black font-black font-black font-black font-black font-black font-black font-black font-black">${evalTxt}</span></div></div>`;
         container.innerHTML = ''; container.appendChild(div); container.classList.remove('hidden');
     }
 
-    // --- 5. Main Initialization ---
+    // --- Main ---
 
     document.addEventListener('DOMContentLoaded', () => {
+        if (typeof ChartDataLabels !== 'undefined') { Chart.register(ChartDataLabels); }
+
         function updateUI() {
             const d = languageData[currentLang];
             document.getElementById('mainTitle').textContent = d.title;
             document.getElementById('instituteTitle').innerText = d.devCredit;
             document.getElementById('step1Title').textContent = d.step1;
-            document.getElementById('analyzeButton').textContent = d.analyzeNow;
-            document.getElementById('exportButton').textContent = d.export;
-            document.getElementById('copyTableButton').textContent = d.copyAll;
-            document.getElementById('srcLocalBtn').innerHTML = `📁 ${d.step1Btn}`;
-            document.getElementById('srcGoogleBtn').innerHTML = `🌐 ${d.step1G}`;
-            document.getElementById('srcGithubBtn').innerHTML = `🐙 ${d.step1H}`;
+            document.getElementById('srcLocalBtn').textContent = d.step1Btn;
+            document.getElementById('srcGoogleBtn').textContent = d.step1G;
+            document.getElementById('srcGithubBtn').textContent = d.step1H;
             document.getElementById('localFileBtnText').textContent = d.localHint;
             document.getElementById('fetchGoogleBtn').textContent = d.fetch;
             document.getElementById('fetchGithubBtn').textContent = d.fetch;
@@ -569,11 +683,22 @@
             document.getElementById('scaleOrderTitle').textContent = d.step3;
             document.getElementById('scaleOrderSubtitle').textContent = d.step3Hint;
             document.getElementById('labelThreshold').textContent = d.threshold;
+            document.getElementById('analyzeButton').textContent = d.analyzeNow;
+            document.getElementById('exportButton').textContent = d.export;
+            document.getElementById('printButton').textContent = d.print;
+            document.getElementById('copyTableButton').textContent = d.copyAll;
             document.getElementById('deptFilterSelect').options[0].text = d.allInstitute;
             document.getElementById('lang-ar').classList.toggle('active-lang', currentLang === 'ar');
             document.getElementById('lang-en').classList.toggle('active-lang', currentLang === 'en');
             document.getElementById('mainHtml').dir = currentLang === 'ar' ? 'rtl' : 'ltr';
             document.body.style.textAlign = currentLang === 'ar' ? 'right' : 'left';
+            document.getElementById('tip-step1').textContent = d.nav.step1;
+            document.getElementById('tip-step2').textContent = d.nav.step2;
+            document.getElementById('tip-step3').textContent = d.nav.step3;
+            document.getElementById('tip-charts').textContent = d.nav.charts;
+            document.getElementById('tip-results').textContent = d.nav.results;
+            document.getElementById('tip-highlights').textContent = d.nav.highlights;
+            document.getElementById('tip-final').textContent = d.nav.final;
         }
 
         const xlsxFile = document.getElementById('xlsxFile');
@@ -650,9 +775,9 @@
                     const avgLen = resps.reduce((s,x)=>s+x.length,0)/resps.length;
                     const redundancy = opts.size / resps.length;
                     const isSugg = (opts.size > 12 && redundancy > 0.25) || (avgLen > 40 && opts.size > 5);
-                    const sig = Array.from(opts).sort().join('|');
-                    if (!identifiedScaleGroups.has(sig)) identifiedScaleGroups.set(sig, { options: Array.from(opts), positives: new Set(), isSuggestion: isSugg });
-                    itemToScaleGroup.set(col, sig);
+                    const sigStr = Array.from(opts).sort().join('|');
+                    if (!identifiedScaleGroups.has(sigStr)) identifiedScaleGroups.set(sigStr, { options: Array.from(opts), positives: new Set(), isSuggestion: isSugg });
+                    itemToScaleGroup.set(col, sigStr);
                 }
             }
             const df = document.getElementById('deptFilterSelect');
@@ -660,8 +785,7 @@
             Array.from(departments).sort().forEach(dept => df.add(new Option(dept, dept)));
             document.getElementById('filterSection').classList.remove('hidden'); 
             renderScaleGroups();
-            document.getElementById('scaleOrderSection').classList.remove('hidden'); 
-            document.getElementById('actionButtons').classList.remove('hidden');
+            document.getElementById('scaleOrderSection').classList.remove('hidden'); document.getElementById('actionButtons').classList.remove('hidden');
         };
 
         document.getElementById('analyzeButton').onclick = async () => {
@@ -680,19 +804,17 @@
             
             let rows = rawExcelData.slice(1);
             if (filterValue !== 'all') rows = rows.filter(r => r && String(r[filterColIdx] || "").trim() === filterValue);
-            document.getElementById('participantCountDisplay').textContent = `${rows.length} ${languageData[currentLang].participants}`;
-            document.getElementById('participantCountDisplay').classList.remove('hidden');
+            participantCountDisplay.textContent = `${rows.length} ${languageData[currentLang].participants}`;
+            participantCountDisplay.classList.remove('hidden');
 
             const headers = rawExcelData[0];
             const processedCols = new Set();
 
             for (let col = startColIdx; col < headers.length; col++) {
                 if (processedCols.has(col)) continue;
-                
-                const sig = itemToScaleGroup.get(col);
-                if (!sig) continue;
-                
-                const groupData = identifiedScaleGroups.get(sig);
+                const sigLocal = itemToScaleGroup.get(col);
+                if (!sigLocal) continue;
+                const groupData = identifiedScaleGroups.get(sigLocal);
                 if (!groupData) continue;
 
                 if (groupData.isSuggestion) {
@@ -706,12 +828,11 @@
                         for (let c2 = col; c2 < headers.length; c2++) {
                             if (processedCols.has(c2)) continue;
                             const m2 = String(headers[c2]).match(/(.+) \[(.+)\]/);
-                            if (m2 && m2[1].trim() === dName && itemToScaleGroup.get(c2) === sig) {
+                            if (m2 && m2[1].trim() === dName && itemToScaleGroup.get(c2) === sigLocal) {
                                 itemsInDomain.push({txt: headers[c2], item: m2[2].trim(), colIdx: c2});
                                 processedCols.add(c2);
                             }
                         }
-                        
                         const rowsData = itemsInDomain.map(idom => {
                             const rps = rows.map(r => r[idom.colIdx]);
                             const freqs = {}; groupData.options.forEach(o => freqs[o] = 0);
@@ -725,7 +846,7 @@
                         const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
                         const divC = document.createElement('div');
                         divC.className = 'bg-white p-10 rounded-[2.5rem] shadow-xl border-2 border-blue-100 hover-zoom flex flex-col items-center';
-                        divC.innerHTML = `<h3 class="text-2xl font-black mb-8 text-center text-indigo-900 font-black">${dName}</h3><div class="w-full h-96"><canvas id="${canvasId}"></canvas></div>`;
+                        divC.innerHTML = `<h3 class="text-2xl font-black mb-8 text-center text-indigo-900 font-black font-black">${dName}</h3><div class="w-full h-96"><canvas id="${canvasId}"></canvas></div>`;
                         document.getElementById('chartContainer').appendChild(divC);
                         const ctx = document.getElementById(canvasId).getContext('2d');
                         const dataVals = groupData.options.map(o => { const sum = rowsData.reduce((s, r) => s + r.freqs[o], 0); const total = rowsData.reduce((s, r) => s + r.total, 0); return total ? (sum/total*100).toFixed(1) : 0; });
@@ -755,6 +876,8 @@
             resultsContainer.classList.remove('hidden'); document.getElementById('chartContainer').classList.remove('hidden'); 
             resultsContainer.scrollIntoView({ behavior: 'smooth' });
         };
+
+        document.getElementById('printButton').onclick = () => { window.print(); };
 
         document.getElementById('copyTableButton').onclick = () => {
             const d = languageData[currentLang];
@@ -786,17 +909,15 @@
             document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(s => {
                 allD.push([sanitizeValue(s.querySelector('h2').innerText)]);
                 const tbl = s.querySelector('table');
-                if (tbl) {
-                    tbl.querySelectorAll('tr').forEach(tr => {
-                        let r = []; tr.querySelectorAll('th, td').forEach(c => {
-                            const cs = parseInt(c.getAttribute('colspan') || 1);
-                            let val = c.innerText.trim();
-                            if (val.endsWith('%')) { let num = parseFloat(val.replace('%', '')); r.push(isNaN(num) ? val : num); } else { r.push(sanitizeValue(val)); }
-                            for(let k=1; k < cs; k++) r.push("");
-                        });
-                        allD.push(r);
+                if (tbl) tbl.querySelectorAll('tr').forEach(tr => {
+                    let r = []; tr.querySelectorAll('th, td').forEach(c => {
+                        const cs = parseInt(c.getAttribute('colspan') || 1);
+                        let val = c.innerText.trim();
+                        if (val.endsWith('%')) { let num = parseFloat(val.replace('%', '')); r.push(isNaN(num) ? val : num); } else { r.push(sanitizeValue(val)); }
+                        for(let k=1; k < cs; k++) r.push("");
                     });
-                }
+                    allD.push(r);
+                });
                 const box = s.querySelector('.suggestion-box'); if (box) allD.push([sanitizeValue(box.innerText)]);
                 allD.push([]);
             });
