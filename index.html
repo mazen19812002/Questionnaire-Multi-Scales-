@@ -23,9 +23,7 @@
         .hover-zoom:hover { transform: scale(1.03); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
         .btn-execute { background-color: #22c55e; color: white; font-weight: 700; transition: all 0.2s; padding: 1rem 2rem; border-radius: 1.5rem; }
         .btn-execute:hover { background-color: #16a34a; transform: scale(1.05); }
-        .copy-btn-wrapper { position: absolute; top: 1rem; z-index: 30; }
-        [dir="rtl"] .copy-btn-wrapper { left: 1rem; }
-        [dir="ltr"] .copy-btn-wrapper { right: 1rem; }
+        .copy-btn-wrapper { position: absolute; top: 1rem; z-index: 30; left: 1rem; }
         .copy-btn-inner { opacity: 0.4; transition: opacity 0.2s, transform 0.2s; cursor: pointer; padding: 10px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.9); border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; color: #475569; }
         .copy-btn-inner:hover { opacity: 1; background-color: #ffffff; transform: scale(1.1); border-color: #22c55e; color: #22c55e; }
         .input-card { background: white; padding: 2.5rem; border-radius: 2.5rem; border: 1px solid #bae6fd; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
@@ -37,18 +35,13 @@
         .multi-select-item { padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.2s; }
         .multi-select-item:hover { background-color: #f1f5f9; }
         .multi-select-item input { width: 1.2rem; height: 1.2rem; cursor: pointer; }
-        .active-lang { background-color: #4f46e5 !important; color: white !important; }
         .suggestion-box { background-color: #f8fafc; border: 2px solid #e2e8f0; border-radius: 1.5rem; padding: 2rem; line-height: 1.8; color: #1e293b; min-height: 80px; max-height: 600px; overflow-y: auto; white-space: pre-wrap; font-weight: 500; font-size: 1.1rem; box-shadow: inset 0 2px 8px 0 rgba(0,0,0,0.03); }
         .ai-badge { background: linear-gradient(90deg, #4f46e5, #9333ea); color: white; padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 900; margin-right: 10px; display: inline-flex; align-items: center; }
         /* Floating Nav */
-        .floating-nav { position: fixed; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 100; padding: 12px; background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); border-radius: 2rem; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.15); }
-        [dir="rtl"] .floating-nav { left: 1rem; }
-        [dir="ltr"] .floating-nav { right: 1rem; }
+        .floating-nav { position: fixed; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 100; padding: 12px; background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); border-radius: 2rem; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.15); left: 1rem; }
         .nav-dot { width: 44px; height: 44px; background: white; border: 2px solid #4f46e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; position: relative; color: #4f46e5; }
         .nav-dot:hover { background: #4f46e5; color: white; transform: scale(1.15); }
-        .nav-tooltip { position: absolute; white-space: nowrap; background: #1e293b; color: white; padding: 6px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 900; opacity: 0; pointer-events: none; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        [dir="rtl"] .nav-tooltip { left: 55px; }
-        [dir="ltr"] .nav-tooltip { right: 55px; }
+        .nav-tooltip { position: absolute; white-space: nowrap; background: #1e293b; color: white; padding: 6px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 900; opacity: 0; pointer-events: none; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); left: 55px; }
         .nav-dot:hover .nav-tooltip { opacity: 1; }
         
         /* ------------------------------------------------------------- */
@@ -59,7 +52,7 @@
             body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 10pt !important; }
             
             /* Hide UI elements not meant for print */
-            .input-card, #langToggle, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .flex.justify-between.items-start.mb-8 { display: none !important; }
+            .input-card, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .flex.justify-between.items-start.mb-8 { display: none !important; }
             main { box-shadow: none !important; padding: 0 !important; background-color: transparent !important; max-width: 100% !important; margin: 0 !important; border: none !important; }
             
             /* Titles and Headers */
@@ -176,15 +169,8 @@
     <main class="max-w-7xl mx-auto w-full bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl flex-grow mb-12">
         <h1 id="mainTitle" class="text-4xl thin-title text-center mb-2 text-slate-800 font-black uppercase tracking-tight">تحليل نتائج الاستبيان</h1>
         <p class="text-center text-indigo-700 mb-8 text-xl font-bold font-black" id="instituteTitle"></p>
-        
-        <div class="flex flex-col items-center space-y-6 mb-10">
-            <div id="langToggle" class="flex rounded-xl shadow-inner bg-gray-100 p-1 cursor-pointer border border-gray-200">
-                <span id="lang-ar" class="px-8 py-2 font-black transition-all rounded-lg active-lang">العربية</span>
-                <span id="lang-en" class="px-8 py-2 font-black transition-all rounded-lg">English</span>
-            </div>
-        </div>
 
-        <div class="max-w-4xl mx-auto mb-10">
+        <div class="max-w-4xl mx-auto mb-10 mt-8">
             <div class="input-card border-2 border-blue-100">
                 <h2 id="step1Title" class="text-xl font-bold text-center mb-6 text-slate-700 font-black">الخطوة 1: اختر مصدر ملف البيانات</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -304,48 +290,6 @@
         let selectedDepts = new Set();
 
         const languageData = {
-            en: {
-                title: 'Questionnaire Results Analysis',
-                devCredit: 'High Institute of Engineering and Technology in Kafr El-Sheikh\nQuality Assurance and Accreditation Unit',
-                allInstitute: 'All Institute',
-                participants: 'Participants',
-                pos: 'Positive',
-                copied: 'Copied!',
-                emptyList: 'No items found',
-                headers: { no: '#', item: 'Statement', checkTotal: 'Row Total (%)', total: 'Total (%)', positives: 'Positives (%)', footer: 'Average' },
-                strengths: '★ Core Strengths',
-                improvement: '⚠️ Critical Improvement Areas',
-                recommendation: 'Final Recommendation',
-                evaluations: ["Excellent", "Very Good", "Good", "Acceptable", "Weak"],
-                suggestionsTitle: 'AI-Summarized Feedback',
-                loadingAI: 'AI is analyzing suggestions...',
-                groupLabel: 'Scale Group',
-                step1: 'Step 1: Data Source',
-                step1Btn: 'Local Upload',
-                step1G: 'Google Sheet',
-                step1H: 'GitHub Server',
-                localHint: 'Choose XLSX or CSV',
-                googleHint: 'Paste link here...',
-                fetch: 'Fetch Data',
-                step2: 'Step 2: Data Mapping',
-                confirm: 'Confirm Mapping',
-                filterLabel: 'Filter by Department(s)',
-                deptLabel: 'Select Dept Column',
-                startColLabel: 'Analyze from Column',
-                step3: 'Step 3: Define Scale Orders',
-                step3Hint: 'Rank choices (Highest on top).',
-                threshold: 'Threshold (%):',
-                analyzeNow: 'Analyze Now',
-                export: 'Export (Excel)',
-                print: 'Print (PDF)',
-                copyAll: 'Copy All',
-                finalResult: 'Overall Percentage',
-                evalLabel: 'General Evaluation',
-                googleErrorTitle: 'Google Sheets Error',
-                googleErrorBody: 'Ensure the file is Published to Web.',
-                nav: { step1: 'Source', step2: 'Mapping', filter: 'Filters', step3: 'Scales', results: 'Tables', charts: 'Charts', highlights: 'Points', final: 'Evaluation' },
-                selectAll: 'Select All'
-            },
             ar: {
                 title: 'تحليل نتائج الاستبيان',
                 devCredit: 'المعهد العالي للهندسة والتكنولوجيا بكفر الشيخ\nوحدة ضمان الجودة والاعتماد',
@@ -391,13 +335,11 @@
         };
 
         /* --- AI --- */
-        async function summarizeWithAI(text, lang) {
+        async function summarizeWithAI(text) {
             const apiKey = "AIzaSyBt0DtjhTpAZRQMYeMv_GFGogVYf1hLRNs";
             const modelName = "gemini-2.5-flash-preview-09-2025";
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-            const systemPrompt = lang === 'ar' 
-                ? "أنت خبير في تحليل البيانات التعليمية. قم بتلخيص المقترحات التالية في نقاط واضحة ومهنية باللغة العربية. ابدأ مباشرة بالنقاط دون مقدمات."
-                : "Summarize feedback suggestions into clear professional bullet points.";
+            const systemPrompt = "أنت خبير في تحليل البيانات التعليمية. قم بتلخيص المقترحات التالية في نقاط واضحة ومهنية باللغة العربية. ابدأ مباشرة بالنقاط دون مقدمات.";
             const payload = { contents: [{ parts: [{ text: text }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
             try {
                 const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -479,7 +421,7 @@
             const totalRes = rows.reduce((s, r) => s + r.total, 0);
             const domainPos = rows.reduce((s, r) => s + Array.from(positives).reduce((sum, opt) => sum + (r.freqs[opt] || 0), 0), 0);
             const avgPos = totalRes ? (domainPos / totalRes * 100).toFixed(1) : '0.0';
-            const align = currentLang === 'ar' ? 'text-right' : 'text-left';
+            const align = 'text-right';
             
             let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black ${align} font-black">${title}</h2><div class="overflow-x-auto"><table class="w-full text-sm ${align} font-black"><thead class="bg-slate-100"><tr><th class="p-6 text-center font-black">#</th><th class="p-6 text-right font-black font-black font-black">${d.headers.item}</th>${opts.map(o => `<th class="p-6 text-center text-indigo-700 font-black font-black font-black">${o}</th>`).join('')}<th class="p-6 text-center font-bold text-blue-600 font-black font-black font-black">${d.headers.checkTotal}</th><th class="p-6 text-center font-black font-black font-black font-black font-black">${d.headers.positives}</th></tr></thead><tbody>`;
             
@@ -509,10 +451,10 @@
             const container = document.getElementById('resultsContainer');
             const div = document.createElement('div');
             div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-100 overflow-hidden hover-zoom mb-10 suggestion-wrapper';
-            const align = currentLang === 'ar' ? 'text-right' : 'text-left';
+            const align = 'text-right';
             div.innerHTML = `<div class="p-8 bg-indigo-50 border-b-2 border-indigo-100 ${align} font-black font-black font-black"><h2 class="text-3xl font-black font-black font-black font-black">${title}</h2><div class="mt-2 flex items-center font-black font-black font-black"><span class="ai-badge font-black">Gemini AI</span> <span class="text-xs font-black text-indigo-500 uppercase tracking-widest font-black font-black">${d.suggestionsTitle}</span></div></div><div class="p-8 ${align} font-black font-black"><div class="suggestion-box italic text-slate-400 font-black font-black font-black">${d.loadingAI}</div></div>`;
             container.appendChild(div);
-            const summary = await summarizeWithAI(rawText, currentLang);
+            const summary = await summarizeWithAI(rawText);
             const aiOutputEl = div.querySelector('.suggestion-box');
             aiOutputEl.classList.remove('italic', 'text-slate-400');
             aiOutputEl.textContent = summary;
@@ -526,10 +468,10 @@
             div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-200 overflow-hidden hover-zoom mt-16 summary-table-wrapper font-black font-black font-black';
             const gTotal = summaryDataList.reduce((s, dm) => s + dm.total, 0);
             const gPos = summaryDataList.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
-            const align = currentLang === 'ar' ? 'text-right' : 'text-left';
-            let html = `<h2 class="text-3xl thin-title p-8 bg-indigo-700 text-white font-black text-center font-black font-black font-black font-black font-black">Summary of All Domains</h2><table class="w-full text-lg ${align} font-black font-black font-black font-black"><thead class="bg-indigo-50 font-black font-black font-black"><tr><th class="p-8 text-center font-black font-black font-black font-black font-black">#</th><th class="p-8 font-black font-black font-black font-black font-black">Domain</th><th class="p-8 text-center font-black font-black font-black font-black font-black font-black font-black">${d.headers.positives}</th></tr></thead><tbody>`;
+            const align = 'text-right';
+            let html = `<h2 class="text-3xl thin-title p-8 bg-indigo-700 text-white font-black text-center font-black font-black font-black font-black font-black">ملخص كل المحاور</h2><table class="w-full text-lg ${align} font-black font-black font-black font-black"><thead class="bg-indigo-50 font-black font-black font-black"><tr><th class="p-8 text-center font-black font-black font-black font-black font-black">#</th><th class="p-8 font-black font-black font-black font-black font-black">المحور</th><th class="p-8 text-center font-black font-black font-black font-black font-black font-black font-black">${d.headers.positives}</th></tr></thead><tbody>`;
             summaryDataList.forEach((dm, i) => { const pSum = Array.from(dm.positives).reduce((s,o)=>s+(dm.freqs[o]||0),0); html += `<tr class="border-b border-indigo-50 font-black font-black font-black font-black font-black font-black font-black font-black"><td class="p-8 text-center text-indigo-300 font-black font-black font-black font-black font-black font-black">${i+1}</td><td class="p-8 font-black text-slate-800 font-black font-black font-black font-black font-black">${dm.name}</td><td class="p-8 text-center font-black text-green-600 font-black font-black font-black font-black font-black font-black font-black">${(pSum/dm.total*100).toFixed(1)}%</td></tr>`; });
-            html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300 font-black font-black font-black font-black font-black font-black font-black"><tr><td colspan="2" class="p-8 text-center uppercase font-black font-black font-black font-black font-black font-black">Total Average</td><td class="p-8 text-center text-green-800 text-2xl font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${(gPos/gTotal*100).toFixed(1)}%</td></tr></tfoot></table>`;
+            html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300 font-black font-black font-black font-black font-black font-black font-black"><tr><td colspan="2" class="p-8 text-center uppercase font-black font-black font-black font-black font-black font-black">المتوسط الكلي</td><td class="p-8 text-center text-green-800 text-2xl font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${(gPos/gTotal*100).toFixed(1)}%</td></tr></tfoot></table>`;
             div.innerHTML = html;
             attachCopyButton(div, (btn) => {
                 let summaryContent = 'Summary\n';
@@ -601,10 +543,6 @@
                 document.getElementById('exportButton').textContent = d.export;
                 document.getElementById('printButton').textContent = d.print;
                 document.getElementById('copyTableButton').textContent = d.copyAll;
-                document.getElementById('lang-ar').classList.toggle('active-lang', currentLang === 'ar');
-                document.getElementById('lang-en').classList.toggle('active-lang', currentLang === 'en');
-                document.getElementById('mainHtml').dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-                document.body.style.textAlign = currentLang === 'ar' ? 'right' : 'left';
 
                 document.getElementById('tip-step1').textContent = d.nav.step1;
                 document.getElementById('tip-step2').textContent = d.nav.step2;
@@ -738,6 +676,7 @@
                     dropdown.appendChild(item);
                 });
 
+                /* --- NEW ADVANCED SCALE MERGING LOGIC --- */
                 for (let col = startColIdx; col < rawExcelData[0].length; col++) {
                     const resps = [];
                     for (let r = 1; r < rawExcelData.length; r++) {
@@ -746,14 +685,51 @@
                     }
                     const opts = new Set(resps);
                     if (opts.size > 0) {
-                        const avgLen = resps.reduce((s,x)=>s+x.length,0)/resps.length;
-                        const redundancy = opts.size / resps.length;
-                        const isSugg = (opts.size > 12 && redundancy > 0.25) || (avgLen > 40 && opts.size > 5);
-                        const sigStr = Array.from(opts).sort().join('|');
-                        if (!identifiedScaleGroups.has(sigStr)) identifiedScaleGroups.set(sigStr, { options: Array.from(opts), positives: new Set(), isSuggestion: isSugg });
-                        itemToScaleGroup.set(col, sigStr);
+                        // NEW LOGIC: Any column with strictly > 5 unique responses is treated as an open-ended suggestion
+                        const isSugg = opts.size > 5;
+                        
+                        if (isSugg) {
+                            const sigStr = 'sugg_' + col;
+                            identifiedScaleGroups.set(sigStr, { options: [], positives: new Set(), isSuggestion: true });
+                            itemToScaleGroup.set(col, sigStr);
+                            continue;
+                        }
+
+                        // Check if this column's options overlap with any existing group
+                        let matchedSig = null;
+                        let maxOverlap = 0;
+                        
+                        for (const [sig, group] of identifiedScaleGroups.entries()) {
+                            if (group.isSuggestion) continue;
+                            let overlap = 0;
+                            for (const opt of opts) {
+                                if (group.options.includes(opt)) overlap++;
+                            }
+                            if (overlap > maxOverlap) {
+                                maxOverlap = overlap;
+                                matchedSig = sig;
+                            }
+                        }
+
+                        // If it shares at least one identical response option with an existing group, merge it!
+                        if (matchedSig && maxOverlap > 0) {
+                            const group = identifiedScaleGroups.get(matchedSig);
+                            // Add any missing responses into the master group
+                            for (const opt of opts) {
+                                if (!group.options.includes(opt)) {
+                                    group.options.push(opt);
+                                }
+                            }
+                            itemToScaleGroup.set(col, matchedSig);
+                        } else {
+                            // Create a brand new group if there's zero overlap
+                            const sigStr = 'scale_' + col;
+                            identifiedScaleGroups.set(sigStr, { options: Array.from(opts), positives: new Set(), isSuggestion: false });
+                            itemToScaleGroup.set(col, sigStr);
+                        }
                     }
                 }
+                
                 document.getElementById('filterSection').classList.remove('hidden'); 
                 renderScaleGroups();
                 document.getElementById('scaleOrderSection').classList.remove('hidden'); document.getElementById('actionButtons').classList.remove('hidden');
@@ -794,18 +770,39 @@
                         await renderAISuggestionBox(headers[col], rows.map(r => r[col]));
                         processedCols.add(col);
                     } else {
-                        const match = String(headers[col]).match(/(.+) \[(.+)\]/);
-                        if (match) {
-                            const dName = match[1].trim();
-                            const itemsInDomain = [];
+                        const headerStr = String(headers[col]).trim();
+                        const matchFull = headerStr.match(/(.+) \[(.+)\]/);
+                        const matchBracket = headerStr.match(/^\[(.+)\]$/);
+
+                        let dName = "";
+                        let itemsInDomain = [];
+
+                        if (matchFull) {
+                            dName = matchFull[1].trim();
                             for (let c2 = col; c2 < headers.length; c2++) {
                                 if (processedCols.has(c2)) continue;
-                                const m2 = String(headers[c2]).match(/(.+) \[(.+)\]/);
+                                const m2 = String(headers[c2]).trim().match(/(.+) \[(.+)\]/);
                                 if (m2 && m2[1].trim() === dName && itemToScaleGroup.get(c2) === sigLocal) {
                                     itemsInDomain.push({txt: headers[c2], item: m2[2].trim(), colIdx: c2});
                                     processedCols.add(c2);
                                 }
                             }
+                        } else if (matchBracket) {
+                            dName = "الأسئلة المستقلة"; // Group title for sequential bracket-only items
+                            for (let c2 = col; c2 < headers.length; c2++) {
+                                if (processedCols.has(c2)) continue;
+                                const h2Str = String(headers[c2]).trim();
+                                const m2 = h2Str.match(/^\[(.+)\]$/);
+                                if (m2 && itemToScaleGroup.get(c2) === sigLocal) {
+                                    itemsInDomain.push({txt: headers[c2], item: m2[1].trim(), colIdx: c2});
+                                    processedCols.add(c2);
+                                } else {
+                                    break; // Stop grouping if the sequence is broken
+                                }
+                            }
+                        }
+
+                        if (itemsInDomain.length > 0) {
                             const rowsData = itemsInDomain.map(idom => {
                                 const rps = rows.map(r => r[idom.colIdx]);
                                 const freqs = {}; groupData.options.forEach(o => freqs[o] = 0);
@@ -905,9 +902,6 @@
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(allD), "Analysis");
                 XLSX.writeFile(wb, `Survey_Report.xlsx`);
             };
-
-            document.getElementById('lang-ar').onclick = () => { currentLang = 'ar'; updateUI(); renderScaleGroups(); };
-            document.getElementById('lang-en').onclick = () => { currentLang = 'en'; updateUI(); renderScaleGroups(); };
 
             updateUI();
         });
