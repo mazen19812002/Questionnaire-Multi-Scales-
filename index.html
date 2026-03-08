@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl" id="mainHtml">
+<!DOCTYPE html><html lang="ar" dir="rtl" id="mainHtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +9,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Inter:wght@300;400;600;700;900&display=swap');
-        
         body {
             font-family: 'Cairo', 'Inter', sans-serif;
             background-color: #e0f2fe;
@@ -20,224 +18,56 @@
             flex-direction: column;
             scroll-behavior: smooth;
         }
-
         .thin-title { font-weight: 300; letter-spacing: -0.01em; }
-
-        .hover-zoom {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-        .hover-zoom:hover {
-            transform: scale(1.03);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-execute {
-            background-color: #22c55e;
-            color: white;
-            font-weight: 700;
-            transition: all 0.2s;
-            padding: 1rem 2rem;
-            border-radius: 1.5rem;
-        }
+        .hover-zoom { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+        .hover-zoom:hover { transform: scale(1.03); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        .btn-execute { background-color: #22c55e; color: white; font-weight: 700; transition: all 0.2s; padding: 1rem 2rem; border-radius: 1.5rem; }
         .btn-execute:hover { background-color: #16a34a; transform: scale(1.05); }
-
         .copy-btn-wrapper { position: absolute; top: 1rem; z-index: 30; }
         [dir="rtl"] .copy-btn-wrapper { left: 1rem; }
         [dir="ltr"] .copy-btn-wrapper { right: 1rem; }
-
-        .copy-btn-inner {
-            opacity: 0.4;
-            transition: opacity 0.2s, transform 0.2s;
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 10px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border: 1px solid #cbd5e1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #475569;
-        }
-        .copy-btn-inner:hover {
-            opacity: 1;
-            background-color: #ffffff;
-            transform: scale(1.1);
-            border-color: #22c55e;
-            color: #22c55e;
-        }
-
-        .input-card {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 2.5rem;
-            border: 1px solid #bae6fd;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
+        .copy-btn-inner { opacity: 0.4; transition: opacity 0.2s, transform 0.2s; cursor: pointer; padding: 10px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.9); border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; color: #475569; }
+        .copy-btn-inner:hover { opacity: 1; background-color: #ffffff; transform: scale(1.1); border-color: #22c55e; color: #22c55e; }
+        .input-card { background: white; padding: 2.5rem; border-radius: 2.5rem; border: 1px solid #bae6fd; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
         /* Custom Multi-select styles */
-        .multi-select-container {
-            position: relative;
-            width: 100%;
-        }
-        .multi-select-trigger {
-            background-color: white;
-            border: 1px solid #cbd5e1;
-            padding: 1rem;
-            border-radius: 1rem;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            min-height: 3.5rem;
-        }
-        .multi-select-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #cbd5e1;
-            border-radius: 1rem;
-            margin-top: 5px;
-            max-height: 250px;
-            overflow-y: auto;
-            z-index: 50;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-        .multi-select-dropdown.active {
-            display: block;
-        }
-        .multi-select-item {
-            padding: 0.75rem 1rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .multi-select-item:hover {
-            background-color: #f1f5f9;
-        }
-        .multi-select-item input {
-            width: 1.2rem;
-            height: 1.2rem;
-            cursor: pointer;
-        }
-
-        .active-lang {
-            background-color: #4f46e5 !important;
-            color: white !important;
-        }
-
-        .suggestion-box {
-            background-color: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 1.5rem;
-            padding: 2rem;
-            line-height: 1.8;
-            color: #1e293b;
-            min-height: 80px;
-            max-height: 600px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            font-weight: 500;
-            font-size: 1.1rem;
-            box-shadow: inset 0 2px 8px 0 rgba(0,0,0,0.03);
-        }
-
-        .ai-badge {
-            background: linear-gradient(90deg, #4f46e5, #9333ea);
-            color: white;
-            padding: 2px 10px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            font-weight: 900;
-            margin-right: 10px;
-            display: inline-flex;
-            align-items: center;
-        }
-
+        .multi-select-container { position: relative; width: 100%; }
+        .multi-select-trigger { background-color: white; border: 1px solid #cbd5e1; padding: 1rem; border-radius: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; min-height: 3.5rem; }
+        .multi-select-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; border-radius: 1rem; margin-top: 5px; max-height: 250px; overflow-y: auto; z-index: 50; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); display: none; }
+        .multi-select-dropdown.active { display: block; }
+        .multi-select-item { padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.2s; }
+        .multi-select-item:hover { background-color: #f1f5f9; }
+        .multi-select-item input { width: 1.2rem; height: 1.2rem; cursor: pointer; }
+        .active-lang { background-color: #4f46e5 !important; color: white !important; }
+        .suggestion-box { background-color: #f8fafc; border: 2px solid #e2e8f0; border-radius: 1.5rem; padding: 2rem; line-height: 1.8; color: #1e293b; min-height: 80px; max-height: 600px; overflow-y: auto; white-space: pre-wrap; font-weight: 500; font-size: 1.1rem; box-shadow: inset 0 2px 8px 0 rgba(0,0,0,0.03); }
+        .ai-badge { background: linear-gradient(90deg, #4f46e5, #9333ea); color: white; padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 900; margin-right: 10px; display: inline-flex; align-items: center; }
         /* Floating Nav */
-        .floating-nav {
-            position: fixed;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            z-index: 100;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.5);
-            backdrop-blur-lg;
-            border-radius: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.15);
-        }
+        .floating-nav { position: fixed; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 100; padding: 12px; background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); border-radius: 2rem; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.15); }
         [dir="rtl"] .floating-nav { left: 1rem; }
         [dir="ltr"] .floating-nav { right: 1rem; }
-
-        .nav-dot {
-            width: 44px;
-            height: 44px;
-            background: white;
-            border: 2px solid #4f46e5;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            color: #4f46e5;
-        }
+        .nav-dot { width: 44px; height: 44px; background: white; border: 2px solid #4f46e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; position: relative; color: #4f46e5; }
         .nav-dot:hover { background: #4f46e5; color: white; transform: scale(1.15); }
-        .nav-tooltip {
-            position: absolute;
-            white-space: nowrap;
-            background: #1e293b;
-            color: white;
-            padding: 6px 14px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            font-weight: 900;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
+        .nav-tooltip { position: absolute; white-space: nowrap; background: #1e293b; color: white; padding: 6px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 900; opacity: 0; pointer-events: none; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         [dir="rtl"] .nav-tooltip { left: 55px; }
         [dir="ltr"] .nav-tooltip { right: 55px; }
         .nav-dot:hover .nav-tooltip { opacity: 1; }
-
         @media print {
             @page { size: A4; margin: 15mm; }
             body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 11pt !important; }
-            .input-card, #langToggle, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .flex.justify-between.items-start.mb-8 {
-                display: none !important;
-            }
+            .input-card, #langToggle, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .flex.justify-between.items-start.mb-8 { display: none !important; }
             main { box-shadow: none !important; padding: 0 !important; background-color: transparent !important; max-width: 100% !important; margin: 0 !important; }
             #mainTitle { font-size: 24pt !important; font-weight: 900 !important; margin-bottom: 5mm !important; text-align: center !important; }
             #instituteTitle { font-size: 14pt !important; text-align: center !important; margin-bottom: 10mm !important; }
             #fileNameDisplay { font-size: 18pt !important; display: block !important; margin-bottom: 5mm !important; text-align: center !important; }
-            .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper, #positiveNegativeItemsContainer > div, #finalRecommendationContainer > div, #chartContainer > div {
-                break-inside: avoid !important; page-break-inside: avoid !important; margin-bottom: 10mm !important; border: 1px solid #ddd !important; padding: 10mm !important;
-            }
+            .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper, #positiveNegativeItemsContainer > div, #finalRecommendationContainer > div, #chartContainer > div { break-inside: avoid !important; page-break-inside: avoid !important; margin-bottom: 10mm !important; border: 1px solid #ddd !important; padding: 10mm !important; }
             .copy-btn-wrapper { display: none !important; }
             table { width: 100% !important; border-collapse: collapse !important; }
             th, td { border: 1px solid #000 !important; padding: 6pt !important; }
         }
-
-        .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper {
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
+        .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="p-4 md:p-12 text-right" dir="rtl">
-
     <nav class="floating-nav" id="floatingNav">
         <a href="#step1Title" class="nav-dot hover-zoom">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
@@ -315,14 +145,17 @@
                         </div>
                     </label>
                 </div>
+                
                 <div id="googleInputPanel" class="hidden space-y-4">
-                    <input type="text" id="googleLink" placeholder="">
+                    <input type="text" id="googleLink" class="w-full p-4 border rounded-xl" placeholder="">
                     <button id="fetchGoogleBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white"></button>
                 </div>
+                
                 <div id="githubInputPanel" class="hidden space-y-4">
-                    <input type="text" id="githubFileName" value="data.xlsx">
+                    <input type="text" id="githubFileName" class="w-full p-4 border rounded-xl" value="data.xlsx">
                     <button id="fetchGithubBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white"></button>
                 </div>
+                
                 <div id="loadingMessage" class="hidden mt-4 text-indigo-700 font-black animate-pulse text-lg italic text-center"></div>
             </div>
         </div>
@@ -335,11 +168,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                     <div class="flex flex-col">
                         <label id="labelFilterCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center font-black"></label>
-                        <select id="filterColSelect" class="p-4 font-bold text-center hover-zoom"></select>
+                        <select id="filterColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
                     </div>
                     <div class="flex flex-col">
                         <label id="labelStartCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center font-black"></label>
-                        <select id="analysisStartColSelect" class="p-4 font-bold text-center hover-zoom"></select>
+                        <select id="analysisStartColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
                     </div>
                 </div>
                 <div class="flex justify-center">
@@ -406,627 +239,622 @@
     </footer>
 
     <script>
-    // --- 1. Global State ---
-    let currentLang = 'ar';
-    let rawExcelData = null;
-    let identifiedScaleGroups = new Map();
-    let itemToScaleGroup = new Map();
-    let chartInstances = [];
-    let selectedDepts = new Set();
+        /* --- 1. Global State --- */
+        let currentLang = 'ar';
+        let rawExcelData = null;
+        let identifiedScaleGroups = new Map();
+        let itemToScaleGroup = new Map();
+        let chartInstances = [];
+        let selectedDepts = new Set();
 
-    const languageData = {
-        en: {
-            title: 'Questionnaire Results Analysis',
-            devCredit: 'High Institute of Engineering and Technology in Kafr El-Sheikh\nQuality Assurance and Accreditation Unit',
-            allInstitute: 'All Institute',
-            participants: 'Participants',
-            pos: 'Positive',
-            copied: 'Copied!',
-            emptyList: 'No items found',
-            headers: { no: '#', item: 'Statement', checkTotal: 'Row Total (%)', total: 'Total (%)', positives: 'Positives (%)', footer: 'Average' },
-            strengths: '★ Core Strengths',
-            improvement: '⚠️ Critical Improvement Areas',
-            recommendation: 'Final Recommendation',
-            evaluations: ["Excellent", "Very Good", "Good", "Acceptable", "Weak"],
-            suggestionsTitle: 'AI-Summarized Feedback',
-            loadingAI: 'AI is analyzing suggestions...',
-            groupLabel: 'Scale Group',
-            step1: 'Step 1: Data Source',
-            step1Btn: 'Local Upload',
-            step1G: 'Google Sheet',
-            step1H: 'GitHub Server',
-            localHint: 'Choose XLSX or CSV',
-            googleHint: 'Paste link here...',
-            fetch: 'Fetch Data',
-            step2: 'Step 2: Data Mapping',
-            confirm: 'Confirm Mapping',
-            filterLabel: 'Filter by Department(s)',
-            deptLabel: 'Select Dept Column',
-            startColLabel: 'Analyze from Column',
-            step3: 'Step 3: Define Scale Orders',
-            step3Hint: 'Rank choices (Highest on top).',
-            threshold: 'Threshold (%):',
-            analyzeNow: 'Analyze Now',
-            export: 'Export (Excel)',
-            print: 'Print (PDF)',
-            copyAll: 'Copy All',
-            finalResult: 'Overall Percentage',
-            evalLabel: 'General Evaluation',
-            googleErrorTitle: 'Google Sheets Error',
-            googleErrorBody: 'Ensure the file is Published to Web.',
-            nav: {
-                step1: 'Source',
-                step2: 'Mapping',
-                filter: 'Filters',
-                step3: 'Scales',
-                results: 'Tables',
-                charts: 'Charts',
-                highlights: 'Points',
-                final: 'Evaluation'
+        const languageData = {
+            en: {
+                title: 'Questionnaire Results Analysis',
+                devCredit: 'High Institute of Engineering and Technology in Kafr El-Sheikh\nQuality Assurance and Accreditation Unit',
+                allInstitute: 'All Institute',
+                participants: 'Participants',
+                pos: 'Positive',
+                copied: 'Copied!',
+                emptyList: 'No items found',
+                headers: { no: '#', item: 'Statement', checkTotal: 'Row Total (%)', total: 'Total (%)', positives: 'Positives (%)', footer: 'Average' },
+                strengths: '★ Core Strengths',
+                improvement: '⚠️ Critical Improvement Areas',
+                recommendation: 'Final Recommendation',
+                evaluations: ["Excellent", "Very Good", "Good", "Acceptable", "Weak"],
+                suggestionsTitle: 'AI-Summarized Feedback',
+                loadingAI: 'AI is analyzing suggestions...',
+                groupLabel: 'Scale Group',
+                step1: 'Step 1: Data Source',
+                step1Btn: 'Local Upload',
+                step1G: 'Google Sheet',
+                step1H: 'GitHub Server',
+                localHint: 'Choose XLSX or CSV',
+                googleHint: 'Paste link here...',
+                fetch: 'Fetch Data',
+                step2: 'Step 2: Data Mapping',
+                confirm: 'Confirm Mapping',
+                filterLabel: 'Filter by Department(s)',
+                deptLabel: 'Select Dept Column',
+                startColLabel: 'Analyze from Column',
+                step3: 'Step 3: Define Scale Orders',
+                step3Hint: 'Rank choices (Highest on top).',
+                threshold: 'Threshold (%):',
+                analyzeNow: 'Analyze Now',
+                export: 'Export (Excel)',
+                print: 'Print (PDF)',
+                copyAll: 'Copy All',
+                finalResult: 'Overall Percentage',
+                evalLabel: 'General Evaluation',
+                googleErrorTitle: 'Google Sheets Error',
+                googleErrorBody: 'Ensure the file is Published to Web.',
+                nav: { step1: 'Source', step2: 'Mapping', filter: 'Filters', step3: 'Scales', results: 'Tables', charts: 'Charts', highlights: 'Points', final: 'Evaluation' },
+                selectAll: 'Select All'
             },
-            selectAll: 'Select All'
-        },
-        ar: {
-            title: 'تحليل نتائج الاستبيان',
-            devCredit: 'المعهد العالي للهندسة والتكنولوجيا بكفر الشيخ\nوحدة ضمان الجودة والاعتماد',
-            allInstitute: 'المعهد بالكامل',
-            participants: 'مشارك',
-            pos: 'إيجابي',
-            copied: 'تم النسخ!',
-            emptyList: 'لا توجد بنود',
-            headers: { no: '#', item: 'بيان البند', checkTotal: 'إجمالي الصف (%)', total: 'الإجمالي (%)', positives: 'إيجابيات (%)', footer: 'المتوسط' },
-            strengths: '★ نقاط القوة الأساسية',
-            improvement: '⚠️ مجالات التحسين الحرجة',
-            recommendation: 'التوصية النهائية',
-            evaluations: ["ممتازة", "جيد جداً", "جيدة", "مقبولة", "ضعيفة"],
-            suggestionsTitle: 'ملخص الملاحظات (بالذكاء الاصطناعي)',
-            loadingAI: 'جاري التحليل بالذكاء الاصطناعي...',
-            groupLabel: 'مجموعة المقياس',
-            step1: 'الخطوة 1: مصدر البيانات',
-            step1Btn: 'تحميل ملف محلي',
-            step1G: 'رابط جوجل شيت',
-            step1H: 'ملف من السيرفر',
-            localHint: 'اختر ملف XLSX أو CSV',
-            googleHint: 'ضع رابط جوجل شيت العام...',
-            fetch: 'جلب البيانات',
-            step2: 'الخطوة 2: تعيين البيانات',
-            confirm: 'تأكيد الإعدادات',
-            filterLabel: 'تصفية حسب القسم (اختيار متعدد)',
-            deptLabel: 'اختر عمود القسم',
-            startColLabel: 'ابدأ التحليل من عمود',
-            step3: 'الخطوة 3: ترتيب المقاييس',
-            step3Hint: 'قم بترتيب خيارات الإجابة (الأعلى في الأعلى).',
-            threshold: 'حد الإيجابيات (%):',
-            analyzeNow: 'حلل البيانات الآن',
-            export: 'تصدير (Excel)',
-            print: 'طباعة (PDF)',
-            copyAll: 'نسخ الكل',
-            finalResult: 'النسبة الإجمالية',
-            evalLabel: 'التقييم العام للمعهد',
-            googleErrorTitle: 'خطأ في بيانات جوجل',
-            googleErrorBody: 'تأكد أن الملف متاح للجميع ومنشور على الويب.',
-            nav: {
-                step1: 'المصدر',
-                step2: 'التعيين',
-                filter: 'الفلترة',
-                step3: 'المقاييس',
-                results: 'الجداول',
-                charts: 'الرسوم',
-                highlights: 'النقاط',
-                final: 'التقييم'
-            },
-            selectAll: 'اختيار الكل'
-        }
-    };
-
-    // --- AI ---
-    async function summarizeWithAI(text, lang) {
-        const apiKey = "AIzaSyBt0DtjhTpAZRQMYeMv_GFGogVYf1hLRNs";
-        const modelName = "gemini-2.5-flash-preview-09-2025";
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-        const systemPrompt = lang === 'ar' 
-            ? "أنت خبير في تحليل البيانات التعليمية. قم بتلخيص المقترحات التالية في نقاط واضحة ومهنية باللغة العربية. ابدأ مباشرة بالنقاط دون مقدمات."
-            : "Summarize feedback suggestions into clear professional bullet points.";
-        const payload = { contents: [{ parts: [{ text: text }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
-        try {
-            const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            const result = await response.json();
-            return result.candidates?.[0]?.content?.parts?.[0]?.text || text;
-        } catch (err) { return text; }
-    }
-
-    // --- Helpers ---
-    function sanitizeValue(val) {
-        if (typeof val !== 'string') return val;
-        if (['=', '-', '+', '@'].includes(val.trim().charAt(0))) return "'" + val;
-        return val;
-    }
-
-    function showStatus(btnEl) {
-        if (!btnEl) return;
-        const originalHtml = btnEl.innerHTML;
-        btnEl.innerHTML = `<span class="text-[12px] font-black uppercase px-2 text-green-600 font-black">${languageData[currentLang].copied}</span>`;
-        setTimeout(() => btnEl.innerHTML = originalHtml, 2000);
-    }
-
-    function copyToClipboard(text) {
-        const textArea = document.createElement("textarea");
-        textArea.value = text; textArea.style.position = "fixed"; textArea.style.left = "-9999px"; textArea.style.top = "0";
-        document.body.appendChild(textArea); textArea.focus(); textArea.select();
-        try { const ok = document.execCommand('copy'); document.body.removeChild(textArea); return ok; } 
-        catch (err) { return false; }
-    }
-
-    function attachCopyButton(container, copyLogic) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'copy-btn-wrapper';
-        wrapper.innerHTML = `<div class="copy-btn-inner hover-zoom"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></div>`;
-        wrapper.onclick = (e) => { e.stopPropagation(); copyLogic(wrapper.querySelector('.copy-btn-inner')); };
-        container.style.position = 'relative';
-        container.appendChild(wrapper);
-    }
-
-    // --- Components Rendering ---
-
-    function renderScaleGroups() {
-        const container = document.getElementById('scaleGroupsContainer');
-        container.innerHTML = '';
-        identifiedScaleGroups.forEach((group, sig) => {
-            if (group.isSuggestion) return;
-            const wrap = document.createElement('div');
-            wrap.className = 'bg-white p-6 rounded-3xl border-2 border-blue-200 shadow-md hover-zoom';
-            wrap.innerHTML = `<h3 class="font-black text-indigo-900 uppercase tracking-tighter text-xl mb-4 pr-4 font-black">${languageData[currentLang].groupLabel}: ${group.options.join(', ')}</h3><div class="scale-list space-y-3 font-black" data-sig="${sig}"></div>`;
-            const list = wrap.querySelector('.scale-list');
-            group.options.forEach((opt, idx) => {
-                const item = document.createElement('div');
-                item.className = 'p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl flex justify-between items-center cursor-move font-black font-black';
-                item.draggable = true;
-                item.innerHTML = `<span class="font-bold text-slate-900 font-black">${opt}</span><label class="flex items-center cursor-pointer font-black font-black"><input type="checkbox" class="w-6 h-6 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="mr-2 text-xs font-black text-indigo-800 font-black">${languageData[currentLang].pos}</span></label>`;
-                item.querySelector('input').onchange = (e) => e.target.checked ? group.positives.add(opt) : group.positives.delete(opt);
-                item.ondragstart = (e) => { e.dataTransfer.setData('idx', idx); e.dataTransfer.setData('sig', sig); };
-                item.ondragover = (e) => e.preventDefault();
-                item.ondrop = (e) => {
-                    const fromIdx = e.dataTransfer.getData('idx'); if(e.dataTransfer.getData('sig') !== sig) return;
-                    const moved = group.options.splice(fromIdx, 1)[0]; group.options.splice(idx, 0, moved); renderScaleGroups();
-                };
-                list.appendChild(item);
-            });
-            container.appendChild(wrap);
-        });
-    }
-
-    function renderTable(title, rows, opts, positives) {
-        const d = languageData[currentLang];
-        const container = document.getElementById('resultsContainer');
-        const div = document.createElement('div');
-        div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-blue-100 overflow-hidden hover-zoom mb-10 domain-result-wrapper';
-        const totalRes = rows.reduce((s, r) => s + r.total, 0);
-        const domainPos = rows.reduce((s, r) => s + Array.from(positives).reduce((sum, opt) => sum + (r.freqs[opt] || 0), 0), 0);
-        const avgPos = totalRes ? (domainPos / totalRes * 100).toFixed(1) : '0.0';
-        const align = currentLang === 'ar' ? 'text-right' : 'text-left';
-        
-        let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black ${align} font-black">${title}</h2><div class="overflow-x-auto"><table class="w-full text-sm ${align} font-black"><thead class="bg-slate-100"><tr><th class="p-6 text-center font-black">#</th><th class="p-6 text-right font-black font-black font-black">${d.headers.item}</th>${opts.map(o => `<th class="p-6 text-center text-indigo-700 font-black font-black font-black">${o}</th>`).join('')}<th class="p-6 text-center font-bold text-blue-600 font-black font-black font-black">${d.headers.checkTotal}</th><th class="p-6 text-center font-black font-black font-black font-black font-black">${d.headers.positives}</th></tr></thead><tbody>`;
-        
-        rows.forEach((r, i) => { 
-            const rowCheckSum = opts.reduce((acc, o) => acc + (r.freqs[o] / r.total * 100), 0);
-            html += `<tr class="border-b border-slate-50 font-black"><td class="p-6 text-center text-slate-500 font-bold font-black">${i+1}</td><td class="p-6 font-bold text-slate-800 text-right font-black font-black">${r.item}</td>${opts.map(o => `<td class="p-6 text-center font-black font-black">${(r.freqs[o]/r.total*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center font-bold text-blue-500 bg-blue-50/30 font-black font-black">${rowCheckSum.toFixed(1)}%</td><td class="p-6 text-center font-black text-green-700 bg-green-50 font-black font-black">${r.posPerc.toFixed(1)}%</td></tr>`; 
-        });
-        
-        html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td colspan="2" class="p-6 text-center uppercase font-black font-black">${d.headers.footer}</td>${opts.map(o => `<td class="p-6 text-center font-black font-black font-black">${((rows.reduce((s, r) => s + r.freqs[o], 0)/totalRes)*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center font-black font-black">100.0%</td><td class="p-6 text-center text-green-800 text-lg font-black font-black font-black font-black">${avgPos}%</td></tr></tfoot></table></div>`;
-        div.innerHTML = html;
-        attachCopyButton(div, (btn) => {
-            let tableContent = title + '\n';
-            div.querySelectorAll('table tr').forEach(tr => {
-                let rArr = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); rArr.push(c.innerText.trim()); for(let k=1; k < cs; k++) rArr.push(""); });
-                tableContent += rArr.join('\t') + '\n';
-            });
-            copyToClipboard(tableContent); showStatus(btn);
-        });
-        container.appendChild(div);
-    }
-
-    async function renderAISuggestionBox(title, responses) {
-        const rawText = responses.filter(r => String(r || "").trim() !== "").join('. ');
-        if (!rawText) return;
-        const d = languageData[currentLang];
-        const container = document.getElementById('resultsContainer');
-        const div = document.createElement('div');
-        div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-100 overflow-hidden hover-zoom mb-10 suggestion-wrapper';
-        const align = currentLang === 'ar' ? 'text-right' : 'text-left';
-        div.innerHTML = `<div class="p-8 bg-indigo-50 border-b-2 border-indigo-100 ${align} font-black font-black font-black"><h2 class="text-3xl font-black font-black font-black font-black">${title}</h2><div class="mt-2 flex items-center font-black font-black font-black"><span class="ai-badge font-black">Gemini AI</span> <span class="text-xs font-black text-indigo-500 uppercase tracking-widest font-black font-black">${d.suggestionsTitle}</span></div></div><div class="p-8 ${align} font-black font-black"><div class="suggestion-box italic text-slate-400 font-black font-black font-black">${d.loadingAI}</div></div>`;
-        container.appendChild(div);
-        const summary = await summarizeWithAI(rawText, currentLang);
-        const aiOutputEl = div.querySelector('.suggestion-box');
-        aiOutputEl.classList.remove('italic', 'text-slate-400');
-        aiOutputEl.textContent = summary;
-        attachCopyButton(div, (btn) => { copyToClipboard(`${title}\n---\n${summary}`); showStatus(btn); });
-    }
-
-    function renderSummaryTable(summaryDataList) {
-        const d = languageData[currentLang];
-        const container = document.getElementById('resultsContainer');
-        const div = document.createElement('div');
-        div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-200 overflow-hidden hover-zoom mt-16 summary-table-wrapper font-black font-black font-black';
-        const gTotal = summaryDataList.reduce((s, dm) => s + dm.total, 0);
-        const gPos = summaryDataList.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
-        const align = currentLang === 'ar' ? 'text-right' : 'text-left';
-        let html = `<h2 class="text-3xl thin-title p-8 bg-indigo-700 text-white font-black text-center font-black font-black font-black font-black font-black">Summary of All Domains</h2><table class="w-full text-lg ${align} font-black font-black font-black font-black"><thead class="bg-indigo-50 font-black font-black font-black"><tr><th class="p-8 text-center font-black font-black font-black font-black font-black">#</th><th class="p-8 font-black font-black font-black font-black font-black">Domain</th><th class="p-8 text-center font-black font-black font-black font-black font-black font-black font-black">${d.headers.positives}</th></tr></thead><tbody>`;
-        summaryDataList.forEach((dm, i) => { const pSum = Array.from(dm.positives).reduce((s,o)=>s+(dm.freqs[o]||0),0); html += `<tr class="border-b border-indigo-50 font-black font-black font-black font-black font-black font-black font-black font-black"><td class="p-8 text-center text-indigo-300 font-black font-black font-black font-black font-black font-black">${i+1}</td><td class="p-8 font-black text-slate-800 font-black font-black font-black font-black font-black">${dm.name}</td><td class="p-8 text-center font-black text-green-600 font-black font-black font-black font-black font-black font-black font-black">${(pSum/dm.total*100).toFixed(1)}%</td></tr>`; });
-        html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300 font-black font-black font-black font-black font-black font-black font-black"><tr><td colspan="2" class="p-8 text-center uppercase font-black font-black font-black font-black font-black font-black">Total Average</td><td class="p-8 text-center text-green-800 text-2xl font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${(gPos/gTotal*100).toFixed(1)}%</td></tr></tfoot></table>`;
-        div.innerHTML = html;
-        attachCopyButton(div, (btn) => {
-            let summaryContent = 'Summary\n';
-            div.querySelectorAll('table tr').forEach(tr => {
-                let rArr=[]; tr.querySelectorAll('th, td').forEach(c=>{ const cs = parseInt(c.getAttribute('colspan') || 1); rArr.push(c.innerText.trim()); for(let k=1; k < cs; k++) rArr.push(""); });
-                summaryContent += rArr.join('\t') + '\n';
-            });
-            copyToClipboard(summaryContent); showStatus(btn);
-        });
-        container.appendChild(div);
-    }
-
-    function renderHighlightLists(items) {
-        const d = languageData[currentLang];
-        const container = document.getElementById('positiveNegativeItemsContainer');
-        const thresh = parseInt(document.getElementById('positivesThresholdInput').value || 85);
-        const high = items.filter(i => i.posPerc >= thresh);
-        const low = items.filter(i => i.posPerc < thresh);
-        container.innerHTML = '';
-        const sDiv = document.createElement('div');
-        sDiv.className = `p-10 bg-green-50 rounded-[3rem] border-4 border-green-200 shadow-lg hover-zoom w-full font-black font-black font-black font-black font-black`;
-        sDiv.innerHTML = `<h4 class="text-3xl font-black text-green-800 mb-8 font-black font-black font-black font-black font-black">${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold font-black font-black font-black font-black">${high.length ? high.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-green-100 shadow-sm font-black font-black font-black font-black font-black font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
-        const iDiv = document.createElement('div');
-        iDiv.className = `p-10 bg-red-50 rounded-[3rem] border-4 border-red-200 shadow-lg hover-zoom w-full font-black font-black font-black font-black font-black`;
-        iDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8 font-black font-black font-black font-black font-black font-black">${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold font-black font-black font-black font-black font-black font-black">${low.length ? low.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-red-100 shadow-sm font-black font-black font-black font-black font-black font-black font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
-        container.appendChild(sDiv); container.appendChild(iDiv);
-        container.classList.remove('hidden');
-    }
-
-    function renderFinalRecommendation(score) {
-        const d = languageData[currentLang];
-        const container = document.getElementById('finalRecommendationContainer');
-        const div = document.createElement('div');
-        div.className = 'relative p-12 bg-white rounded-[3.5rem] shadow-2xl border-4 border-indigo-400 hover-zoom mb-20 text-center animate-in fade-in duration-700 font-black font-black font-black font-black font-black font-black';
-        let evalTxt = score > 85 ? d.evaluations[0] : score > 75 ? d.evaluations[1] : score > 65 ? d.evaluations[2] : score > 50 ? d.evaluations[3] : d.evaluations[4];
-        div.innerHTML = `<h2 class="text-4xl thin-title mb-10 text-center text-indigo-900 font-black border-b-2 border-indigo-50 pb-6 font-black font-black font-black font-black font-black font-black font-black font-black font-black">${d.recommendation}</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-10 font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black"><div class="p-8 bg-indigo-50 rounded-[2.5rem] text-center border-2 border-indigo-100 flex flex-col justify-center items-center font-black font-black font-black font-black font-black font-black font-black font-black font-black"><span class="text-xs font-black text-indigo-400 mb-2 uppercase font-black font-black font-black font-black font-black font-black font-black font-black font-black">${d.finalResult}</span><span class="text-6xl font-black text-indigo-800 font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${score.toFixed(2)}%</span></div><div class="p-8 bg-green-50 rounded-[2.5rem] text-center border-2 border-green-100 flex flex-col justify-center items-center font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black"><span class="text-xs font-black text-green-400 mb-2 uppercase font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${d.evalLabel}</span><span class="text-6xl font-black text-green-700 font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${evalTxt}</span></div></div>`;
-        container.innerHTML = ''; container.appendChild(div); container.classList.remove('hidden');
-    }
-
-    // --- Logic & Controllers ---
-
-    document.addEventListener('DOMContentLoaded', () => {
-        if (typeof ChartDataLabels !== 'undefined') { Chart.register(ChartDataLabels); }
-
-        function updateUI() {
-            const d = languageData[currentLang];
-            document.getElementById('mainTitle').textContent = d.title;
-            document.getElementById('instituteTitle').innerText = d.devCredit;
-            document.getElementById('step1Title').textContent = d.step1;
-            document.getElementById('srcLocalBtn').textContent = d.step1Btn;
-            document.getElementById('srcGoogleBtn').textContent = d.step1G;
-            document.getElementById('srcGithubBtn').textContent = d.step1H;
-            document.getElementById('localFileBtnText').textContent = d.localHint;
-            document.getElementById('fetchGoogleBtn').textContent = d.fetch;
-            document.getElementById('fetchGithubBtn').textContent = d.fetch;
-            document.getElementById('googleLink').placeholder = d.googleHint;
-            document.getElementById('step2Title').textContent = d.step2;
-            document.getElementById('confirmMappingBtn').textContent = d.confirm;
-            document.getElementById('labelFilterCol').textContent = d.deptLabel;
-            document.getElementById('labelStartCol').textContent = d.startColLabel;
-            document.getElementById('labelDeptFilter').textContent = d.filterLabel;
-            document.getElementById('scaleOrderTitle').textContent = d.step3;
-            document.getElementById('scaleOrderSubtitle').textContent = d.step3Hint;
-            document.getElementById('labelThreshold').textContent = d.threshold;
-            document.getElementById('analyzeButton').textContent = d.analyzeNow;
-            document.getElementById('exportButton').textContent = d.export;
-            document.getElementById('printButton').textContent = d.print;
-            document.getElementById('copyTableButton').textContent = d.copyAll;
-            document.getElementById('lang-ar').classList.toggle('active-lang', currentLang === 'ar');
-            document.getElementById('lang-en').classList.toggle('active-lang', currentLang === 'en');
-            document.getElementById('mainHtml').dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-            document.body.style.textAlign = currentLang === 'ar' ? 'right' : 'left';
-
-            document.getElementById('tip-step1').textContent = d.nav.step1;
-            document.getElementById('tip-step2').textContent = d.nav.step2;
-            document.getElementById('tip-filter').textContent = d.nav.filter;
-            document.getElementById('tip-step3').textContent = d.nav.step3;
-            document.getElementById('tip-results').textContent = d.nav.results;
-            document.getElementById('tip-charts').textContent = d.nav.charts;
-            document.getElementById('tip-highlights').textContent = d.nav.highlights;
-            document.getElementById('tip-final').textContent = d.nav.final;
-            
-            updateDeptSelectedText();
-        }
-
-        const xlsxFile = document.getElementById('xlsxFile');
-        const loadingMessage = document.getElementById('loadingMessage');
-
-        function processWorkbook(workbook, fileName) {
-            rawExcelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
-            document.getElementById('fileNameDisplay').textContent = fileName;
-            document.getElementById('fileNameDisplay').classList.remove('hidden');
-            document.getElementById('dataConfigSection').classList.remove('hidden');
-            const fs = document.getElementById('filterColSelect');
-            const as = document.getElementById('analysisStartColSelect');
-            fs.innerHTML = ''; as.innerHTML = '';
-            (rawExcelData[0] || []).forEach((h, i) => {
-                const colLetter = i < 26 ? String.fromCharCode(65 + i) : `C${i+1}`;
-                fs.add(new Option(`${colLetter}: ${h || '---'}`, i));
-                as.add(new Option(`${colLetter}: ${h || '---'}`, i));
-            });
-            fs.value = Math.min(1, rawExcelData[0].length - 1); 
-            as.value = Math.min(2, rawExcelData[0].length - 1); 
-            loadingMessage.classList.add('hidden');
-        }
-
-        document.getElementById('srcLocalBtn').onclick = () => { document.getElementById('localInputPanel').classList.toggle('hidden'); document.getElementById('googleInputPanel').classList.add('hidden'); document.getElementById('githubInputPanel').classList.add('hidden'); };
-        document.getElementById('srcGoogleBtn').onclick = () => { document.getElementById('googleInputPanel').classList.toggle('hidden'); document.getElementById('localInputPanel').classList.add('hidden'); document.getElementById('githubInputPanel').classList.add('hidden'); };
-        document.getElementById('srcGithubBtn').onclick = () => { document.getElementById('githubInputPanel').classList.toggle('hidden'); document.getElementById('localInputPanel').classList.add('hidden'); document.getElementById('googleInputPanel').classList.add('hidden'); };
-
-        xlsxFile.addEventListener('change', (e) => {
-            const file = e.target.files[0]; if (!file) return;
-            loadingMessage.classList.remove('hidden');
-            const reader = new FileReader();
-            reader.onload = (ev) => processWorkbook(XLSX.read(new Uint8Array(ev.target.result), { type: 'array' }), file.name.split('.')[0]);
-            reader.readAsArrayBuffer(file);
-        });
-
-        document.getElementById('fetchGoogleBtn').onclick = async () => {
-            const link = document.getElementById('googleLink').value; if(!link) return;
-            loadingMessage.classList.remove('hidden');
-            try {
-                const match = link.match(/[-\w]{25,}/); if (!match) throw new Error();
-                const resp = await fetch(`https://docs.google.com/spreadsheets/d/${match[0]}/export?format=csv`);
-                if (!resp.ok) throw new Error();
-                processWorkbook(XLSX.read(await resp.text(), { type: 'string' }), "Google Data");
-            } catch(e) { showMessage(languageData[currentLang].googleErrorTitle, languageData[currentLang].googleErrorBody); loadingMessage.classList.add('hidden'); }
-        };
-
-        document.getElementById('fetchGithubBtn').onclick = async () => {
-            const fName = document.getElementById('githubFileName').value;
-            loadingMessage.classList.remove('hidden');
-            try {
-                const resp = await fetch(fName);
-                processWorkbook(XLSX.read(new Uint8Array(await resp.arrayBuffer()), { type: 'array' }), fName);
-            } catch(e) { showMessage('Error', 'File not found.'); loadingMessage.classList.add('hidden'); }
-        };
-
-        // Multi-select Dropdown toggle
-        const trigger = document.getElementById('deptMultiTrigger');
-        const dropdown = document.getElementById('deptMultiDropdown');
-        trigger.onclick = (e) => {
-            e.stopPropagation();
-            dropdown.classList.toggle('active');
-        };
-        document.addEventListener('click', () => dropdown.classList.remove('active'));
-        dropdown.onclick = (e) => e.stopPropagation();
-
-        function updateDeptSelectedText() {
-            const d = languageData[currentLang];
-            const textEl = document.getElementById('deptSelectedText');
-            if (selectedDepts.size === 0) {
-                textEl.textContent = d.allInstitute;
-            } else {
-                textEl.textContent = Array.from(selectedDepts).join(', ');
+            ar: {
+                title: 'تحليل نتائج الاستبيان',
+                devCredit: 'المعهد العالي للهندسة والتكنولوجيا بكفر الشيخ\nوحدة ضمان الجودة والاعتماد',
+                allInstitute: 'المعهد بالكامل',
+                participants: 'مشارك',
+                pos: 'إيجابي',
+                copied: 'تم النسخ!',
+                emptyList: 'لا توجد بنود',
+                headers: { no: '#', item: 'بيان البند', checkTotal: 'إجمالي الصف (%)', total: 'الإجمالي (%)', positives: 'إيجابيات (%)', footer: 'المتوسط' },
+                strengths: '★ نقاط القوة الأساسية',
+                improvement: '⚠️ مجالات التحسين الحرجة',
+                recommendation: 'التوصية النهائية',
+                evaluations: ["ممتازة", "جيد جداً", "جيدة", "مقبولة", "ضعيفة"],
+                suggestionsTitle: 'ملخص الملاحظات (بالذكاء الاصطناعي)',
+                loadingAI: 'جاري التحليل بالذكاء الاصطناعي...',
+                groupLabel: 'مجموعة المقياس',
+                step1: 'الخطوة 1: مصدر البيانات',
+                step1Btn: 'تحميل ملف محلي',
+                step1G: 'رابط جوجل شيت',
+                step1H: 'ملف من السيرفر',
+                localHint: 'اختر ملف XLSX أو CSV',
+                googleHint: 'ضع رابط جوجل شيت العام...',
+                fetch: 'جلب البيانات',
+                step2: 'الخطوة 2: تعيين البيانات',
+                confirm: 'تأكيد الإعدادات',
+                filterLabel: 'تصفية حسب القسم (اختيار متعدد)',
+                deptLabel: 'اختر عمود القسم',
+                startColLabel: 'ابدأ التحليل من عمود',
+                step3: 'الخطوة 3: ترتيب المقاييس',
+                step3Hint: 'قم بترتيب خيارات الإجابة (الأعلى في الأعلى).',
+                threshold: 'حد الإيجابيات (%):',
+                analyzeNow: 'حلل البيانات الآن',
+                export: 'تصدير (Excel)',
+                print: 'طباعة (PDF)',
+                copyAll: 'نسخ الكل',
+                finalResult: 'النسبة الإجمالية',
+                evalLabel: 'التقييم العام للمعهد',
+                googleErrorTitle: 'خطأ في بيانات جوجل',
+                googleErrorBody: 'تأكد أن الملف متاح للجميع ومنشور على الويب.',
+                nav: { step1: 'المصدر', step2: 'التعيين', filter: 'الفلترة', step3: 'المقاييس', results: 'الجداول', charts: 'الرسوم', highlights: 'النقاط', final: 'التقييم' },
+                selectAll: 'اختيار الكل'
             }
+        };
+
+        /* --- AI --- */
+        async function summarizeWithAI(text, lang) {
+            const apiKey = "AIzaSyBt0DtjhTpAZRQMYeMv_GFGogVYf1hLRNs";
+            const modelName = "gemini-2.5-flash-preview-09-2025";
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+            const systemPrompt = lang === 'ar' 
+                ? "أنت خبير في تحليل البيانات التعليمية. قم بتلخيص المقترحات التالية في نقاط واضحة ومهنية باللغة العربية. ابدأ مباشرة بالنقاط دون مقدمات."
+                : "Summarize feedback suggestions into clear professional bullet points.";
+            const payload = { contents: [{ parts: [{ text: text }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+            try {
+                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const result = await response.json();
+                return result.candidates?.[0]?.content?.parts?.[0]?.text || text;
+            } catch (err) { return text; }
         }
 
-        document.getElementById('confirmMappingBtn').onclick = () => {
-            if (!rawExcelData) return;
-            identifiedScaleGroups.clear(); itemToScaleGroup.clear();
-            const filterColIdx = parseInt(document.getElementById('filterColSelect').value);
-            const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
-            
-            const departments = new Set();
-            for (let r = 1; r < rawExcelData.length; r++) {
-                const val = String(rawExcelData[r][filterColIdx] || "").trim();
-                if (val !== "") departments.add(val);
-            }
+        /* --- Helpers --- */
+        function sanitizeValue(val) {
+            if (typeof val !== 'string') return val;
+            if (['=', '-', '+', '@'].includes(val.trim().charAt(0))) return "'" + val;
+            return val;
+        }
 
-            // Populate Multi-select
-            dropdown.innerHTML = '';
-            selectedDepts.clear();
+        function showStatus(btnEl) {
+            if (!btnEl) return;
+            const originalHtml = btnEl.innerHTML;
+            btnEl.innerHTML = `<span class="text-[12px] font-black uppercase px-2 text-green-600 font-black">${languageData[currentLang].copied}</span>`;
+            setTimeout(() => btnEl.innerHTML = originalHtml, 2000);
+        }
 
-            // "Select All" Option
-            const allItem = document.createElement('div');
-            allItem.className = 'multi-select-item border-b border-gray-100 font-black';
-            allItem.innerHTML = `<input type="checkbox" id="selectAllDepts"><span>${languageData[currentLang].selectAll}</span>`;
-            allItem.querySelector('input').onchange = (e) => {
-                const checked = e.target.checked;
-                const checkboxes = dropdown.querySelectorAll('.dept-checkbox');
-                checkboxes.forEach(cb => {
-                    cb.checked = checked;
-                    if (checked) selectedDepts.add(cb.value);
-                    else selectedDepts.delete(cb.value);
+        function copyToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text; textArea.style.position = "fixed"; textArea.style.left = "-9999px"; textArea.style.top = "0";
+            document.body.appendChild(textArea); textArea.focus(); textArea.select();
+            try { const ok = document.execCommand('copy'); document.body.removeChild(textArea); return ok; } 
+            catch (err) { return false; }
+        }
+
+        function attachCopyButton(container, copyLogic) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'copy-btn-wrapper';
+            wrapper.innerHTML = `<div class="copy-btn-inner hover-zoom"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></div>`;
+            wrapper.onclick = (e) => { e.stopPropagation(); copyLogic(wrapper.querySelector('.copy-btn-inner')); };
+            container.style.position = 'relative';
+            container.appendChild(wrapper);
+        }
+
+        function showMessage(title, body) {
+            document.getElementById('messageBoxTitle').textContent = title;
+            document.getElementById('messageBoxBody').textContent = body;
+            document.getElementById('messageBoxModal').classList.remove('hidden');
+        }
+
+        /* --- Components Rendering --- */
+        function renderScaleGroups() {
+            const container = document.getElementById('scaleGroupsContainer');
+            container.innerHTML = '';
+            identifiedScaleGroups.forEach((group, sig) => {
+                if (group.isSuggestion) return;
+                const wrap = document.createElement('div');
+                wrap.className = 'bg-white p-6 rounded-3xl border-2 border-blue-200 shadow-md hover-zoom';
+                wrap.innerHTML = `<h3 class="font-black text-indigo-900 uppercase tracking-tighter text-xl mb-4 pr-4 font-black">${languageData[currentLang].groupLabel}: ${group.options.join(', ')}</h3><div class="scale-list space-y-3 font-black" data-sig="${sig}"></div>`;
+                const list = wrap.querySelector('.scale-list');
+                group.options.forEach((opt, idx) => {
+                    const item = document.createElement('div');
+                    item.className = 'p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl flex justify-between items-center cursor-move font-black font-black';
+                    item.draggable = true;
+                    item.innerHTML = `<span class="font-bold text-slate-900 font-black">${opt}</span><label class="flex items-center cursor-pointer font-black font-black"><input type="checkbox" class="w-6 h-6 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="mr-2 text-xs font-black text-indigo-800 font-black">${languageData[currentLang].pos}</span></label>`;
+                    item.querySelector('input').onchange = (e) => e.target.checked ? group.positives.add(opt) : group.positives.delete(opt);
+                    item.ondragstart = (e) => { e.dataTransfer.setData('idx', idx); e.dataTransfer.setData('sig', sig); };
+                    item.ondragover = (e) => e.preventDefault();
+                    item.ondrop = (e) => {
+                        const fromIdx = e.dataTransfer.getData('idx'); if(e.dataTransfer.getData('sig') !== sig) return;
+                        const moved = group.options.splice(fromIdx, 1)[0]; group.options.splice(idx, 0, moved); renderScaleGroups();
+                    };
+                    list.appendChild(item);
                 });
-                updateDeptSelectedText();
-            };
-            dropdown.appendChild(allItem);
+                container.appendChild(wrap);
+            });
+        }
 
-            Array.from(departments).sort().forEach(dept => {
-                const item = document.createElement('div');
-                item.className = 'multi-select-item font-bold';
-                item.innerHTML = `<input type="checkbox" class="dept-checkbox" value="${dept}"><span>${dept}</span>`;
-                item.querySelector('input').onchange = (e) => {
-                    if (e.target.checked) selectedDepts.add(dept);
-                    else {
-                        selectedDepts.delete(dept);
-                        document.getElementById('selectAllDepts').checked = false;
-                    }
+        function renderTable(title, rows, opts, positives) {
+            const d = languageData[currentLang];
+            const container = document.getElementById('resultsContainer');
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-blue-100 overflow-hidden hover-zoom mb-10 domain-result-wrapper';
+            const totalRes = rows.reduce((s, r) => s + r.total, 0);
+            const domainPos = rows.reduce((s, r) => s + Array.from(positives).reduce((sum, opt) => sum + (r.freqs[opt] || 0), 0), 0);
+            const avgPos = totalRes ? (domainPos / totalRes * 100).toFixed(1) : '0.0';
+            const align = currentLang === 'ar' ? 'text-right' : 'text-left';
+            
+            let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black ${align} font-black">${title}</h2><div class="overflow-x-auto"><table class="w-full text-sm ${align} font-black"><thead class="bg-slate-100"><tr><th class="p-6 text-center font-black">#</th><th class="p-6 text-right font-black font-black font-black">${d.headers.item}</th>${opts.map(o => `<th class="p-6 text-center text-indigo-700 font-black font-black font-black">${o}</th>`).join('')}<th class="p-6 text-center font-bold text-blue-600 font-black font-black font-black">${d.headers.checkTotal}</th><th class="p-6 text-center font-black font-black font-black font-black font-black">${d.headers.positives}</th></tr></thead><tbody>`;
+            
+            rows.forEach((r, i) => { 
+                const rowCheckSum = opts.reduce((acc, o) => acc + (r.freqs[o] / r.total * 100), 0);
+                // Utilizing r.originalIdx to maintain strict numerical numbering according to original file columns
+                html += `<tr class="border-b border-slate-50 font-black"><td class="p-6 text-center text-slate-500 font-bold font-black">${r.originalIdx}</td><td class="p-6 font-bold text-slate-800 text-right font-black font-black">${r.item}</td>${opts.map(o => `<td class="p-6 text-center font-black font-black">${(r.freqs[o]/r.total*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center font-bold text-blue-500 bg-blue-50/30 font-black font-black">${rowCheckSum.toFixed(1)}%</td><td class="p-6 text-center font-black text-green-700 bg-green-50 font-black font-black">${r.posPerc.toFixed(1)}%</td></tr>`; 
+            });
+            
+            html += `</tbody><tfoot class="bg-slate-50 font-black border-t-4 border-slate-200"><tr><td colspan="2" class="p-6 text-center uppercase font-black font-black">${d.headers.footer}</td>${opts.map(o => `<td class="p-6 text-center font-black font-black font-black">${((rows.reduce((s, r) => s + r.freqs[o], 0)/totalRes)*100).toFixed(1)}%</td>`).join('')}<td class="p-6 text-center font-black font-black">100.0%</td><td class="p-6 text-center text-green-800 text-lg font-black font-black font-black font-black">${avgPos}%</td></tr></tfoot></table></div>`;
+            div.innerHTML = html;
+            attachCopyButton(div, (btn) => {
+                let tableContent = title + '\n';
+                div.querySelectorAll('table tr').forEach(tr => {
+                    let rArr = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); rArr.push(c.innerText.trim()); for(let k=1; k < cs; k++) rArr.push(""); });
+                    tableContent += rArr.join('\t') + '\n';
+                });
+                copyToClipboard(tableContent); showStatus(btn);
+            });
+            container.appendChild(div);
+        }
+
+        async function renderAISuggestionBox(title, responses) {
+            const rawText = responses.filter(r => String(r || "").trim() !== "").join('. ');
+            if (!rawText) return;
+            const d = languageData[currentLang];
+            const container = document.getElementById('resultsContainer');
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-100 overflow-hidden hover-zoom mb-10 suggestion-wrapper';
+            const align = currentLang === 'ar' ? 'text-right' : 'text-left';
+            div.innerHTML = `<div class="p-8 bg-indigo-50 border-b-2 border-indigo-100 ${align} font-black font-black font-black"><h2 class="text-3xl font-black font-black font-black font-black">${title}</h2><div class="mt-2 flex items-center font-black font-black font-black"><span class="ai-badge font-black">Gemini AI</span> <span class="text-xs font-black text-indigo-500 uppercase tracking-widest font-black font-black">${d.suggestionsTitle}</span></div></div><div class="p-8 ${align} font-black font-black"><div class="suggestion-box italic text-slate-400 font-black font-black font-black">${d.loadingAI}</div></div>`;
+            container.appendChild(div);
+            const summary = await summarizeWithAI(rawText, currentLang);
+            const aiOutputEl = div.querySelector('.suggestion-box');
+            aiOutputEl.classList.remove('italic', 'text-slate-400');
+            aiOutputEl.textContent = summary;
+            attachCopyButton(div, (btn) => { copyToClipboard(`${title}\n---\n${summary}`); showStatus(btn); });
+        }
+
+        function renderSummaryTable(summaryDataList) {
+            const d = languageData[currentLang];
+            const container = document.getElementById('resultsContainer');
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-200 overflow-hidden hover-zoom mt-16 summary-table-wrapper font-black font-black font-black';
+            const gTotal = summaryDataList.reduce((s, dm) => s + dm.total, 0);
+            const gPos = summaryDataList.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
+            const align = currentLang === 'ar' ? 'text-right' : 'text-left';
+            let html = `<h2 class="text-3xl thin-title p-8 bg-indigo-700 text-white font-black text-center font-black font-black font-black font-black font-black">Summary of All Domains</h2><table class="w-full text-lg ${align} font-black font-black font-black font-black"><thead class="bg-indigo-50 font-black font-black font-black"><tr><th class="p-8 text-center font-black font-black font-black font-black font-black">#</th><th class="p-8 font-black font-black font-black font-black font-black">Domain</th><th class="p-8 text-center font-black font-black font-black font-black font-black font-black font-black">${d.headers.positives}</th></tr></thead><tbody>`;
+            summaryDataList.forEach((dm, i) => { const pSum = Array.from(dm.positives).reduce((s,o)=>s+(dm.freqs[o]||0),0); html += `<tr class="border-b border-indigo-50 font-black font-black font-black font-black font-black font-black font-black font-black"><td class="p-8 text-center text-indigo-300 font-black font-black font-black font-black font-black font-black">${i+1}</td><td class="p-8 font-black text-slate-800 font-black font-black font-black font-black font-black">${dm.name}</td><td class="p-8 text-center font-black text-green-600 font-black font-black font-black font-black font-black font-black font-black">${(pSum/dm.total*100).toFixed(1)}%</td></tr>`; });
+            html += `</tbody><tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300 font-black font-black font-black font-black font-black font-black font-black"><tr><td colspan="2" class="p-8 text-center uppercase font-black font-black font-black font-black font-black font-black">Total Average</td><td class="p-8 text-center text-green-800 text-2xl font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${(gPos/gTotal*100).toFixed(1)}%</td></tr></tfoot></table>`;
+            div.innerHTML = html;
+            attachCopyButton(div, (btn) => {
+                let summaryContent = 'Summary\n';
+                div.querySelectorAll('table tr').forEach(tr => {
+                    let rArr=[]; tr.querySelectorAll('th, td').forEach(c=>{ const cs = parseInt(c.getAttribute('colspan') || 1); rArr.push(c.innerText.trim()); for(let k=1; k < cs; k++) rArr.push(""); });
+                    summaryContent += rArr.join('\t') + '\n';
+                });
+                copyToClipboard(summaryContent); showStatus(btn);
+            });
+            container.appendChild(div);
+        }
+
+        function renderHighlightLists(items) {
+            const d = languageData[currentLang];
+            const container = document.getElementById('positiveNegativeItemsContainer');
+            const thresh = parseInt(document.getElementById('positivesThresholdInput').value || 85);
+            const high = items.filter(i => i.posPerc >= thresh);
+            const low = items.filter(i => i.posPerc < thresh);
+            container.innerHTML = '';
+            const sDiv = document.createElement('div');
+            sDiv.className = `p-10 bg-green-50 rounded-[3rem] border-4 border-green-200 shadow-lg hover-zoom w-full font-black font-black font-black font-black font-black`;
+            sDiv.innerHTML = `<h4 class="text-3xl font-black text-green-800 mb-8 font-black font-black font-black font-black font-black">${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold font-black font-black font-black font-black">${high.length ? high.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-green-100 shadow-sm font-black font-black font-black font-black font-black font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
+            const iDiv = document.createElement('div');
+            iDiv.className = `p-10 bg-red-50 rounded-[3rem] border-4 border-red-200 shadow-lg hover-zoom w-full font-black font-black font-black font-black font-black`;
+            iDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8 font-black font-black font-black font-black font-black font-black">${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold font-black font-black font-black font-black font-black font-black">${low.length ? low.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-red-100 shadow-sm font-black font-black font-black font-black font-black font-black font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`}</ul>`;
+            container.appendChild(sDiv); container.appendChild(iDiv);
+            container.classList.remove('hidden');
+        }
+
+        function renderFinalRecommendation(score) {
+            const d = languageData[currentLang];
+            const container = document.getElementById('finalRecommendationContainer');
+            const div = document.createElement('div');
+            div.className = 'relative p-12 bg-white rounded-[3.5rem] shadow-2xl border-4 border-indigo-400 hover-zoom mb-20 text-center animate-in fade-in duration-700 font-black font-black font-black font-black font-black font-black';
+            let evalTxt = score > 85 ? d.evaluations[0] : score > 75 ? d.evaluations[1] : score > 65 ? d.evaluations[2] : score > 50 ? d.evaluations[3] : d.evaluations[4];
+            div.innerHTML = `<h2 class="text-4xl thin-title mb-10 text-center text-indigo-900 font-black border-b-2 border-indigo-50 pb-6 font-black font-black font-black font-black font-black font-black font-black font-black font-black">${d.recommendation}</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-10 font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black"><div class="p-8 bg-indigo-50 rounded-[2.5rem] text-center border-2 border-indigo-100 flex flex-col justify-center items-center font-black font-black font-black font-black font-black font-black font-black font-black font-black"><span class="text-xs font-black text-indigo-400 mb-2 uppercase font-black font-black font-black font-black font-black font-black font-black font-black font-black">${d.finalResult}</span><span class="text-6xl font-black text-indigo-800 font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${score.toFixed(2)}%</span></div><div class="p-8 bg-green-50 rounded-[2.5rem] text-center border-2 border-green-100 flex flex-col justify-center items-center font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black"><span class="text-xs font-black text-green-400 mb-2 uppercase font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${d.evalLabel}</span><span class="text-6xl font-black text-green-700 font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">${evalTxt}</span></div></div>`;
+            container.innerHTML = ''; container.appendChild(div); container.classList.remove('hidden');
+        }
+
+        /* --- Logic & Controllers --- */
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof ChartDataLabels !== 'undefined') { Chart.register(ChartDataLabels); }
+
+            document.getElementById('closeMessageBox').onclick = () => {
+                document.getElementById('messageBoxModal').classList.add('hidden');
+            };
+
+            function updateUI() {
+                const d = languageData[currentLang];
+                document.getElementById('mainTitle').textContent = d.title;
+                document.getElementById('instituteTitle').innerText = d.devCredit;
+                document.getElementById('step1Title').textContent = d.step1;
+                document.getElementById('srcLocalBtn').textContent = d.step1Btn;
+                document.getElementById('srcGoogleBtn').textContent = d.step1G;
+                document.getElementById('srcGithubBtn').textContent = d.step1H;
+                document.getElementById('localFileBtnText').textContent = d.localHint;
+                document.getElementById('fetchGoogleBtn').textContent = d.fetch;
+                document.getElementById('fetchGithubBtn').textContent = d.fetch;
+                document.getElementById('googleLink').placeholder = d.googleHint;
+                document.getElementById('step2Title').textContent = d.step2;
+                document.getElementById('confirmMappingBtn').textContent = d.confirm;
+                document.getElementById('labelFilterCol').textContent = d.deptLabel;
+                document.getElementById('labelStartCol').textContent = d.startColLabel;
+                document.getElementById('labelDeptFilter').textContent = d.filterLabel;
+                document.getElementById('scaleOrderTitle').textContent = d.step3;
+                document.getElementById('scaleOrderSubtitle').textContent = d.step3Hint;
+                document.getElementById('labelThreshold').textContent = d.threshold;
+                document.getElementById('analyzeButton').textContent = d.analyzeNow;
+                document.getElementById('exportButton').textContent = d.export;
+                document.getElementById('printButton').textContent = d.print;
+                document.getElementById('copyTableButton').textContent = d.copyAll;
+                document.getElementById('lang-ar').classList.toggle('active-lang', currentLang === 'ar');
+                document.getElementById('lang-en').classList.toggle('active-lang', currentLang === 'en');
+                document.getElementById('mainHtml').dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+                document.body.style.textAlign = currentLang === 'ar' ? 'right' : 'left';
+
+                document.getElementById('tip-step1').textContent = d.nav.step1;
+                document.getElementById('tip-step2').textContent = d.nav.step2;
+                document.getElementById('tip-filter').textContent = d.nav.filter;
+                document.getElementById('tip-step3').textContent = d.nav.step3;
+                document.getElementById('tip-results').textContent = d.nav.results;
+                document.getElementById('tip-charts').textContent = d.nav.charts;
+                document.getElementById('tip-highlights').textContent = d.nav.highlights;
+                document.getElementById('tip-final').textContent = d.nav.final;
+                
+                updateDeptSelectedText();
+            }
+
+            const xlsxFile = document.getElementById('xlsxFile');
+            const loadingMessage = document.getElementById('loadingMessage');
+
+            function processWorkbook(workbook, fileName) {
+                rawExcelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+                document.getElementById('fileNameDisplay').textContent = fileName;
+                document.getElementById('fileNameDisplay').classList.remove('hidden');
+                document.getElementById('dataConfigSection').classList.remove('hidden');
+                const fs = document.getElementById('filterColSelect');
+                const as = document.getElementById('analysisStartColSelect');
+                fs.innerHTML = ''; as.innerHTML = '';
+                (rawExcelData[0] || []).forEach((h, i) => {
+                    const colLetter = i < 26 ? String.fromCharCode(65 + i) : `C${i+1}`;
+                    fs.add(new Option(`${colLetter}: ${h || '---'}`, i));
+                    as.add(new Option(`${colLetter}: ${h || '---'}`, i));
+                });
+                fs.value = Math.min(1, rawExcelData[0].length - 1); 
+                as.value = Math.min(2, rawExcelData[0].length - 1); 
+                loadingMessage.classList.add('hidden');
+            }
+
+            document.getElementById('srcLocalBtn').onclick = () => { document.getElementById('localInputPanel').classList.toggle('hidden'); document.getElementById('googleInputPanel').classList.add('hidden'); document.getElementById('githubInputPanel').classList.add('hidden'); };
+            document.getElementById('srcGoogleBtn').onclick = () => { document.getElementById('googleInputPanel').classList.toggle('hidden'); document.getElementById('localInputPanel').classList.add('hidden'); document.getElementById('githubInputPanel').classList.add('hidden'); };
+            document.getElementById('srcGithubBtn').onclick = () => { document.getElementById('githubInputPanel').classList.toggle('hidden'); document.getElementById('localInputPanel').classList.add('hidden'); document.getElementById('googleInputPanel').classList.add('hidden'); };
+
+            xlsxFile.addEventListener('change', (e) => {
+                const file = e.target.files[0]; if (!file) return;
+                loadingMessage.classList.remove('hidden');
+                const reader = new FileReader();
+                reader.onload = (ev) => processWorkbook(XLSX.read(new Uint8Array(ev.target.result), { type: 'array' }), file.name.split('.')[0]);
+                reader.readAsArrayBuffer(file);
+            });
+
+            document.getElementById('fetchGoogleBtn').onclick = async () => {
+                const link = document.getElementById('googleLink').value; if(!link) return;
+                loadingMessage.classList.remove('hidden');
+                try {
+                    const match = link.match(/[-\w]{25,}/); if (!match) throw new Error();
+                    const resp = await fetch(`https://docs.google.com/spreadsheets/d/${match[0]}/export?format=csv`);
+                    if (!resp.ok) throw new Error();
+                    processWorkbook(XLSX.read(await resp.text(), { type: 'string' }), "Google Data");
+                } catch(e) { showMessage(languageData[currentLang].googleErrorTitle, languageData[currentLang].googleErrorBody); loadingMessage.classList.add('hidden'); }
+            };
+
+            document.getElementById('fetchGithubBtn').onclick = async () => {
+                const fName = document.getElementById('githubFileName').value;
+                loadingMessage.classList.remove('hidden');
+                try {
+                    const resp = await fetch(fName);
+                    processWorkbook(XLSX.read(new Uint8Array(await resp.arrayBuffer()), { type: 'array' }), fName);
+                } catch(e) { showMessage('Error', 'File not found.'); loadingMessage.classList.add('hidden'); }
+            };
+
+            /* Multi-select Dropdown toggle */
+            const trigger = document.getElementById('deptMultiTrigger');
+            const dropdown = document.getElementById('deptMultiDropdown');
+            trigger.onclick = (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('active');
+            };
+            document.addEventListener('click', () => dropdown.classList.remove('active'));
+            dropdown.onclick = (e) => e.stopPropagation();
+
+            function updateDeptSelectedText() {
+                const d = languageData[currentLang];
+                const textEl = document.getElementById('deptSelectedText');
+                if (selectedDepts.size === 0) {
+                    textEl.textContent = d.allInstitute;
+                } else {
+                    textEl.textContent = Array.from(selectedDepts).join(', ');
+                }
+            }
+
+            document.getElementById('confirmMappingBtn').onclick = () => {
+                if (!rawExcelData) return;
+                identifiedScaleGroups.clear(); itemToScaleGroup.clear();
+                const filterColIdx = parseInt(document.getElementById('filterColSelect').value);
+                const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
+                
+                const departments = new Set();
+                for (let r = 1; r < rawExcelData.length; r++) {
+                    const val = String(rawExcelData[r][filterColIdx] || "").trim();
+                    if (val !== "") departments.add(val);
+                }
+
+                /* Populate Multi-select */
+                dropdown.innerHTML = '';
+                selectedDepts.clear();
+
+                /* "Select All" Option */
+                const allItem = document.createElement('div');
+                allItem.className = 'multi-select-item border-b border-gray-100 font-black';
+                allItem.innerHTML = `<input type="checkbox" id="selectAllDepts"><span>${languageData[currentLang].selectAll}</span>`;
+                allItem.querySelector('input').onchange = (e) => {
+                    const checked = e.target.checked;
+                    const checkboxes = dropdown.querySelectorAll('.dept-checkbox');
+                    checkboxes.forEach(cb => {
+                        cb.checked = checked;
+                        if (checked) selectedDepts.add(cb.value);
+                        else selectedDepts.delete(cb.value);
+                    });
                     updateDeptSelectedText();
                 };
-                dropdown.appendChild(item);
-            });
+                dropdown.appendChild(allItem);
 
-            for (let col = startColIdx; col < rawExcelData[0].length; col++) {
-                const resps = [];
-                for (let r = 1; r < rawExcelData.length; r++) {
-                    const val = String(rawExcelData[r][col] || "").trim();
-                    if (val !== "") resps.push(val);
-                }
-                const opts = new Set(resps);
-                if (opts.size > 0) {
-                    const avgLen = resps.reduce((s,x)=>s+x.length,0)/resps.length;
-                    const redundancy = opts.size / resps.length;
-                    const isSugg = (opts.size > 12 && redundancy > 0.25) || (avgLen > 40 && opts.size > 5);
-                    const sigStr = Array.from(opts).sort().join('|');
-                    if (!identifiedScaleGroups.has(sigStr)) identifiedScaleGroups.set(sigStr, { options: Array.from(opts), positives: new Set(), isSuggestion: isSugg });
-                    itemToScaleGroup.set(col, sigStr);
-                }
-            }
-            document.getElementById('filterSection').classList.remove('hidden'); 
-            renderScaleGroups();
-            document.getElementById('scaleOrderSection').classList.remove('hidden'); document.getElementById('actionButtons').classList.remove('hidden');
-        };
-
-        document.getElementById('analyzeButton').onclick = async () => {
-            if (!rawExcelData) return;
-            const allItemsList = []; const summaryDataList = []; 
-            const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
-            const filterColIdx = parseInt(document.getElementById('filterColSelect').value);
-            
-            const resultsContainer = document.getElementById('resultsContainer');
-            resultsContainer.innerHTML = ''; 
-            document.getElementById('chartContainer').innerHTML = ''; 
-            document.getElementById('positiveNegativeItemsContainer').innerHTML = ''; 
-            document.getElementById('finalRecommendationContainer').innerHTML = '';
-            chartInstances.forEach(c => c.destroy()); chartInstances = [];
-            
-            let rows = rawExcelData.slice(1);
-            if (selectedDepts.size > 0) {
-                rows = rows.filter(r => r && selectedDepts.has(String(r[filterColIdx] || "").trim()));
-            }
-            
-            document.getElementById('participantCountDisplay').textContent = `${rows.length} ${languageData[currentLang].participants}`;
-            document.getElementById('participantCountDisplay').classList.remove('hidden');
-
-            const headers = rawExcelData[0];
-            const processedCols = new Set();
-
-            for (let col = startColIdx; col < headers.length; col++) {
-                if (processedCols.has(col)) continue;
-                const sigLocal = itemToScaleGroup.get(col);
-                if (!sigLocal) continue;
-                const groupData = identifiedScaleGroups.get(sigLocal);
-                if (!groupData) continue;
-
-                if (groupData.isSuggestion) {
-                    await renderAISuggestionBox(headers[col], rows.map(r => r[col]));
-                    processedCols.add(col);
-                } else {
-                    const match = String(headers[col]).match(/(.+) \[(.+)\]/);
-                    if (match) {
-                        const dName = match[1].trim();
-                        const itemsInDomain = [];
-                        for (let c2 = col; c2 < headers.length; c2++) {
-                            if (processedCols.has(c2)) continue;
-                            const m2 = String(headers[c2]).match(/(.+) \[(.+)\]/);
-                            if (m2 && m2[1].trim() === dName && itemToScaleGroup.get(c2) === sigLocal) {
-                                itemsInDomain.push({txt: headers[c2], item: m2[2].trim(), colIdx: c2});
-                                processedCols.add(c2);
-                            }
+                Array.from(departments).forEach(dept => {
+                    const item = document.createElement('div');
+                    item.className = 'multi-select-item font-bold';
+                    item.innerHTML = `<input type="checkbox" class="dept-checkbox" value="${dept}"><span>${dept}</span>`;
+                    item.querySelector('input').onchange = (e) => {
+                        if (e.target.checked) selectedDepts.add(dept);
+                        else {
+                            selectedDepts.delete(dept);
+                            document.getElementById('selectAllDepts').checked = false;
                         }
-                        const rowsData = itemsInDomain.map(idom => {
-                            const rps = rows.map(r => r[idom.colIdx]);
+                        updateDeptSelectedText();
+                    };
+                    dropdown.appendChild(item);
+                });
+
+                for (let col = startColIdx; col < rawExcelData[0].length; col++) {
+                    const resps = [];
+                    for (let r = 1; r < rawExcelData.length; r++) {
+                        const val = String(rawExcelData[r][col] || "").trim();
+                        if (val !== "") resps.push(val);
+                    }
+                    const opts = new Set(resps);
+                    if (opts.size > 0) {
+                        const avgLen = resps.reduce((s,x)=>s+x.length,0)/resps.length;
+                        const redundancy = opts.size / resps.length;
+                        const isSugg = (opts.size > 12 && redundancy > 0.25) || (avgLen > 40 && opts.size > 5);
+                        const sigStr = Array.from(opts).sort().join('|');
+                        if (!identifiedScaleGroups.has(sigStr)) identifiedScaleGroups.set(sigStr, { options: Array.from(opts), positives: new Set(), isSuggestion: isSugg });
+                        itemToScaleGroup.set(col, sigStr);
+                    }
+                }
+                document.getElementById('filterSection').classList.remove('hidden'); 
+                renderScaleGroups();
+                document.getElementById('scaleOrderSection').classList.remove('hidden'); document.getElementById('actionButtons').classList.remove('hidden');
+            };
+
+            document.getElementById('analyzeButton').onclick = async () => {
+                if (!rawExcelData) return;
+                const allItemsList = []; const summaryDataList = []; 
+                const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
+                const filterColIdx = parseInt(document.getElementById('filterColSelect').value);
+                
+                const resultsContainer = document.getElementById('resultsContainer');
+                resultsContainer.innerHTML = ''; 
+                document.getElementById('chartContainer').innerHTML = ''; 
+                document.getElementById('positiveNegativeItemsContainer').innerHTML = ''; 
+                document.getElementById('finalRecommendationContainer').innerHTML = '';
+                chartInstances.forEach(c => c.destroy()); chartInstances = [];
+                
+                let rows = rawExcelData.slice(1);
+                if (selectedDepts.size > 0) {
+                    rows = rows.filter(r => r && selectedDepts.has(String(r[filterColIdx] || "").trim()));
+                }
+                
+                document.getElementById('participantCountDisplay').textContent = `${rows.length} ${languageData[currentLang].participants}`;
+                document.getElementById('participantCountDisplay').classList.remove('hidden');
+
+                const headers = rawExcelData[0];
+                const processedCols = new Set();
+
+                for (let col = startColIdx; col < headers.length; col++) {
+                    if (processedCols.has(col)) continue;
+                    const sigLocal = itemToScaleGroup.get(col);
+                    if (!sigLocal) continue;
+                    const groupData = identifiedScaleGroups.get(sigLocal);
+                    if (!groupData) continue;
+
+                    if (groupData.isSuggestion) {
+                        await renderAISuggestionBox(headers[col], rows.map(r => r[col]));
+                        processedCols.add(col);
+                    } else {
+                        const match = String(headers[col]).match(/(.+) \[(.+)\]/);
+                        if (match) {
+                            const dName = match[1].trim();
+                            const itemsInDomain = [];
+                            for (let c2 = col; c2 < headers.length; c2++) {
+                                if (processedCols.has(c2)) continue;
+                                const m2 = String(headers[c2]).match(/(.+) \[(.+)\]/);
+                                if (m2 && m2[1].trim() === dName && itemToScaleGroup.get(c2) === sigLocal) {
+                                    itemsInDomain.push({txt: headers[c2], item: m2[2].trim(), colIdx: c2});
+                                    processedCols.add(c2);
+                                }
+                            }
+                            const rowsData = itemsInDomain.map(idom => {
+                                const rps = rows.map(r => r[idom.colIdx]);
+                                const freqs = {}; groupData.options.forEach(o => freqs[o] = 0);
+                                let posCount = 0;
+                                rps.forEach(r => { const tr = String(r || "").trim(); if (freqs[tr] !== undefined) freqs[tr]++; if (groupData.positives.has(tr)) posCount++; });
+                                // Add originalIdx mapped purely to the original column index
+                                const res = { item: idom.item, freqs, total: rps.length, posPerc: rps.length ? (posCount/rps.length)*100 : 0, originalIdx: idom.colIdx - startColIdx + 1 };
+                                allItemsList.push(res); return res;
+                            });
+
+                            renderTable(dName, rowsData, groupData.options, groupData.positives);
+                            const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
+                            const divC = document.createElement('div');
+                            divC.className = 'bg-white p-10 rounded-[2.5rem] shadow-xl border-2 border-blue-100 flex flex-col items-center';
+                            divC.innerHTML = `<h3 class="text-2xl font-black mb-8 text-center text-indigo-900">${dName}</h3><div class="w-full h-96"><canvas id="${canvasId}"></canvas></div>`;
+                            document.getElementById('chartContainer').appendChild(divC);
+                            const ctx = document.getElementById(canvasId).getContext('2d');
+                            const dataVals = groupData.options.map(o => { const sum = rowsData.reduce((s, r) => s + r.freqs[o], 0); const total = rowsData.reduce((s, r) => s + r.total, 0); return total ? (sum/total*100).toFixed(1) : 0; });
+                            chartInstances.push(new Chart(ctx, { type: 'bar', data: { labels: groupData.options, datasets: [{ data: dataVals, backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], borderRadius: 15 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', font: { weight: 'bold' }, formatter: v => v+'%' } } } }));
+                            const dFreqs = {}; groupData.options.forEach(o => dFreqs[o] = rowsData.reduce((s, r) => s + r.freqs[o], 0));
+                            summaryDataList.push({ name: dName, freqs: dFreqs, total: rowsData.reduce((s, r) => s + r.total, 0), positives: groupData.positives });
+                        } else {
+                            const rps = rows.map(r => r[col]);
                             const freqs = {}; groupData.options.forEach(o => freqs[o] = 0);
                             let posCount = 0;
                             rps.forEach(r => { const tr = String(r || "").trim(); if (freqs[tr] !== undefined) freqs[tr]++; if (groupData.positives.has(tr)) posCount++; });
-                            const res = { item: idom.item, freqs, total: rps.length, posPerc: rps.length ? (posCount/rps.length)*100 : 0 };
-                            allItemsList.push(res); return res;
-                        });
-
-                        renderTable(dName, rowsData, groupData.options, groupData.positives);
-                        const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
-                        const divC = document.createElement('div');
-                        divC.className = 'bg-white p-10 rounded-[2.5rem] shadow-xl border-2 border-blue-100 flex flex-col items-center';
-                        divC.innerHTML = `<h3 class="text-2xl font-black mb-8 text-center text-indigo-900">${dName}</h3><div class="w-full h-96"><canvas id="${canvasId}"></canvas></div>`;
-                        document.getElementById('chartContainer').appendChild(divC);
-                        const ctx = document.getElementById(canvasId).getContext('2d');
-                        const dataVals = groupData.options.map(o => { const sum = rowsData.reduce((s, r) => s + r.freqs[o], 0); const total = rowsData.reduce((s, r) => s + r.total, 0); return total ? (sum/total*100).toFixed(1) : 0; });
-                        chartInstances.push(new Chart(ctx, { type: 'bar', data: { labels: groupData.options, datasets: [{ data: dataVals, backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], borderRadius: 15 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', font: { weight: 'bold' }, formatter: v => v+'%' } } } }));
-                        const dFreqs = {}; groupData.options.forEach(o => dFreqs[o] = rowsData.reduce((s, r) => s + r.freqs[o], 0));
-                        summaryDataList.push({ name: dName, freqs: dFreqs, total: rowsData.reduce((s, r) => s + r.total, 0), positives: groupData.positives });
-                    } else {
-                        const rps = rows.map(r => r[col]);
-                        const freqs = {}; groupData.options.forEach(o => freqs[o] = 0);
-                        let posCount = 0;
-                        rps.forEach(r => { const tr = String(r || "").trim(); if (freqs[tr] !== undefined) freqs[tr]++; if (groupData.positives.has(tr)) posCount++; });
-                        const res = { item: headers[col], freqs, total: rps.length, posPerc: rps.length ? (posCount/rps.length)*100 : 0 };
-                        allItemsList.push(res);
-                        renderTable(headers[col], [res], groupData.options, groupData.positives);
-                        processedCols.add(col);
+                            // Add originalIdx for non-grouped items
+                            const res = { item: headers[col], freqs, total: rps.length, posPerc: rps.length ? (posCount/rps.length)*100 : 0, originalIdx: col - startColIdx + 1 };
+                            allItemsList.push(res);
+                            renderTable(headers[col], [res], groupData.options, groupData.positives);
+                            processedCols.add(col);
+                        }
                     }
                 }
-            }
 
-            if (allItemsList.length > 0) {
-                renderSummaryTable(summaryDataList);
-                renderHighlightLists(allItemsList);
-                const gTotal = allItemsList.reduce((s, i) => s + i.total, 0);
-                const gPos = allItemsList.reduce((s, i) => s + (i.posPerc/100 * i.total), 0);
-                renderFinalRecommendation(gTotal ? (gPos / gTotal * 100) : 0);
-            }
-            resultsContainer.classList.remove('hidden'); document.getElementById('chartContainer').classList.remove('hidden'); 
-            resultsContainer.scrollIntoView({ behavior: 'smooth' });
-        };
+                if (allItemsList.length > 0) {
+                    renderSummaryTable(summaryDataList);
+                    // Explicitly sort everything by original file column index to completely preserve original layout in lists
+                    allItemsList.sort((a, b) => a.originalIdx - b.originalIdx);
+                    renderHighlightLists(allItemsList);
+                    const gTotal = allItemsList.reduce((s, i) => s + i.total, 0);
+                    const gPos = allItemsList.reduce((s, i) => s + (i.posPerc/100 * i.total), 0);
+                    renderFinalRecommendation(gTotal ? (gPos / gTotal * 100) : 0);
+                }
+                resultsContainer.classList.remove('hidden'); document.getElementById('chartContainer').classList.remove('hidden'); 
+                resultsContainer.scrollIntoView({ behavior: 'smooth' });
+            };
 
-        document.getElementById('printButton').onclick = () => { window.print(); };
+            document.getElementById('printButton').onclick = () => { window.print(); };
 
-        document.getElementById('copyTableButton').onclick = () => {
-            const d = languageData[currentLang];
-            let copyContent = `--- ${d.title} ---\n${d.devCredit}\n\n`;
-            document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(block => {
-                const h2 = block.querySelector('h2'); if (h2) copyContent += `\n[ ${h2.innerText} ]\n`;
-                const table = block.querySelector('table');
-                if (table) table.querySelectorAll('tr').forEach(tr => {
-                    let rD = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); rD.push(c.innerText.trim()); for(let k=1; k < cs; k++) rD.push(""); });
-                    copyContent += rD.join('\t') + '\n';
+            document.getElementById('copyTableButton').onclick = () => {
+                const d = languageData[currentLang];
+                let copyContent = `--- ${d.title} ---\n${d.devCredit}\n\n`;
+                document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(block => {
+                    const h2 = block.querySelector('h2'); if (h2) copyContent += `\n[ ${h2.innerText} ]\n`;
+                    const table = block.querySelector('table');
+                    if (table) table.querySelectorAll('tr').forEach(tr => {
+                        let rD = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); rD.push(c.innerText.trim()); for(let k=1; k < cs; k++) rD.push(""); });
+                        copyContent += rD.join('\t') + '\n';
+                    });
+                    const sb = block.querySelector('.suggestion-box'); if (sb) copyContent += sb.innerText + '\n';
                 });
-                const sb = block.querySelector('.suggestion-box'); if (sb) copyContent += sb.innerText + '\n';
-            });
-            document.querySelectorAll('#positiveNegativeItemsContainer > div').forEach(box => {
-                const h4 = box.querySelector('h4'); if (h4) { copyContent += `\n[ ${h4.innerText} ]\n`; box.querySelectorAll('li').forEach(li => copyContent += `- ${li.innerText}\n`); }
-            });
-            const rec = document.querySelector('#finalRecommendationContainer div');
-            if (rec) {
-                const h2 = rec.querySelector('h2'); if (h2) copyContent += `\n*** ${h2.innerText} ***\n`;
-                const stats = rec.querySelectorAll('.text-6xl'); const lbls = rec.querySelectorAll('.text-xs');
-                stats.forEach((stat, i) => { copyContent += `${lbls[i].innerText}: ${stat.innerText}\n`; });
-            }
-            if (copyToClipboard(copyContent)) { showStatus(document.getElementById('copyTableButton')); }
-        };
-
-        document.getElementById('exportButton').onclick = () => {
-            const d = languageData[currentLang];
-            const wb = XLSX.utils.book_new(); let allD = [[d.title], [d.devCredit], []];
-            document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(s => {
-                allD.push([sanitizeValue(s.querySelector('h2').innerText)]);
-                const tbl = s.querySelector('table');
-                if (tbl) tbl.querySelectorAll('tr').forEach(tr => {
-                    let r = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); let val = c.innerText.trim(); if (val.endsWith('%')) { let num = parseFloat(val.replace('%', '')); r.push(isNaN(num) ? val : num); } else { r.push(sanitizeValue(val)); } for(let k=1; k < cs; k++) r.push(""); });
-                    allD.push(r);
+                document.querySelectorAll('#positiveNegativeItemsContainer > div').forEach(box => {
+                    const h4 = box.querySelector('h4'); if (h4) { copyContent += `\n[ ${h4.innerText} ]\n`; box.querySelectorAll('li').forEach(li => copyContent += `- ${li.innerText}\n`); }
                 });
-                const box = s.querySelector('.suggestion-box'); if (box) allD.push([sanitizeValue(box.innerText)]);
-                allD.push([]);
-            });
-            document.querySelectorAll('#positiveNegativeItemsContainer > div').forEach(box => {
-                const h4 = box.querySelector('h4'); if (h4) { allD.push([sanitizeValue(h4.innerText)]); box.querySelectorAll('li').forEach(li => allD.push(["-", sanitizeValue(li.innerText)])); allD.push([]); }
-            });
-            const rec = document.querySelector('#finalRecommendationContainer div');
-            if (rec) {
-                const h2 = rec.querySelector('h2'); if (h2) allD.push([sanitizeValue(h2.innerText)]);
-                const stats = rec.querySelectorAll('.text-6xl'); const lbls = rec.querySelectorAll('.text-xs');
-                stats.forEach((stat, i) => { let val = stat.innerText.replace('%', ''); allD.push([sanitizeValue(lbls[i].innerText), isNaN(parseFloat(val)) ? val : parseFloat(val)]); });
-            }
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(allD), "Analysis");
-            XLSX.writeFile(wb, `Survey_Report.xlsx`);
-        };
+                const rec = document.querySelector('#finalRecommendationContainer div');
+                if (rec) {
+                    const h2 = rec.querySelector('h2'); if (h2) copyContent += `\n*** ${h2.innerText} ***\n`;
+                    const stats = rec.querySelectorAll('.text-6xl'); const lbls = rec.querySelectorAll('.text-xs');
+                    stats.forEach((stat, i) => { copyContent += `${lbls[i].innerText}: ${stat.innerText}\n`; });
+                }
+                if (copyToClipboard(copyContent)) { showStatus(document.getElementById('copyTableButton')); }
+            };
 
-        document.getElementById('lang-ar').onclick = () => { currentLang = 'ar'; updateUI(); renderScaleGroups(); };
-        document.getElementById('lang-en').onclick = () => { currentLang = 'en'; updateUI(); renderScaleGroups(); };
+            document.getElementById('exportButton').onclick = () => {
+                const d = languageData[currentLang];
+                const wb = XLSX.utils.book_new(); let allD = [[d.title], [d.devCredit], []];
+                document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(s => {
+                    allD.push([sanitizeValue(s.querySelector('h2').innerText)]);
+                    const tbl = s.querySelector('table');
+                    if (tbl) tbl.querySelectorAll('tr').forEach(tr => {
+                        let r = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); let val = c.innerText.trim(); if (val.endsWith('%')) { let num = parseFloat(val.replace('%', '')); r.push(isNaN(num) ? val : num); } else { r.push(sanitizeValue(val)); } for(let k=1; k < cs; k++) r.push(""); });
+                        allD.push(r);
+                    });
+                    const box = s.querySelector('.suggestion-box'); if (box) allD.push([sanitizeValue(box.innerText)]);
+                    allD.push([]);
+                });
+                document.querySelectorAll('#positiveNegativeItemsContainer > div').forEach(box => {
+                    const h4 = box.querySelector('h4'); if (h4) { allD.push([sanitizeValue(h4.innerText)]); box.querySelectorAll('li').forEach(li => allD.push(["-", sanitizeValue(li.innerText)])); allD.push([]); }
+                });
+                const rec = document.querySelector('#finalRecommendationContainer div');
+                if (rec) {
+                    const h2 = rec.querySelector('h2'); if (h2) allD.push([sanitizeValue(h2.innerText)]);
+                    const stats = rec.querySelectorAll('.text-6xl'); const lbls = rec.querySelectorAll('.text-xs');
+                    stats.forEach((stat, i) => { let val = stat.innerText.replace('%', ''); allD.push([sanitizeValue(lbls[i].innerText), isNaN(parseFloat(val)) ? val : parseFloat(val)]); });
+                }
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(allD), "Analysis");
+                XLSX.writeFile(wb, `Survey_Report.xlsx`);
+            };
 
-        updateUI();
-    });
+            document.getElementById('lang-ar').onclick = () => { currentLang = 'ar'; updateUI(); renderScaleGroups(); };
+            document.getElementById('lang-en').onclick = () => { currentLang = 'en'; updateUI(); renderScaleGroups(); };
+
+            updateUI();
+        });
     </script>
 </body>
 </html>
