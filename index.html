@@ -50,21 +50,77 @@
         [dir="rtl"] .nav-tooltip { left: 55px; }
         [dir="ltr"] .nav-tooltip { right: 55px; }
         .nav-dot:hover .nav-tooltip { opacity: 1; }
+        
+        /* ------------------------------------------------------------- */
+        /* --- OPTIMIZED PRINT MEDIA QUERY FOR FITTING EVERYTHING --- */
+        /* ------------------------------------------------------------- */
         @media print {
-            @page { size: A4; margin: 15mm; }
-            body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 11pt !important; }
+            @page { size: A4 portrait; margin: 10mm; }
+            body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 10pt !important; }
+            
+            /* Hide UI elements not meant for print */
             .input-card, #langToggle, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .flex.justify-between.items-start.mb-8 { display: none !important; }
-            main { box-shadow: none !important; padding: 0 !important; background-color: transparent !important; max-width: 100% !important; margin: 0 !important; }
-            #mainTitle { font-size: 24pt !important; font-weight: 900 !important; margin-bottom: 5mm !important; text-align: center !important; }
-            #instituteTitle { font-size: 14pt !important; text-align: center !important; margin-bottom: 10mm !important; }
-            #fileNameDisplay { font-size: 18pt !important; display: block !important; margin-bottom: 5mm !important; text-align: center !important; }
-            .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper, #positiveNegativeItemsContainer > div, #finalRecommendationContainer > div, #chartContainer > div { break-inside: avoid !important; page-break-inside: avoid !important; margin-bottom: 10mm !important; border: 1px solid #ddd !important; padding: 10mm !important; }
-            .copy-btn-wrapper { display: none !important; }
+            main { box-shadow: none !important; padding: 0 !important; background-color: transparent !important; max-width: 100% !important; margin: 0 !important; border: none !important; }
+            
+            /* Titles and Headers */
+            #mainTitle { font-size: 20pt !important; font-weight: 900 !important; margin-bottom: 5mm !important; text-align: center !important; }
+            #instituteTitle { font-size: 12pt !important; text-align: center !important; margin-bottom: 10mm !important; }
+            #fileNameDisplay { font-size: 16pt !important; display: block !important; margin-bottom: 5mm !important; text-align: center !important; }
+            
+            h2 { font-size: 14pt !important; padding: 4pt !important; margin-bottom: 4pt !important; }
+            h3, h4 { font-size: 12pt !important; margin-bottom: 4pt !important; }
+
+            /* General Prevent Breaks */
+            .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper, #finalRecommendationContainer > div {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                margin-bottom: 8mm !important;
+                border: 1pt solid #cbd5e1 !important;
+                padding: 5mm !important;
+                border-radius: 12pt !important;
+                box-shadow: none !important;
+            }
+
+            /* 2-Column Layout Forces (Highlights, Final Rec, Charts) */
+            #positiveNegativeItemsContainer, #chartContainer, #finalRecommendationContainer > div > .grid {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                gap: 2% !important;
+                justify-content: space-between !important;
+                align-items: stretch !important;
+            }
+            
+            #positiveNegativeItemsContainer > div, #chartContainer > div, #finalRecommendationContainer > div > .grid > div {
+                width: 49% !important;
+                box-sizing: border-box !important;
+                margin-bottom: 10px !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                border: 1pt solid #cbd5e1 !important;
+                padding: 4mm !important;
+                border-radius: 12pt !important;
+            }
+            
+            /* Shrink massive text and charts */
+            .text-6xl { font-size: 22pt !important; line-height: 1 !important; }
+            .h-96 { height: 200px !important; } 
+            
+            /* Table Optimization to fit on Page */
             table { width: 100% !important; border-collapse: collapse !important; }
-            th, td { border: 1px solid #000 !important; padding: 6pt !important; }
+            th, td { border: 1pt solid #94a3b8 !important; padding: 4pt !important; font-size: 8.5pt !important; word-break: break-word; }
+            th { background-color: #f1f5f9 !important; font-weight: 900 !important; }
+            
+            /* Give fixed width limits to prevent horizontal overflow */
+            table th:nth-child(1), table td:nth-child(1) { width: 5% !important; text-align: center !important; }
+            table th:nth-child(2), table td:nth-child(2) { width: 40% !important; }
+            
+            /* Ensure background colors and styling prints correctly */
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+            
+            /* Cleanup */
+            .copy-btn-wrapper { display: none !important; }
         }
-        .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="p-4 md:p-12 text-right" dir="rtl">
