@@ -924,18 +924,44 @@
                                 type: 'bar', 
                                 data: { 
                                     labels: groupData.options, 
-                                    datasets: [{ data: dataVals, backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], borderRadius: 8 }] 
+                                    datasets: [{ 
+                                        data: dataVals, 
+                                        backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], 
+                                        borderRadius: 8,
+                                        maxBarThickness: 70 /* يمنع تمدد الأعمدة بشكل مبالغ فيه */
+                                    }] 
                                 }, 
                                 options: { 
                                     animation: false, 
                                     maintainAspectRatio: false, 
                                     responsive: true,
+                                    layout: {
+                                        padding: {
+                                            top: 35 /* هامش علوي داخل الرسم لضمان ظهور نسبة 100% بوضوح */
+                                        }
+                                    },
                                     scales: {
-                                        y: { beginAtZero: true, grace: '10%' }
+                                        y: { 
+                                            beginAtZero: true, 
+                                            grace: '5%',
+                                            ticks: {
+                                                font: { weight: '900', family: 'Cairo', size: 12 } /* خط عريض ومقروء للمحور الصادي */
+                                            }
+                                        },
+                                        x: {
+                                            ticks: {
+                                                font: { weight: '900', family: 'Cairo', size: 14 } /* خط عريض ومقروء للمحور السيني */
+                                            }
+                                        }
                                     },
                                     plugins: { 
                                         legend: { display: false }, 
-                                        datalabels: { anchor: 'end', align: 'top', font: { weight: 'bold' }, formatter: v => v+'%' } 
+                                        datalabels: { 
+                                            anchor: 'end', 
+                                            align: 'top', 
+                                            font: { weight: '900', size: 14, family: 'Cairo' }, /* خط عريض للنسب فوق الأعمدة */
+                                            formatter: v => v+'%' 
+                                        } 
                                     } 
                                 } 
                             }));
