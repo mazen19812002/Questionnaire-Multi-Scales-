@@ -61,7 +61,7 @@
             
             /* Logos Header Fix */
             .flex.justify-between.items-start.mb-8 { display: flex !important; margin-bottom: 5mm !important; align-items: center !important; }
-            .flex.justify-between.items-start.mb-8 img { height: 60px !important; width: 60px !important; box-shadow: none !important; border: none !important; padding: 0 !important; }
+            .flex.justify-between.items-start.mb-8 img { height: 60px !important; width: 60px !important; box-shadow: none !important; border: none !important; padding: 0 !important; display: block !important; }
 
             /* Titles and Headers */
             #mainTitle { font-size: 18pt !important; font-weight: 900 !important; margin-bottom: 2mm !important; text-align: center !important; }
@@ -78,6 +78,7 @@
                 border-radius: 6pt !important;
                 box-shadow: none !important;
                 padding: 0 !important; 
+                background-color: white !important;
             }
             .domain-result-wrapper h2, .summary-table-wrapper h2, .suggestion-wrapper h2 { padding: 4mm !important; background-color: #f8fafc !important; border-bottom: 1pt solid #cbd5e1 !important; margin: 0 !important; border-top-left-radius: 6pt !important; border-top-right-radius: 6pt !important; }
             .suggestion-wrapper .p-8 { padding: 4mm !important; }
@@ -90,24 +91,45 @@
             #positiveNegativeItemsContainer > div { width: 49% !important; box-sizing: border-box !important; margin-bottom: 5mm !important; border: 1pt solid #cbd5e1 !important; padding: 4mm !important; border-radius: 6pt !important; background-color: #f8fafc !important; }
             
             /* ========================================= */
-            /* CHARTS PRINT FIX */
+            /* STRICT CHARTS PRINT CAGE FIX */
             /* ========================================= */
             #chartContainer { display: flex !important; flex-wrap: wrap !important; gap: 2% !important; justify-content: space-between !important; }
-            #chartContainer > div { width: 49% !important; page-break-inside: avoid !important; break-inside: avoid !important; border: 1pt solid #cbd5e1 !important; padding: 4mm !important; border-radius: 6pt !important; margin-bottom: 5mm !important;}
+            #chartContainer > div { 
+                width: 48% !important; 
+                min-width: 300px !important; /* يمنع انهيار مساحة الرسم البياني للصفر أثناء الطباعة */
+                page-break-inside: avoid !important; 
+                break-inside: avoid !important; 
+                border: 1pt solid #cbd5e1 !important; 
+                padding: 4mm !important; 
+                border-radius: 6pt !important; 
+                margin-bottom: 5mm !important;
+                background-color: white !important;
+            }
+            
+            /* Caging the canvas heavily for print */
+            #chartContainer .relative {
+                height: 220px !important;
+                max-height: 220px !important;
+                width: 100% !important;
+            }
+            canvas {
+                max-width: 100% !important;
+                height: 100% !important;
+            }
             /* ========================================= */
             
             /* FINAL RECOMMENDATION FIXES */
             #finalRecommendationContainer { page-break-inside: avoid !important; break-inside: avoid !important; margin-top: 5mm !important; }
-            #finalRecommendationContainer > div { padding: 6mm !important; border: 1.5pt solid #818cf8 !important; border-radius: 10pt !important; box-shadow: none !important; }
+            #finalRecommendationContainer > div { padding: 6mm !important; border: 1.5pt solid #818cf8 !important; border-radius: 10pt !important; box-shadow: none !important; background-color: white !important; }
             #finalRecommendationContainer h2 { font-size: 16pt !important; margin-bottom: 4mm !important; border-bottom: 1pt solid #e0e7ff !important; padding-bottom: 2mm !important; background-color: transparent !important; }
             #finalRecommendationContainer > div > .grid { display: flex !important; flex-direction: row !important; gap: 4% !important; justify-content: center !important; }
-            #finalRecommendationContainer > div > .grid > div { width: 48% !important; padding: 4mm !important; border-radius: 6pt !important; border: 1pt solid #cbd5e1 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; }
+            #finalRecommendationContainer > div > .grid > div { width: 48% !important; padding: 4mm !important; border-radius: 6pt !important; border: 1pt solid #cbd5e1 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; background-color: #f8fafc !important; }
             #finalRecommendationContainer .text-6xl { font-size: 24pt !important; line-height: 1.2 !important; margin-top: 2mm !important; }
             #finalRecommendationContainer .text-xs { font-size: 10pt !important; }
             
             /* Table Optimization to fit on Page and Break Cleanly */
             .overflow-x-auto { overflow: visible !important; } /* Fixes horizontal clipping */
-            table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; margin: 0 !important; }
+            table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; margin: 0 !important; background-color: white !important; }
             thead { display: table-header-group !important; } /* Repeats headers on new pages */
             tfoot { display: table-row-group !important; } /* Prevents overlapping text bugs at page bottom */
             tr { page-break-inside: avoid !important; break-inside: avoid !important; } /* Prevents cutting a single row in half */
@@ -908,9 +930,9 @@
                             const divC = document.createElement('div');
                             divC.className = 'bg-white p-6 rounded-[2rem] shadow-xl border-2 border-blue-100 flex flex-col items-center';
                             
-                            // Remove inline height styling so it scales correctly according to Aspect Ratio
+                            // USING A STRICT HEIGHT WRAPPER FOR BOTH SCREEN AND PRINT TO PREVENT ANY CROP/DISTORTION
                             divC.innerHTML = `<h3 class="text-xl font-black mb-4 text-center text-indigo-900">${dName}</h3>
-                                              <div class="w-full relative">
+                                              <div class="w-full relative flex-grow" style="height: 250px; max-height: 250px;">
                                                   <canvas id="${canvasId}"></canvas>
                                               </div>`;
                             document.getElementById('chartContainer').appendChild(divC);
@@ -925,33 +947,41 @@
                                     datasets: [{ 
                                         data: dataVals, 
                                         backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], 
-                                        borderRadius: 8,
-                                        maxBarThickness: 70 /* يمنع تمدد الأعمدة بشكل مبالغ فيه */
+                                        borderRadius: 4, // زوايا أقل انحناء للأعمدة الرفيعة
+                                        maxBarThickness: 25, // أعمدة أرفع بكثير وأكثر أناقة
+                                        barPercentage: 0.6 // تضمن عدم احتلال الأعمدة لمساحة الفئة بالكامل
                                     }] 
                                 }, 
                                 options: { 
                                     animation: false, 
-                                    maintainAspectRatio: true, /* تفعيل التناسب التلقائي للإصلاح الجذري */
-                                    aspectRatio: 1.4, /* تحديد نسبة أبعاد ثابتة تجعل الرسم دائماً متناسق */
+                                    maintainAspectRatio: false, // الاعتماد الكامل على الارتفاع الثابت (250px)
                                     responsive: true,
+                                    devicePixelRatio: 2, // رفع دقة الرسم لمنع التشوه عند تحويله لـ PDF
+                                    locale: 'ar-EG', // إجبار الحسابات على السياق العربي
+                                    rtl: true, // إجبار خاصية RTL بشكل صريح في إعدادات اللوحة لمنع تداخل المحاور أثناء الطباعة
                                     layout: {
                                         padding: {
-                                            top: 35 /* هامش علوي داخل الرسم لضمان ظهور نسبة 100% بوضوح */
+                                            top: 30, 
+                                            bottom: 10,
+                                            left: 10,
+                                            right: 10
                                         }
                                     },
                                     scales: {
                                         y: { 
                                             beginAtZero: true, 
-                                            grace: '10%',
-                                            position: 'right', /* وضع المحور على اليمين لمنع تخبطه في المنتصف */
+                                            grace: '15%', // زيادة السماحية العلوية
+                                            position: 'right', // إجبار المحور على البقاء يميناً
                                             ticks: {
-                                                font: { weight: '900', family: 'Cairo', size: 12 } /* خط عريض ومقروء للمحور الصادي */
+                                                font: { weight: '900', family: 'Cairo', size: 11 } 
                                             }
                                         },
                                         x: {
+                                            grid: { display: false }, // إخفاء خطوط الشبكة السينية لشكل أنظف
                                             ticks: {
-                                                font: { weight: '900', family: 'Cairo', size: 12 }, /* خط عريض ومقروء للمحور السيني وتصغيره قليلاً لمنع التداخل */
-                                                autoSkip: false /* ضمان ظهور جميع الكلمات في المحور السفلي */
+                                                font: { weight: '900', family: 'Cairo', size: 10 },
+                                                autoSkip: false, // إجبار المتصفح على عدم تخطي أو إخفاء أي تسمية
+                                                maxRotation: 0 // إبقاء النصوص مسطحة لتجنب التداخل العشوائي
                                             }
                                         }
                                     },
@@ -960,7 +990,7 @@
                                         datalabels: { 
                                             anchor: 'end', 
                                             align: 'top', 
-                                            font: { weight: '900', size: 14, family: 'Cairo' }, /* خط عريض للنسب فوق الأعمدة */
+                                            font: { weight: '900', size: 11, family: 'Cairo' }, 
                                             formatter: v => v+'%' 
                                         } 
                                     } 
