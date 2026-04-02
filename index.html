@@ -71,7 +71,7 @@
                 margin-bottom: 0 !important; 
             }
             .flex.justify-between.items-start.mb-8 img { 
-                height: 105px !important; /* Triple size */
+                height: 105px !important; 
                 width: 105px !important; 
                 box-shadow: none !important; 
                 border: none !important; 
@@ -88,7 +88,7 @@
                 margin-bottom: 2mm !important; 
                 text-align: center !important; 
                 line-height: 1.2 !important; 
-                padding-top: 6mm !important; /* Push down vertically */
+                padding-top: 6mm !important; 
                 margin-top: 0 !important;
             }
             #instituteTitle { 
@@ -212,11 +212,11 @@
                 padding-top: 3mm !important;
                 padding-left: 10mm !important;
                 padding-right: 10mm !important;
-                padding-bottom: 10mm !important; /* مسافة سفلية إجبارية تمنع المتصفح من قص الأسماء في نهاية الورقة */
+                padding-bottom: 10mm !important; 
                 font-size: 11pt !important;
             }
             #signatureSection .text-center { display: flex !important; flex-direction: column !important; align-items: center !important; }
-            #signatureSection .sig-space { height: 12mm !important; width: 100% !important; display: block !important; } /* مساحة مخصصة للتوقيع اليدوي في الطباعة */
+            #signatureSection .sig-space { height: 12mm !important; width: 100% !important; display: block !important; } 
             #signatureSection p { margin-bottom: 0 !important; display: block !important; color: black !important; }
             
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
@@ -370,7 +370,7 @@
             <div class="mb-6 relative">
                 <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 hidden font-black uppercase text-center mb-4"></p>
                 
-                <!-- القسم الجديد: البرنامج والمشاركين في أقصى اليسار -->
+                <!-- القسم الخاص: البرنامج والمشاركين في أقصى اليسار -->
                 <div id="metaInfoDisplay" class="hidden flex justify-end gap-4 text-lg font-black w-full">
                     <div class="bg-indigo-50 text-indigo-800 px-4 py-2 rounded-xl border border-indigo-100 flex items-center">
                         <span id="participantCountDisplay"></span>
@@ -424,7 +424,7 @@
                 pos: 'إيجابي',
                 copied: 'تم النسخ!',
                 emptyList: 'لا توجد بنود',
-                headers: { no: '#', item: 'بيان البند', checkTotal: 'إجمالي الصف (%)', total: 'الإجمالي (%)', positives: 'إيجيات (%)', footer: 'المتوسط' },
+                headers: { no: '#', item: 'بيان البند', checkTotal: 'إجمالي الصف (%)', total: 'الإجمالي (%)', positives: 'إيجابيات (%)', footer: 'المتوسط' },
                 strengths: '★ نقاط القوة الأساسية',
                 improvement: '⚠️ مجالات التحسين الحرجة',
                 recommendation: 'التوصية النهائية',
@@ -518,11 +518,12 @@
         function renderScaleGroups() {
             const container = document.getElementById('scaleGroupsContainer');
             container.innerHTML = '';
-            identifiedScaleGroups.forEach((group, sig) => {
+            identifiedScaleGroups.forEach((group, domainName) => {
                 if (group.isSuggestion) return;
                 const wrap = document.createElement('div');
                 wrap.className = 'bg-white p-4 rounded-2xl border-2 border-blue-200 shadow-md hover-zoom';
-                wrap.innerHTML = `<h3 class="font-black text-indigo-900 uppercase tracking-tighter text-lg mb-3 pr-2">${languageData[currentLang].groupLabel}: ${group.options.join(', ')}</h3><div class="scale-list space-y-2 font-black" data-sig="${sig}"></div>`;
+                // تم تعديل العنوان ليعرض اسم المحور المرتبط بهذه المقاييس
+                wrap.innerHTML = `<h3 class="font-black text-indigo-900 uppercase tracking-tighter text-lg mb-3 pr-2">محور: ${domainName}</h3><div class="scale-list space-y-2 font-black" data-sig="${domainName}"></div>`;
                 const list = wrap.querySelector('.scale-list');
                 group.options.forEach((opt, idx) => {
                     const item = document.createElement('div');
@@ -530,10 +531,10 @@
                     item.draggable = true;
                     item.innerHTML = `<span class="font-bold text-slate-900">${opt}</span><label class="flex items-center cursor-pointer font-black"><input type="checkbox" class="w-5 h-5 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="mr-2 text-xs font-black text-indigo-800">${languageData[currentLang].pos}</span></label>`;
                     item.querySelector('input').onchange = (e) => e.target.checked ? group.positives.add(opt) : group.positives.delete(opt);
-                    item.ondragstart = (e) => { e.dataTransfer.setData('idx', idx); e.dataTransfer.setData('sig', sig); };
+                    item.ondragstart = (e) => { e.dataTransfer.setData('idx', idx); e.dataTransfer.setData('sig', domainName); };
                     item.ondragover = (e) => e.preventDefault();
                     item.ondrop = (e) => {
-                        const fromIdx = e.dataTransfer.getData('idx'); if(e.dataTransfer.getData('sig') !== sig) return;
+                        const fromIdx = e.dataTransfer.getData('idx'); if(e.dataTransfer.getData('sig') !== domainName) return;
                         const moved = group.options.splice(fromIdx, 1)[0]; group.options.splice(idx, 0, moved); renderScaleGroups();
                     };
                     list.appendChild(item);
@@ -846,7 +847,8 @@
 
             document.getElementById('confirmMappingBtn').onclick = () => {
                 if (!rawExcelData) return;
-                identifiedScaleGroups.clear(); itemToScaleGroup.clear();
+                identifiedScaleGroups.clear(); 
+                
                 const filterColIdx = parseInt(document.getElementById('filterColSelect').value);
                 const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
                 
@@ -891,52 +893,58 @@
                     dropdown.appendChild(item);
                 });
 
-                /* --- NEW ADVANCED SCALE MERGING LOGIC --- */
-                for (let col = startColIdx; col < rawExcelData[0].length; col++) {
-                    const resps = [];
+                /* --- DOMAIN-BASED ISOLATED SCALE LOGIC --- */
+                const headers = rawExcelData[0];
+                
+                for (let col = startColIdx; col < headers.length; col++) {
+                    const headerStr = String(headers[col] || "").trim();
+                    const matchFull = headerStr.match(/(.+) \[(.+)\]/);
+                    const matchBracket = headerStr.match(/^\[(.+)\]$/);
+
+                    let dName = "";
+                    let iName = "";
+
+                    if (matchFull) {
+                        dName = matchFull[1].trim();
+                        iName = matchFull[2].trim();
+                    } else if (matchBracket) {
+                        dName = "الأسئلة المستقلة";
+                        iName = matchBracket[1].trim();
+                    } else {
+                        dName = headerStr; // Standalone becomes its own domain
+                        iName = headerStr;
+                    }
+
+                    if (!identifiedScaleGroups.has(dName)) {
+                        identifiedScaleGroups.set(dName, {
+                            options: new Set(),
+                            positives: new Set(),
+                            cols: [],
+                            items: [],
+                            isSuggestion: false
+                        });
+                    }
+
+                    const group = identifiedScaleGroups.get(dName);
+                    group.cols.push(col);
+                    group.items.push(iName);
+
+                    // Extract unique responses from all rows strictly for this specific domain's columns
                     for (let r = 1; r < rawExcelData.length; r++) {
                         const val = String(rawExcelData[r][col] || "").trim();
-                        if (val !== "") resps.push(val);
+                        if (val !== "") {
+                            group.options.add(val);
+                        }
                     }
-                    const opts = new Set(resps);
-                    if (opts.size > 0) {
-                        const isSugg = opts.size > 5;
-                        
-                        if (isSugg) {
-                            const sigStr = 'sugg_' + col;
-                            identifiedScaleGroups.set(sigStr, { options: [], positives: new Set(), isSuggestion: true });
-                            itemToScaleGroup.set(col, sigStr);
-                            continue;
-                        }
+                }
 
-                        let matchedSig = null;
-                        let maxOverlap = 0;
-                        
-                        for (const [sig, group] of identifiedScaleGroups.entries()) {
-                            if (group.isSuggestion) continue;
-                            let overlap = 0;
-                            for (const opt of opts) {
-                                if (group.options.includes(opt)) overlap++;
-                            }
-                            if (overlap > maxOverlap) {
-                                maxOverlap = overlap;
-                                matchedSig = sig;
-                            }
-                        }
-
-                        if (matchedSig && maxOverlap > 0) {
-                            const group = identifiedScaleGroups.get(matchedSig);
-                            for (const opt of opts) {
-                                if (!group.options.includes(opt)) {
-                                    group.options.push(opt);
-                                }
-                            }
-                            itemToScaleGroup.set(col, matchedSig);
-                        } else {
-                            const sigStr = 'scale_' + col;
-                            identifiedScaleGroups.set(sigStr, { options: Array.from(opts), positives: new Set(), isSuggestion: false });
-                            itemToScaleGroup.set(col, sigStr);
-                        }
+                // Post-process the domains to finalize the scales
+                for (const [dName, group] of identifiedScaleGroups.entries()) {
+                    group.options = Array.from(group.options);
+                    // AI Suggestion heuristic: if too many unique options exist in the domain
+                    if (group.options.length > 12 || (group.cols.length === 1 && group.options.length > 6)) {
+                        group.isSuggestion = true;
+                        group.options = [];
                     }
                 }
                 
@@ -964,10 +972,8 @@
                     rows = rows.filter(r => r && selectedDepts.has(String(r[filterColIdx] || "").trim()));
                 }
                 
-                // إضافة عدد المشاركين
                 document.getElementById('participantCountDisplay').textContent = `${rows.length} ${languageData[currentLang].participants}`;
                 
-                // إضافة البرنامج الذي تم فلترته للرأسية
                 let programText = '';
                 if (selectedDepts.size === 0) {
                     programText = languageData[currentLang].allInstitute;
@@ -976,150 +982,115 @@
                 }
                 document.getElementById('programNameText').textContent = programText;
                 
-                // إظهار اللوحة العلوية المحدثة
                 document.getElementById('metaInfoDisplay').classList.remove('hidden');
 
                 const headers = rawExcelData[0];
-                const processedCols = new Set();
 
-                for (let col = startColIdx; col < headers.length; col++) {
-                    if (processedCols.has(col)) continue;
-                    const sigLocal = itemToScaleGroup.get(col);
-                    if (!sigLocal) continue;
-                    const groupData = identifiedScaleGroups.get(sigLocal);
-                    if (!groupData) continue;
-
+                /* --- ITERATE STRICTLY BY DOMAINS --- */
+                for (const [domainName, groupData] of identifiedScaleGroups.entries()) {
                     if (groupData.isSuggestion) {
-                        await renderAISuggestionBox(headers[col], rows.map(r => r[col]));
-                        processedCols.add(col);
-                    } else {
-                        const headerStr = String(headers[col]).trim();
-                        const matchFull = headerStr.match(/(.+) \[(.+)\]/);
-                        const matchBracket = headerStr.match(/^\[(.+)\]$/);
-
-                        let dName = "";
-                        let itemsInDomain = [];
-
-                        if (matchFull) {
-                            dName = matchFull[1].trim();
-                            for (let c2 = col; c2 < headers.length; c2++) {
-                                if (processedCols.has(c2)) continue;
-                                const m2 = String(headers[c2]).trim().match(/(.+) \[(.+)\]/);
-                                if (m2 && m2[1].trim() === dName && itemToScaleGroup.get(c2) === sigLocal) {
-                                    itemsInDomain.push({txt: headers[c2], item: m2[2].trim(), colIdx: c2});
-                                    processedCols.add(c2);
-                                }
-                            }
-                        } else if (matchBracket) {
-                            dName = "الأسئلة المستقلة"; 
-                            for (let c2 = col; c2 < headers.length; c2++) {
-                                if (processedCols.has(c2)) continue;
-                                const h2Str = String(headers[c2]).trim();
-                                const m2 = h2Str.match(/^\[(.+)\]$/);
-                                if (m2 && itemToScaleGroup.get(c2) === sigLocal) {
-                                    itemsInDomain.push({txt: headers[c2], item: m2[1].trim(), colIdx: c2});
-                                    processedCols.add(c2);
-                                } else {
-                                    break; 
-                                }
-                            }
+                        for (const col of groupData.cols) {
+                            await renderAISuggestionBox(headers[col], rows.map(r => r[col]));
                         }
-
-                        if (itemsInDomain.length > 0) {
-                            const rowsData = itemsInDomain.map(idom => {
-                                const rps = rows.map(r => r[idom.colIdx]);
-                                const freqs = {}; groupData.options.forEach(o => freqs[o] = 0);
-                                let posCount = 0;
-                                rps.forEach(r => { const tr = String(r || "").trim(); if (freqs[tr] !== undefined) freqs[tr]++; if (groupData.positives.has(tr)) posCount++; });
-                                const res = { item: idom.item, freqs, total: rps.length, posPerc: rps.length ? (posCount/rps.length)*100 : 0, originalIdx: idom.colIdx - startColIdx + 1 };
-                                allItemsList.push(res); return res;
-                            });
-
-                            renderTable(dName, rowsData, groupData.options, groupData.positives);
-                            
-                            const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
-                            const divC = document.createElement('div');
-                            divC.className = 'bg-white p-4 rounded-2xl shadow-xl border border-blue-100 flex flex-col items-center';
-                            
-                            // USING A STRICT HEIGHT WRAPPER FOR BOTH SCREEN AND PRINT TO PREVENT ANY CROP/DISTORTION
-                            divC.innerHTML = `<h3 class="text-lg font-black mb-3 text-center text-indigo-900">${dName}</h3>
-                                              <div class="w-full relative flex-grow" style="height: 250px; max-height: 250px;">
-                                                  <canvas id="${canvasId}"></canvas>
-                                              </div>`;
-                            document.getElementById('chartContainer').appendChild(divC);
-                            
-                            const ctx = document.getElementById(canvasId).getContext('2d');
-                            const dataVals = groupData.options.map(o => { const sum = rowsData.reduce((s, r) => s + r.freqs[o], 0); const total = rowsData.reduce((s, r) => s + r.total, 0); return total ? (sum/total*100).toFixed(1) : 0; });
-                            
-                            chartInstances.push(new Chart(ctx, { 
-                                type: 'bar', 
-                                data: { 
-                                    labels: groupData.options, 
-                                    datasets: [{ 
-                                        data: dataVals, 
-                                        backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], 
-                                        borderRadius: 4, 
-                                        maxBarThickness: 50, // تم مضاعفة السُمك ليصبح عريضاً وقوياً
-                                        barPercentage: 0.8 // زيادة المساحة المتاحة للعمود
-                                    }] 
-                                }, 
-                                options: { 
-                                    animation: false, 
-                                    maintainAspectRatio: false, 
-                                    responsive: true,
-                                    devicePixelRatio: 2, 
-                                    locale: 'ar-EG', 
-                                    rtl: true, 
-                                    layout: {
-                                        padding: {
-                                            top: 30, 
-                                            bottom: 10,
-                                            left: 10,
-                                            right: 10
-                                        }
-                                    },
-                                    scales: {
-                                        y: { 
-                                            beginAtZero: true, 
-                                            grace: '15%', 
-                                            position: 'right', 
-                                            ticks: {
-                                                font: { weight: '900', family: 'Cairo', size: 11 } 
-                                            }
-                                        },
-                                        x: {
-                                            grid: { display: false }, 
-                                            ticks: {
-                                                font: { weight: '900', family: 'Cairo', size: 10 },
-                                                autoSkip: false, 
-                                                maxRotation: 0 
-                                            }
-                                        }
-                                    },
-                                    plugins: { 
-                                        legend: { display: false }, 
-                                        datalabels: { 
-                                            anchor: 'end', 
-                                            align: 'top', 
-                                            font: { weight: '900', size: 11, family: 'Cairo' }, 
-                                            formatter: v => v+'%' 
-                                        } 
-                                    } 
-                                } 
-                            }));
-                            
-                            const dFreqs = {}; groupData.options.forEach(o => dFreqs[o] = rowsData.reduce((s, r) => s + r.freqs[o], 0));
-                            summaryDataList.push({ name: dName, freqs: dFreqs, total: rowsData.reduce((s, r) => s + r.total, 0), positives: groupData.positives });
-                        } else {
+                    } else {
+                        // Calculate frequencies solely based on this domain's specific isolated scales
+                        const rowsData = groupData.cols.map((col, idx) => {
                             const rps = rows.map(r => r[col]);
                             const freqs = {}; groupData.options.forEach(o => freqs[o] = 0);
                             let posCount = 0;
-                            rps.forEach(r => { const tr = String(r || "").trim(); if (freqs[tr] !== undefined) freqs[tr]++; if (groupData.positives.has(tr)) posCount++; });
-                            const res = { item: headers[col], freqs, total: rps.length, posPerc: rps.length ? (posCount/rps.length)*100 : 0, originalIdx: col - startColIdx + 1 };
-                            allItemsList.push(res);
-                            renderTable(headers[col], [res], groupData.options, groupData.positives);
-                            processedCols.add(col);
-                        }
+                            rps.forEach(r => { 
+                                const tr = String(r || "").trim(); 
+                                if (freqs[tr] !== undefined) freqs[tr]++; 
+                                if (groupData.positives.has(tr)) posCount++; 
+                            });
+                            const res = { 
+                                item: groupData.items[idx], 
+                                freqs, 
+                                total: rps.length, 
+                                posPerc: rps.length ? (posCount/rps.length)*100 : 0, 
+                                originalIdx: col - startColIdx + 1 
+                            };
+                            allItemsList.push(res); 
+                            return res;
+                        });
+
+                        renderTable(domainName, rowsData, groupData.options, groupData.positives);
+                        
+                        const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
+                        const divC = document.createElement('div');
+                        divC.className = 'bg-white p-4 rounded-2xl shadow-xl border border-blue-100 flex flex-col items-center';
+                        
+                        divC.innerHTML = `<h3 class="text-lg font-black mb-3 text-center text-indigo-900">${domainName}</h3>
+                                          <div class="w-full relative flex-grow" style="height: 250px; max-height: 250px;">
+                                              <canvas id="${canvasId}"></canvas>
+                                          </div>`;
+                        document.getElementById('chartContainer').appendChild(divC);
+                        
+                        const ctx = document.getElementById(canvasId).getContext('2d');
+                        const dataVals = groupData.options.map(o => { 
+                            const sum = rowsData.reduce((s, r) => s + r.freqs[o], 0); 
+                            const total = rowsData.reduce((s, r) => s + r.total, 0); 
+                            return total ? (sum/total*100).toFixed(1) : 0; 
+                        });
+                        
+                        chartInstances.push(new Chart(ctx, { 
+                            type: 'bar', 
+                            data: { 
+                                labels: groupData.options, 
+                                datasets: [{ 
+                                    data: dataVals, 
+                                    backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], 
+                                    borderRadius: 4, 
+                                    maxBarThickness: 50, 
+                                    barPercentage: 0.8 
+                                }] 
+                            }, 
+                            options: { 
+                                animation: false, 
+                                maintainAspectRatio: false, 
+                                responsive: true,
+                                devicePixelRatio: 2, 
+                                locale: 'ar-EG', 
+                                rtl: true, 
+                                layout: {
+                                    padding: { top: 30, bottom: 10, left: 10, right: 10 }
+                                },
+                                scales: {
+                                    y: { 
+                                        beginAtZero: true, 
+                                        grace: '15%', 
+                                        position: 'right', 
+                                        ticks: { font: { weight: '900', family: 'Cairo', size: 11 } }
+                                    },
+                                    x: {
+                                        grid: { display: false }, 
+                                        ticks: {
+                                            font: { weight: '900', family: 'Cairo', size: 10 },
+                                            autoSkip: false, 
+                                            maxRotation: 0 
+                                        }
+                                    }
+                                },
+                                plugins: { 
+                                    legend: { display: false }, 
+                                    datalabels: { 
+                                        anchor: 'end', 
+                                        align: 'top', 
+                                        font: { weight: '900', size: 11, family: 'Cairo' }, 
+                                        formatter: v => v+'%' 
+                                    } 
+                                } 
+                            } 
+                        }));
+                        
+                        const dFreqs = {}; 
+                        groupData.options.forEach(o => dFreqs[o] = rowsData.reduce((s, r) => s + r.freqs[o], 0));
+                        summaryDataList.push({ 
+                            name: domainName, 
+                            freqs: dFreqs, 
+                            total: rowsData.reduce((s, r) => s + r.total, 0), 
+                            positives: groupData.positives 
+                        });
                     }
                 }
 
