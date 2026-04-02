@@ -322,7 +322,7 @@
                 <div class="text-center border-b border-blue-100 pb-4 mb-6">
                     <p id="step2Title" class="text-slate-900 font-black thin-title text-2xl uppercase">الخطوة 2: تعيين البيانات</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
                     <div class="flex flex-col">
                         <label id="labelFilterCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
                         <select id="filterColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
@@ -330,6 +330,10 @@
                     <div class="flex flex-col">
                         <label id="labelStartCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
                         <select id="analysisStartColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
+                    </div>
+                    <div class="flex flex-col">
+                        <label id="labelEndCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
+                        <select id="analysisEndColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
                     </div>
                 </div>
                 <div class="flex justify-center">
@@ -456,6 +460,8 @@
                 filterLabel: 'تصفية حسب القسم (اختيار متعدد)',
                 deptLabel: 'اختر عمود القسم',
                 startColLabel: 'ابدأ التحليل من عمود',
+                endColLabel: 'إلى عمود (اختياري)',
+                endColDefault: '-- حتى نهاية الملف --',
                 step3: 'الخطوة 3: ترتيب المقاييس',
                 step3Hint: 'قم بترتيب خيارات الإجابة (الأعلى في الأعلى).',
                 threshold: 'حد الإيجابيات (%):',
@@ -801,6 +807,7 @@
                 document.getElementById('confirmMappingBtn').textContent = d.confirm;
                 document.getElementById('labelFilterCol').textContent = d.deptLabel;
                 document.getElementById('labelStartCol').textContent = d.startColLabel;
+                document.getElementById('labelEndCol').textContent = d.endColLabel;
                 document.getElementById('labelDeptFilter').textContent = d.filterLabel;
                 document.getElementById('scaleOrderTitle').textContent = d.step3;
                 document.getElementById('scaleOrderSubtitle').textContent = d.step3Hint;
@@ -830,16 +837,33 @@
                 document.getElementById('fileNameDisplay').textContent = fileName;
                 document.getElementById('fileNameDisplay').classList.remove('hidden');
                 document.getElementById('dataConfigSection').classList.remove('hidden');
+                
+                function getColLetter(colIdx) {
+                    let letter = '';
+                    let temp = colIdx;
+                    while (temp >= 0) {
+                        letter = String.fromCharCode((temp % 26) + 65) + letter;
+                        temp = Math.floor(temp / 26) - 1;
+                    }
+                    return letter;
+                }
+
                 const fs = document.getElementById('filterColSelect');
                 const as = document.getElementById('analysisStartColSelect');
-                fs.innerHTML = ''; as.innerHTML = '';
+                const es = document.getElementById('analysisEndColSelect');
+                fs.innerHTML = ''; as.innerHTML = ''; es.innerHTML = '';
+                
+                es.add(new Option(languageData[currentLang].endColDefault, ""));
+
                 (rawExcelData[0] || []).forEach((h, i) => {
-                    const colLetter = i < 26 ? String.fromCharCode(65 + i) : `C${i+1}`;
+                    const colLetter = getColLetter(i);
                     fs.add(new Option(`${colLetter}: ${h || '---'}`, i));
                     as.add(new Option(`${colLetter}: ${h || '---'}`, i));
+                    es.add(new Option(`${colLetter}: ${h || '---'}`, i));
                 });
                 fs.value = Math.min(1, rawExcelData[0].length - 1); 
                 as.value = Math.min(2, rawExcelData[0].length - 1); 
+                es.value = "";
                 loadingMessage.classList.add('hidden');
             }
 
@@ -891,6 +915,7 @@
                 
                 const filterColIdx = parseInt(document.getElementById('filterColSelect').value);
                 const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
+                const endColVal = document.getElementById('analysisEndColSelect').value;
                 
                 const departments = new Set();
                 for (let r = 1; r < rawExcelData.length; r++) {
@@ -935,8 +960,9 @@
 
                 /* --- DOMAIN-BASED ISOLATED SCALE LOGIC --- */
                 const headers = rawExcelData[0];
+                const endColIdx = endColVal !== "" ? parseInt(endColVal) : headers.length - 1;
                 
-                for (let col = startColIdx; col < headers.length; col++) {
+                for (let col = startColIdx; col <= endColIdx; col++) {
                     const headerStr = String(headers[col] || "").trim();
                     const matchFull = headerStr.match(/(.+) \[(.+)\]/);
                     const matchBracket = headerStr.match(/^\[(.+)\]$/);
