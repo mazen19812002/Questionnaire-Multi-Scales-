@@ -71,7 +71,7 @@
             h2 { font-size: 13pt !important; padding: 4pt !important; margin-bottom: 0 !important; border: none !important; background-color: transparent !important; }
             h3, h4 { font-size: 12pt !important; margin-bottom: 4pt !important; }
 
-            /* General Wrappers: Remove padding/shadows to save space, let tables break pages naturally */
+            /* General Wrappers */
             .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper {
                 margin-bottom: 8mm !important;
                 border: 1pt solid #cbd5e1 !important;
@@ -90,22 +90,10 @@
             #positiveNegativeItemsContainer > div { width: 49% !important; box-sizing: border-box !important; margin-bottom: 5mm !important; border: 1pt solid #cbd5e1 !important; padding: 4mm !important; border-radius: 6pt !important; background-color: #f8fafc !important; }
             
             /* ========================================= */
-            /* CHARTS AND CANVAS OVERFLOW FIX FOR PRINT */
+            /* CHARTS PRINT FIX */
             /* ========================================= */
             #chartContainer { display: flex !important; flex-wrap: wrap !important; gap: 2% !important; }
             #chartContainer > div { width: 49% !important; page-break-inside: avoid !important; break-inside: avoid !important; border: 1pt solid #cbd5e1 !important; padding: 4mm !important; border-radius: 6pt !important; margin-bottom: 5mm !important;}
-            
-            /* Remove the fixed h-96 class in print to let it shrink to fit the canvas properly */
-            .h-96 { height: auto !important; }
-            
-            /* Force the canvas element to scale down like an image and stay strictly inside its box */
-            canvas {
-                max-width: 100% !important;
-                height: auto !important; 
-                max-height: 250px !important;
-                display: block !important;
-                margin: 0 auto !important;
-            }
             /* ========================================= */
             
             /* FINAL RECOMMENDATION FIXES */
@@ -445,7 +433,6 @@
             const avgPos = totalRes ? (domainPos / totalRes * 100).toFixed(1) : '0.0';
             const align = 'text-right';
             
-            // Build inner pieces to avoid nested template literals
             const thCells = opts.map(o => `<th class="p-6 text-center text-indigo-700 font-black">${o}</th>`).join('');
             
             let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black ${align}">${title}</h2>
@@ -920,13 +907,38 @@
                             
                             const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
                             const divC = document.createElement('div');
-                            divC.className = 'bg-white p-10 rounded-[2.5rem] shadow-xl border-2 border-blue-100 flex flex-col items-center h-full';
-                            divC.innerHTML = `<h3 class="text-2xl font-black mb-8 text-center text-indigo-900">${dName}</h3><div class="w-full h-96 flex justify-center items-center overflow-hidden"><canvas id="${canvasId}"></canvas></div>`;
+                            divC.className = 'bg-white p-6 rounded-[2rem] shadow-xl border-2 border-blue-100 flex flex-col items-center';
+                            
+                            // USING A FIXED INLINE HEIGHT SO CANVAS NEVER EXCEEDS IT
+                            divC.innerHTML = `<h3 class="text-xl font-black mb-4 text-center text-indigo-900">${dName}</h3>
+                                              <div class="w-full relative" style="height: 280px;">
+                                                  <canvas id="${canvasId}"></canvas>
+                                              </div>`;
                             document.getElementById('chartContainer').appendChild(divC);
                             
                             const ctx = document.getElementById(canvasId).getContext('2d');
                             const dataVals = groupData.options.map(o => { const sum = rowsData.reduce((s, r) => s + r.freqs[o], 0); const total = rowsData.reduce((s, r) => s + r.total, 0); return total ? (sum/total*100).toFixed(1) : 0; });
-                            chartInstances.push(new Chart(ctx, { type: 'bar', data: { labels: groupData.options, datasets: [{ data: dataVals, backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], borderRadius: 15 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', font: { weight: 'bold' }, formatter: v => v+'%' } } } }));
+                            
+                            // IMPORTANT: animation: false SOLVES THE PRINT OUT-OF-BOUNDS GLITCH
+                            chartInstances.push(new Chart(ctx, { 
+                                type: 'bar', 
+                                data: { 
+                                    labels: groupData.options, 
+                                    datasets: [{ data: dataVals, backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], borderRadius: 8 }] 
+                                }, 
+                                options: { 
+                                    animation: false, 
+                                    maintainAspectRatio: false, 
+                                    responsive: true,
+                                    scales: {
+                                        y: { beginAtZero: true, grace: '10%' }
+                                    },
+                                    plugins: { 
+                                        legend: { display: false }, 
+                                        datalabels: { anchor: 'end', align: 'top', font: { weight: 'bold' }, formatter: v => v+'%' } 
+                                    } 
+                                } 
+                            }));
                             
                             const dFreqs = {}; groupData.options.forEach(o => dFreqs[o] = rowsData.reduce((s, r) => s + r.freqs[o], 0));
                             summaryDataList.push({ name: dName, freqs: dFreqs, total: rowsData.reduce((s, r) => s + r.total, 0), positives: groupData.positives });
