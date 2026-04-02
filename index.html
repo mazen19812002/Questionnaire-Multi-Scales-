@@ -52,28 +52,57 @@
         /* --- OPTIMIZED PRINT MEDIA QUERY FOR FITTING EVERYTHING --- */
         /* ------------------------------------------------------------- */
         @media print {
-            @page { size: A4 portrait; margin: 5mm; } /* هوامش ضيقة جداً لتوفير المساحة */
-            body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 8pt !important; line-height: 1.1 !important; } /* ضغط النصوص والأسطر */
+            @page { size: A4 portrait; margin: 5mm; } 
+            body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 8pt !important; line-height: 1.1 !important; } 
             
             /* Hide UI elements and their invisible margins entirely */
             .max-w-4xl, #dataConfigSection, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .copy-btn-wrapper, #messageBoxModal { display: none !important; }
             
             main { box-shadow: none !important; padding: 0 !important; background-color: transparent !important; max-width: 100% !important; margin: 0 !important; border: none !important; }
             
-            /* Logos Header Fix - SUPER COMPACT */
-            .flex.justify-between.items-start.mb-8 { display: flex !important; margin-bottom: 0 !important; align-items: center !important; }
-            .flex.justify-between.items-start.mb-8 img { height: 35px !important; width: 35px !important; box-shadow: none !important; border: none !important; padding: 0 !important; display: block !important; }
+            /* Logos Header Fix - TRIPLE SIZE & TITLE BETWEEN */
+            .flex.justify-between.items-start.mb-8 { 
+                display: flex !important; 
+                position: absolute !important; 
+                top: 0 !important; 
+                left: 0 !important; 
+                right: 0 !important; 
+                align-items: flex-start !important; 
+                margin-bottom: 0 !important; 
+            }
+            .flex.justify-between.items-start.mb-8 img { 
+                height: 105px !important; /* Triple size */
+                width: 105px !important; 
+                box-shadow: none !important; 
+                border: none !important; 
+                padding: 0 !important; 
+                display: block !important; 
+                background: transparent !important;
+            }
 
-            /* Titles and Headers - SUPER COMPACT */
+            /* Titles and Headers - CENTERED BETWEEN LOGOS */
             .mb-6.relative { margin-bottom: 1mm !important; }
-            #mainTitle { font-size: 14pt !important; font-weight: 900 !important; margin-bottom: 0 !important; text-align: center !important; line-height: 1 !important; }
-            #instituteTitle { font-size: 9pt !important; text-align: center !important; margin-bottom: 2mm !important; line-height: 1 !important; }
+            #mainTitle { 
+                font-size: 22pt !important; 
+                font-weight: 900 !important; 
+                margin-bottom: 2mm !important; 
+                text-align: center !important; 
+                line-height: 1.2 !important; 
+                padding-top: 6mm !important; /* Push down vertically */
+                margin-top: 0 !important;
+            }
+            #instituteTitle { 
+                font-size: 13pt !important; 
+                text-align: center !important; 
+                margin-bottom: 12mm !important; 
+                line-height: 1.4 !important; 
+            }
             #fileNameDisplay { font-size: 11pt !important; display: block !important; margin-bottom: 2mm !important; text-align: center !important; line-height: 1 !important; }
             
             /* Meta Info (Program and Participants) - COMPACT & ALIGNED LEFT */
             #metaInfoDisplay { 
                 display: flex !important; 
-                justify-content: flex-end !important; /* يوجه العناصر لأقصى اليسار في اتجاه RTL */
+                justify-content: flex-end !important; 
                 gap: 2mm !important; 
                 margin-top: 1mm !important; 
                 margin-bottom: 2mm !important;
@@ -104,8 +133,8 @@
                 box-shadow: none !important;
                 padding: 0 !important; 
                 background-color: white !important;
-                overflow: visible !important; /* CRITICAL: Allows tables to break naturally and kills huge blank spaces */
-                page-break-inside: auto !important; /* Allow breaking inside the wrapper */
+                overflow: visible !important; 
+                page-break-inside: auto !important; 
             }
             .domain-result-wrapper h2, .summary-table-wrapper h2, .suggestion-wrapper h2 { padding: 1mm 2mm !important; background-color: #f8fafc !important; border-bottom: 1pt solid #cbd5e1 !important; margin: 0 !important; border-top-left-radius: 4pt !important; border-top-right-radius: 4pt !important; }
             .suggestion-wrapper .p-4 { padding: 1mm !important; }
@@ -395,7 +424,7 @@
                 pos: 'إيجابي',
                 copied: 'تم النسخ!',
                 emptyList: 'لا توجد بنود',
-                headers: { no: '#', item: 'بيان البند', checkTotal: 'إجمالي الصف (%)', total: 'الإجمالي (%)', positives: 'إيجابيات (%)', footer: 'المتوسط' },
+                headers: { no: '#', item: 'بيان البند', checkTotal: 'إجمالي الصف (%)', total: 'الإجمالي (%)', positives: 'إيجيات (%)', footer: 'المتوسط' },
                 strengths: '★ نقاط القوة الأساسية',
                 improvement: '⚠️ مجالات التحسين الحرجة',
                 recommendation: 'التوصية النهائية',
