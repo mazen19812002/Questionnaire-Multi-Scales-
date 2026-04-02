@@ -522,7 +522,6 @@
                 if (group.isSuggestion) return;
                 const wrap = document.createElement('div');
                 wrap.className = 'bg-white p-4 rounded-2xl border-2 border-blue-200 shadow-md hover-zoom';
-                // تم تعديل العنوان ليعرض اسم المحور المرتبط بهذه المقاييس
                 wrap.innerHTML = `<h3 class="font-black text-indigo-900 uppercase tracking-tighter text-lg mb-3 pr-2">محور: ${domainName}</h3><div class="scale-list space-y-2 font-black" data-sig="${domainName}"></div>`;
                 const list = wrap.querySelector('.scale-list');
                 group.options.forEach((opt, idx) => {
@@ -911,7 +910,7 @@
                         dName = "الأسئلة المستقلة";
                         iName = matchBracket[1].trim();
                     } else {
-                        dName = headerStr; // Standalone becomes its own domain
+                        dName = headerStr; 
                         iName = headerStr;
                     }
 
@@ -929,7 +928,6 @@
                     group.cols.push(col);
                     group.items.push(iName);
 
-                    // Extract unique responses from all rows strictly for this specific domain's columns
                     for (let r = 1; r < rawExcelData.length; r++) {
                         const val = String(rawExcelData[r][col] || "").trim();
                         if (val !== "") {
@@ -938,10 +936,8 @@
                     }
                 }
 
-                // Post-process the domains to finalize the scales
                 for (const [dName, group] of identifiedScaleGroups.entries()) {
                     group.options = Array.from(group.options);
-                    // AI Suggestion heuristic: if too many unique options exist in the domain
                     if (group.options.length > 12 || (group.cols.length === 1 && group.options.length > 6)) {
                         group.isSuggestion = true;
                         group.options = [];
@@ -986,14 +982,12 @@
 
                 const headers = rawExcelData[0];
 
-                /* --- ITERATE STRICTLY BY DOMAINS --- */
                 for (const [domainName, groupData] of identifiedScaleGroups.entries()) {
                     if (groupData.isSuggestion) {
                         for (const col of groupData.cols) {
                             await renderAISuggestionBox(headers[col], rows.map(r => r[col]));
                         }
                     } else {
-                        // Calculate frequencies solely based on this domain's specific isolated scales
                         const rowsData = groupData.cols.map((col, idx) => {
                             const rps = rows.map(r => r[col]);
                             const freqs = {}; groupData.options.forEach(o => freqs[o] = 0);
@@ -1111,29 +1105,43 @@
 
             document.getElementById('copyTableButton').onclick = () => {
                 const d = languageData[currentLang];
-                let copyContent = `--- ${d.title} ---\n${d.devCredit}\n\n`;
+                let copyContent = `${d.title}\n${d.devCredit}\n\n`;
                 
                 const programText = document.getElementById('programNameText').textContent;
                 const participantText = document.getElementById('participantCountDisplay').textContent;
-                copyContent += `البرنامج: ${programText} | المشاركون: ${participantText}\n\n`;
+                copyContent += `البرنامج: ${programText}\tالمشاركون: ${participantText}\n\n`;
                 
                 document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(block => {
-                    const h2 = block.querySelector('h2'); if (h2) copyContent += `\n[ ${h2.innerText} ]\n`;
+                    const h2 = block.querySelector('h2'); if (h2) copyContent += `\n${h2.innerText}\n`;
                     const table = block.querySelector('table');
                     if (table) table.querySelectorAll('tr').forEach(tr => {
-                        let rD = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); rD.push(c.innerText.trim()); for(let k=1; k < cs; k++) rD.push(""); });
+                        let rD = []; 
+                        tr.querySelectorAll('th, td').forEach(c => { 
+                            const cs = parseInt(c.getAttribute('colspan') || 1); 
+                            let val = c.innerText.trim();
+                            if (['=', '-', '+', '@'].includes(val.charAt(0))) val = "'" + val;
+                            rD.push(val); 
+                            for(let k=1; k < cs; k++) rD.push(""); 
+                        });
                         copyContent += rD.join('\t') + '\n';
                     });
                     const sb = block.querySelector('.suggestion-box'); if (sb) copyContent += sb.innerText + '\n';
                 });
                 document.querySelectorAll('#positiveNegativeItemsContainer > div').forEach(box => {
-                    const h4 = box.querySelector('h4'); if (h4) { copyContent += `\n[ ${h4.innerText} ]\n`; box.querySelectorAll('li').forEach(li => copyContent += `- ${li.innerText}\n`); }
+                    const h4 = box.querySelector('h4'); if (h4) { 
+                        copyContent += `\n${h4.innerText}\n`; 
+                        box.querySelectorAll('li').forEach(li => {
+                            let text = li.innerText.trim();
+                            if (['=', '-', '+', '@'].includes(text.charAt(0))) text = "'" + text;
+                            copyContent += `• ${text}\n`; 
+                        }); 
+                    }
                 });
                 const rec = document.querySelector('#finalRecommendationContainer div');
                 if (rec) {
-                    const h2 = rec.querySelector('h2'); if (h2) copyContent += `\n*** ${h2.innerText} ***\n`;
-                    const stats = rec.querySelectorAll('.text-6xl'); const lbls = rec.querySelectorAll('.text-xs');
-                    stats.forEach((stat, i) => { copyContent += `${lbls[i].innerText}: ${stat.innerText}\n`; });
+                    const h2 = rec.querySelector('h2'); if (h2) copyContent += `\n${h2.innerText}\n`;
+                    const stats = rec.querySelectorAll('.text-6xl, .text-5xl'); const lbls = rec.querySelectorAll('.text-xs');
+                    stats.forEach((stat, i) => { copyContent += `${lbls[i].innerText}:\t${stat.innerText}\n`; });
                 }
                 if (copyToClipboard(copyContent)) { showStatus(document.getElementById('copyTableButton')); }
             };
@@ -1162,16 +1170,23 @@
                     allD.push([]);
                 });
                 document.querySelectorAll('#positiveNegativeItemsContainer > div').forEach(box => {
-                    const h4 = box.querySelector('h4'); if (h4) { allD.push([sanitizeValue(h4.innerText)]); box.querySelectorAll('li').forEach(li => allD.push(["-", sanitizeValue(li.innerText)])); allD.push([]); }
+                    const h4 = box.querySelector('h4'); if (h4) { allD.push([sanitizeValue(h4.innerText)]); box.querySelectorAll('li').forEach(li => allD.push(["• " + sanitizeValue(li.innerText)])); allD.push([]); }
                 });
                 const rec = document.querySelector('#finalRecommendationContainer div');
                 if (rec) {
                     const h2 = rec.querySelector('h2'); if (h2) allD.push([sanitizeValue(h2.innerText)]);
-                    const stats = rec.querySelectorAll('.text-6xl'); const lbls = rec.querySelectorAll('.text-xs');
+                    const stats = rec.querySelectorAll('.text-6xl, .text-5xl'); const lbls = rec.querySelectorAll('.text-xs');
                     stats.forEach((stat, i) => { let val = stat.innerText.replace('%', ''); allD.push([sanitizeValue(lbls[i].innerText), isNaN(parseFloat(val)) ? val : parseFloat(val)]); });
                 }
+                
+                let baseName = document.getElementById('fileNameDisplay').textContent.trim();
+                if (!baseName) baseName = "Survey_Report";
+                const now = new Date();
+                const dateStr = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0') + "_" + String(now.getHours()).padStart(2,'0') + "-" + String(now.getMinutes()).padStart(2,'0');
+                const exportName = `${baseName}_${dateStr}.xlsx`;
+
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(allD), "Analysis");
-                XLSX.writeFile(wb, `Survey_Report.xlsx`);
+                XLSX.writeFile(wb, exportName);
             };
 
             updateUI();
