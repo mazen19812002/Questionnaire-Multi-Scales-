@@ -92,7 +92,7 @@
             /* ========================================= */
             /* CHARTS PRINT FIX */
             /* ========================================= */
-            #chartContainer { display: flex !important; flex-wrap: wrap !important; gap: 2% !important; }
+            #chartContainer { display: flex !important; flex-wrap: wrap !important; gap: 2% !important; justify-content: space-between !important; }
             #chartContainer > div { width: 49% !important; page-break-inside: avoid !important; break-inside: avoid !important; border: 1pt solid #cbd5e1 !important; padding: 4mm !important; border-radius: 6pt !important; margin-bottom: 5mm !important;}
             /* ========================================= */
             
@@ -120,7 +120,6 @@
             table th:nth-child(2), table td:nth-child(2) { width: 35% !important; text-align: right !important; } /* Item */
             table th:nth-last-child(2), table td:nth-last-child(2) { width: 10% !important; text-align: center !important; } /* Check Sum */
             table th:nth-last-child(1), table td:nth-last-child(1) { width: 10% !important; text-align: center !important; } /* Positives */
-            /* Middle dynamic columns automatically divide the remaining ~40% width evenly due to table-layout: fixed */
             
             /* Ensure background colors and styling prints correctly */
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
@@ -909,9 +908,9 @@
                             const divC = document.createElement('div');
                             divC.className = 'bg-white p-6 rounded-[2rem] shadow-xl border-2 border-blue-100 flex flex-col items-center';
                             
-                            // USING A FIXED INLINE HEIGHT SO CANVAS NEVER EXCEEDS IT
+                            // Remove inline height styling so it scales correctly according to Aspect Ratio
                             divC.innerHTML = `<h3 class="text-xl font-black mb-4 text-center text-indigo-900">${dName}</h3>
-                                              <div class="w-full relative" style="height: 280px;">
+                                              <div class="w-full relative">
                                                   <canvas id="${canvasId}"></canvas>
                                               </div>`;
                             document.getElementById('chartContainer').appendChild(divC);
@@ -919,7 +918,6 @@
                             const ctx = document.getElementById(canvasId).getContext('2d');
                             const dataVals = groupData.options.map(o => { const sum = rowsData.reduce((s, r) => s + r.freqs[o], 0); const total = rowsData.reduce((s, r) => s + r.total, 0); return total ? (sum/total*100).toFixed(1) : 0; });
                             
-                            // IMPORTANT: animation: false SOLVES THE PRINT OUT-OF-BOUNDS GLITCH
                             chartInstances.push(new Chart(ctx, { 
                                 type: 'bar', 
                                 data: { 
@@ -933,7 +931,8 @@
                                 }, 
                                 options: { 
                                     animation: false, 
-                                    maintainAspectRatio: false, 
+                                    maintainAspectRatio: true, /* تفعيل التناسب التلقائي للإصلاح الجذري */
+                                    aspectRatio: 1.4, /* تحديد نسبة أبعاد ثابتة تجعل الرسم دائماً متناسق */
                                     responsive: true,
                                     layout: {
                                         padding: {
@@ -943,14 +942,16 @@
                                     scales: {
                                         y: { 
                                             beginAtZero: true, 
-                                            grace: '5%',
+                                            grace: '10%',
+                                            position: 'right', /* وضع المحور على اليمين لمنع تخبطه في المنتصف */
                                             ticks: {
                                                 font: { weight: '900', family: 'Cairo', size: 12 } /* خط عريض ومقروء للمحور الصادي */
                                             }
                                         },
                                         x: {
                                             ticks: {
-                                                font: { weight: '900', family: 'Cairo', size: 14 } /* خط عريض ومقروء للمحور السيني */
+                                                font: { weight: '900', family: 'Cairo', size: 12 }, /* خط عريض ومقروء للمحور السيني وتصغيره قليلاً لمنع التداخل */
+                                                autoSkip: false /* ضمان ظهور جميع الكلمات في المحور السفلي */
                                             }
                                         }
                                     },
