@@ -31,7 +31,7 @@
             /* Number of participants (Default to 100 to prevent percentage fractional drift in mock data) */            const [participantsCount, setParticipantsCount] = useState(100);
 
             /* Temp state for prompt modal */
-            const [tempPromptValue, setTempPromptValue] = useState(75);
+            const [tempPromptValue, setTempPromptValue] = useState(88);
 
             /* Base file name state for exports */            const [originalFileName, setOriginalFileName] = useState('Questionnaire');
 
@@ -39,7 +39,7 @@
 
             /* --- Handlers for Auto Fill (Smart Percentage Generator) --- */            const handleAutoFill = () => {                if (domains.length === 0) {                    showAlert('لا توجد مجالات أو بنود لتعبئتها. يرجى إضافة مجالات أولاً أو رفع ملف.');                    return;                }
                 
-                showPrompt('الرجاء إدخال المتوسط العام للإيجابيات المطلوب (%) لتوليد النسب بناءً عليه:', 75, (targetValue) => {
+                showPrompt('الرجاء إدخال المتوسط العام للإيجابيات المطلوب (%) لتوليد النسب بناءً عليه:', 88, (targetValue) => {
                     executeAutoFill(Number(targetValue));
                 });
             };
