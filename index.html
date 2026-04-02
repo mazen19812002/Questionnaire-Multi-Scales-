@@ -99,13 +99,14 @@
             }
             #fileNameDisplay { font-size: 11pt !important; display: block !important; margin-bottom: 2mm !important; text-align: center !important; line-height: 1 !important; }
             
-            /* Meta Info (Program and Participants) - COMPACT & ALIGNED LEFT */
+            /* Meta Info (Program and Participants) - COMPACT, ALIGNED LEFT & FLEXIBLE */
             #metaInfoDisplay { 
                 display: flex !important; 
                 justify-content: flex-end !important; 
                 gap: 2mm !important; 
                 margin-top: 1mm !important; 
                 margin-bottom: 2mm !important;
+                flex-wrap: nowrap !important;
             }
             #metaInfoDisplay > div {
                 padding: 1.5mm 3mm !important;
@@ -115,8 +116,19 @@
                 font-size: 9pt !important;
                 display: flex !important;
                 align-items: center !important;
+                white-space: nowrap !important;
+            }
+            /* يسمح لخانة البرنامج بالانكماش ووضع نقاط نهاية الجملة إذا ضاق المكان */
+            #metaInfoDisplay > div.min-w-0 {
+                flex-shrink: 1 !important;
+                overflow: hidden !important;
             }
             #metaInfoDisplay span { line-height: 1 !important; }
+            #programNameText {
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                white-space: nowrap !important;
+            }
             
             h2 { font-size: 10pt !important; padding: 1mm 2mm !important; margin-bottom: 0 !important; border: none !important; background-color: transparent !important; }
             h3, h4 { font-size: 9pt !important; margin-bottom: 1mm !important; }
@@ -370,12 +382,14 @@
             <div class="mb-6 relative">
                 <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 hidden font-black uppercase text-center mb-4"></p>
                 
-                <div id="metaInfoDisplay" class="hidden flex justify-end gap-4 text-lg font-black w-full">
-                    <div class="bg-indigo-50 text-indigo-800 px-4 py-2 rounded-xl border border-indigo-100 flex items-center">
+                <!-- القسم الخاص: البرنامج والمشاركين في أقصى اليسار مع مرونة النص الطويل -->
+                <div id="metaInfoDisplay" class="hidden flex justify-end gap-2 md:gap-4 text-base md:text-lg font-black w-full overflow-hidden">
+                    <div class="bg-indigo-50 text-indigo-800 px-3 md:px-4 py-2 rounded-xl border border-indigo-100 flex items-center whitespace-nowrap shrink-0">
                         <span id="participantCountDisplay"></span>
                     </div>
-                    <div class="bg-slate-50 text-slate-800 px-4 py-2 rounded-xl border border-slate-200 flex items-center">
-                        <span class="text-slate-500 ml-2">البرنامج:</span><span id="programNameText" class="text-indigo-700"></span>
+                    <div class="bg-slate-50 text-slate-800 px-3 md:px-4 py-2 rounded-xl border border-slate-200 flex items-center min-w-0">
+                        <span class="text-slate-500 ml-2 whitespace-nowrap shrink-0">البرنامج:</span>
+                        <span id="programNameText" class="text-indigo-700 truncate"></span>
                     </div>
                 </div>
             </div>
@@ -948,7 +962,8 @@
                             cols: [],
                             items: [],
                             isSuggestion: false,
-                            userAddedOptions: new Set()
+                            userAddedOptions: new Set(),
+                            frequencies: new Map() // Track overall frequency for sorting
                         });
                     }
 
@@ -960,12 +975,16 @@
                         const val = String(rawExcelData[r][col] || "").trim();
                         if (val !== "") {
                             group.options.add(val);
+                            group.frequencies.set(val, (group.frequencies.get(val) || 0) + 1);
                         }
                     }
                 }
 
                 for (const [dName, group] of identifiedScaleGroups.entries()) {
                     group.options = Array.from(group.options);
+                    // Sort options based on frequency descending
+                    group.options.sort((a, b) => (group.frequencies.get(b) || 0) - (group.frequencies.get(a) || 0));
+                    
                     if (group.options.length > 12 || (group.cols.length === 1 && group.options.length > 6)) {
                         group.isSuggestion = true;
                         group.options = [];
@@ -1083,7 +1102,7 @@
                                 maintainAspectRatio: false, 
                                 responsive: true,
                                 devicePixelRatio: 2, 
-                                locale: 'ar-EG', 
+                                locale: 'en-US', 
                                 rtl: true, 
                                 layout: {
                                     padding: { top: 30, bottom: 10, left: 10, right: 10 }
