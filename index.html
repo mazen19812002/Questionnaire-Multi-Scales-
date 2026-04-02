@@ -53,75 +53,75 @@
         @media print {
             @page { size: A4 portrait; margin: 10mm; }
             body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 10pt !important; }
-            /* Hide UI elements not meant for print */
-            .input-card, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .flex.justify-between.items-start.mb-8 { display: none !important; }
+            
+            /* Hide UI elements not meant for print (removed the logo container from this list) */
+            .input-card, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .copy-btn-wrapper, #messageBoxModal { display: none !important; }
+            
             main { box-shadow: none !important; padding: 0 !important; background-color: transparent !important; max-width: 100% !important; margin: 0 !important; border: none !important; }
             
+            /* Logos Header Fix */
+            .flex.justify-between.items-start.mb-8 { display: flex !important; margin-bottom: 5mm !important; align-items: center !important; }
+            .flex.justify-between.items-start.mb-8 img { height: 60px !important; width: 60px !important; box-shadow: none !important; border: none !important; padding: 0 !important; }
+
             /* Titles and Headers */
-            #mainTitle { font-size: 20pt !important; font-weight: 900 !important; margin-bottom: 5mm !important; text-align: center !important; }
-            #instituteTitle { font-size: 12pt !important; text-align: center !important; margin-bottom: 10mm !important; }
-            #fileNameDisplay { font-size: 16pt !important; display: block !important; margin-bottom: 5mm !important; text-align: center !important; }
-            h2 { font-size: 14pt !important; padding: 4pt !important; margin-bottom: 4pt !important; }
+            #mainTitle { font-size: 18pt !important; font-weight: 900 !important; margin-bottom: 2mm !important; text-align: center !important; }
+            #instituteTitle { font-size: 11pt !important; text-align: center !important; margin-bottom: 6mm !important; }
+            #fileNameDisplay { font-size: 14pt !important; display: block !important; margin-bottom: 5mm !important; text-align: center !important; }
+            
+            h2 { font-size: 13pt !important; padding: 4pt !important; margin-bottom: 0 !important; border: none !important; background-color: transparent !important; }
             h3, h4 { font-size: 12pt !important; margin-bottom: 4pt !important; }
 
-            /* General Elements Styling */
-            .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper, #finalRecommendationContainer > div {
+            /* General Wrappers: Remove padding/shadows to save space, let tables break pages naturally */
+            .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper {
                 margin-bottom: 8mm !important;
                 border: 1pt solid #cbd5e1 !important;
-                padding: 5mm !important;
-                border-radius: 12pt !important;
+                border-radius: 6pt !important;
                 box-shadow: none !important;
+                padding: 0 !important; 
             }
+            .domain-result-wrapper h2, .summary-table-wrapper h2, .suggestion-wrapper h2 { padding: 4mm !important; background-color: #f8fafc !important; border-bottom: 1pt solid #cbd5e1 !important; margin: 0 !important; border-top-left-radius: 6pt !important; border-top-right-radius: 6pt !important; }
+            .suggestion-wrapper .p-8 { padding: 4mm !important; }
 
-            /* Prevent breaks inside smaller containers. Let large tables (domain wrappers) break across pages naturally. */
-            .suggestion-wrapper, .summary-table-wrapper, #finalRecommendationContainer > div {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
+            /* Prevent breaks inside smaller containers. Let large tables break naturally. */
+            .suggestion-wrapper, .summary-table-wrapper { page-break-inside: avoid !important; break-inside: avoid !important; }
 
-            /* 2-Column Layout Forces (Highlights, Final Rec, Charts) */
-            #positiveNegativeItemsContainer, #chartContainer, #finalRecommendationContainer > div > .grid {
-                display: flex !important;
-                flex-direction: row !important;
-                flex-wrap: wrap !important;
-                gap: 2% !important;
-                justify-content: space-between !important;
-                align-items: stretch !important;
-            }
-            #positiveNegativeItemsContainer > div, #chartContainer > div, #finalRecommendationContainer > div > .grid > div {
-                width: 49% !important;
-                box-sizing: border-box !important;
-                margin-bottom: 10px !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-                border: 1pt solid #cbd5e1 !important;
-                padding: 4mm !important;
-                border-radius: 12pt !important;
-            }
+            /* 2-Column Layout Forces (Highlights) */
+            #positiveNegativeItemsContainer { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 2% !important; justify-content: space-between !important; align-items: stretch !important; page-break-inside: avoid !important; }
+            #positiveNegativeItemsContainer > div { width: 49% !important; box-sizing: border-box !important; margin-bottom: 5mm !important; border: 1pt solid #cbd5e1 !important; padding: 4mm !important; border-radius: 6pt !important; background-color: #f8fafc !important; }
             
-            /* Shrink massive text and charts */
-            .text-6xl { font-size: 22pt !important; line-height: 1 !important; }
+            /* Charts */
+            #chartContainer { display: flex !important; flex-wrap: wrap !important; gap: 2% !important; }
+            #chartContainer > div { width: 49% !important; page-break-inside: avoid !important; border: 1pt solid #cbd5e1 !important; padding: 4mm !important; border-radius: 6pt !important; margin-bottom: 5mm !important;}
             .h-96 { height: 200px !important; }
             
+            /* FINAL RECOMMENDATION FIXES */
+            #finalRecommendationContainer { page-break-inside: avoid !important; break-inside: avoid !important; margin-top: 5mm !important; }
+            #finalRecommendationContainer > div { padding: 6mm !important; border: 1.5pt solid #818cf8 !important; border-radius: 10pt !important; box-shadow: none !important; }
+            #finalRecommendationContainer h2 { font-size: 16pt !important; margin-bottom: 4mm !important; border-bottom: 1pt solid #e0e7ff !important; padding-bottom: 2mm !important; background-color: transparent !important; }
+            #finalRecommendationContainer > div > .grid { display: flex !important; flex-direction: row !important; gap: 4% !important; justify-content: center !important; }
+            #finalRecommendationContainer > div > .grid > div { width: 48% !important; padding: 4mm !important; border-radius: 6pt !important; border: 1pt solid #cbd5e1 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; }
+            #finalRecommendationContainer .text-6xl { font-size: 24pt !important; line-height: 1.2 !important; margin-top: 2mm !important; }
+            #finalRecommendationContainer .text-xs { font-size: 10pt !important; }
+            
             /* Table Optimization to fit on Page and Break Cleanly */
-            .overflow-x-auto { overflow: visible !important; } /* Fixes horizontal clipping in PDF */
-            table { width: 100% !important; border-collapse: collapse !important; table-layout: auto !important; }
+            .overflow-x-auto { overflow: visible !important; } /* Fixes horizontal clipping */
+            table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; margin: 0 !important; }
             thead { display: table-header-group !important; } /* Repeats headers on new pages */
             tfoot { display: table-row-group !important; } /* Prevents overlapping text bugs at page bottom */
             tr { page-break-inside: avoid !important; break-inside: avoid !important; } /* Prevents cutting a single row in half */
             
-            th, td { border: 1pt solid #94a3b8 !important; padding: 4pt !important; font-size: 8.5pt !important; word-break: break-word; }
-            th { background-color: #f1f5f9 !important; font-weight: 900 !important; }
+            th, td { border: 1pt solid #cbd5e1 !important; padding: 4pt !important; font-size: 8.5pt !important; word-wrap: break-word !important; overflow-wrap: break-word !important; white-space: normal !important; vertical-align: middle !important; }
+            th { background-color: #f1f5f9 !important; font-weight: 900 !important; color: #1e293b !important; }
             
-            /* Give fixed width limits to prevent horizontal overflow */
-            table th:nth-child(1), table td:nth-child(1) { width: 5% !important; text-align: center !important; }
-            table th:nth-child(2), table td:nth-child(2) { width: 40% !important; }
+            /* Column Width Distribution */
+            table th:nth-child(1), table td:nth-child(1) { width: 5% !important; text-align: center !important; } /* # */
+            table th:nth-child(2), table td:nth-child(2) { width: 35% !important; text-align: right !important; } /* Item */
+            table th:nth-last-child(2), table td:nth-last-child(2) { width: 10% !important; text-align: center !important; } /* Check Sum */
+            table th:nth-last-child(1), table td:nth-last-child(1) { width: 10% !important; text-align: center !important; } /* Positives */
+            /* Middle dynamic columns automatically divide the remaining ~40% width evenly due to table-layout: fixed */
             
             /* Ensure background colors and styling prints correctly */
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
-            
-            /* Cleanup */
-            .copy-btn-wrapper { display: none !important; }
         }
     </style>
 </head>
