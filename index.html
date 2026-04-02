@@ -370,7 +370,6 @@
             <div class="mb-6 relative">
                 <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 hidden font-black uppercase text-center mb-4"></p>
                 
-                <!-- القسم الخاص: البرنامج والمشاركين في أقصى اليسار -->
                 <div id="metaInfoDisplay" class="hidden flex justify-end gap-4 text-lg font-black w-full">
                     <div class="bg-indigo-50 text-indigo-800 px-4 py-2 rounded-xl border border-indigo-100 flex items-center">
                         <span id="participantCountDisplay"></span>
@@ -386,16 +385,15 @@
             <div id="positiveNegativeItemsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 mt-8"></div>
             <div id="finalRecommendationContainer" class="hidden mt-10"></div>
             
-            <!-- قسم التوقيعات -->
             <div id="signatureSection" class="hidden mt-12 pt-8 border-t-2 border-slate-200 flex justify-between items-center text-lg font-black px-4 md:px-16">
                 <div class="text-center flex flex-col items-center">
                     <p class="text-slate-700">مقرر لجنة القياس والتقويم</p>
-                    <div class="sig-space h-16 w-full"></div> <!-- مساحة للتوقيع -->
+                    <div class="sig-space h-16 w-full"></div> 
                     <p class="text-indigo-900 font-black">د. مازن فوزي بدوي</p>
                 </div>
                 <div class="text-center flex flex-col items-center">
                     <p class="text-slate-700">مدير وحدة ضمان الجودة</p>
-                    <div class="sig-space h-16 w-full"></div> <!-- مساحة للتوقيع -->
+                    <div class="sig-space h-16 w-full"></div> 
                     <p class="text-indigo-900 font-black">د. هنادى عبدالرحمن الدهيمي</p>
                 </div>
             </div>
@@ -521,12 +519,21 @@
             identifiedScaleGroups.forEach((group, domainName) => {
                 if (group.isSuggestion) return;
                 const wrap = document.createElement('div');
-                wrap.className = 'bg-white p-4 rounded-2xl border-2 border-blue-200 shadow-md hover-zoom';
-                wrap.innerHTML = `<h3 class="font-black text-indigo-900 uppercase tracking-tighter text-lg mb-3 pr-2">محور: ${domainName}</h3><div class="scale-list space-y-2 font-black" data-sig="${domainName}"></div>`;
+                wrap.className = 'bg-white p-4 rounded-2xl border-2 border-blue-200 shadow-md transition-all';
+                
+                const addScaleHtml = `
+                    <div class="mt-4 pt-4 border-t border-blue-100 flex gap-3 hide-on-print">
+                        <input type="text" placeholder="إضافة مقياس جديد يدوياً (مثال: محايد)..." class="flex-grow p-3 border border-blue-200 rounded-xl text-sm font-bold text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all new-scale-input">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white font-black px-6 py-2 rounded-xl transition-all shadow-md text-sm add-scale-btn">إضافة</button>
+                    </div>
+                `;
+                
+                wrap.innerHTML = `<h3 class="font-black text-indigo-900 uppercase tracking-tighter text-lg mb-3 pr-2">محور: ${domainName}</h3><div class="scale-list space-y-2 font-black" data-sig="${domainName}"></div>` + addScaleHtml;
+                
                 const list = wrap.querySelector('.scale-list');
                 group.options.forEach((opt, idx) => {
                     const item = document.createElement('div');
-                    item.className = 'p-3 bg-slate-50 border-2 border-slate-200 rounded-xl flex justify-between items-center cursor-move font-black';
+                    item.className = 'p-3 bg-slate-50 border-2 border-slate-200 rounded-xl flex justify-between items-center cursor-move font-black hover-zoom';
                     item.draggable = true;
                     item.innerHTML = `<span class="font-bold text-slate-900">${opt}</span><label class="flex items-center cursor-pointer font-black"><input type="checkbox" class="w-5 h-5 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="mr-2 text-xs font-black text-indigo-800">${languageData[currentLang].pos}</span></label>`;
                     item.querySelector('input').onchange = (e) => e.target.checked ? group.positives.add(opt) : group.positives.delete(opt);
@@ -538,6 +545,26 @@
                     };
                     list.appendChild(item);
                 });
+                
+                const addBtn = wrap.querySelector('.add-scale-btn');
+                const inputEl = wrap.querySelector('.new-scale-input');
+                
+                addBtn.onclick = () => {
+                    const newScale = inputEl.value.trim();
+                    if (newScale && !group.options.includes(newScale)) {
+                        group.options.push(newScale);
+                        if (!group.userAddedOptions) group.userAddedOptions = new Set();
+                        group.userAddedOptions.add(newScale);
+                        renderScaleGroups();
+                    }
+                };
+
+                inputEl.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        addBtn.click();
+                    }
+                });
+
                 container.appendChild(wrap);
             });
         }
@@ -572,7 +599,7 @@
             rows.forEach((r, i) => {
                 const rowCheckSum = opts.reduce((acc, o) => acc + (r.freqs[o] / r.total * 100), 0);
                 const tdCells = opts.map(o => {
-                    const cellVal = (r.freqs[o] / r.total * 100).toFixed(1);
+                    const cellVal = r.total > 0 ? (r.freqs[o] / r.total * 100).toFixed(1) : "0.0";
                     return `<td class="p-3 text-center font-black">${cellVal}%</td>`;
                 }).join('');
                 
@@ -586,7 +613,7 @@
             });
             
             const footTdCells = opts.map(o => {
-                const footVal = ((rows.reduce((s, r) => s + r.freqs[o], 0) / totalRes) * 100).toFixed(1);
+                const footVal = totalRes > 0 ? ((rows.reduce((s, r) => s + r.freqs[o], 0) / totalRes) * 100).toFixed(1) : "0.0";
                 return `<td class="p-3 text-center font-black">${footVal}%</td>`;
             }).join('');
             
@@ -595,7 +622,7 @@
                                     <tr>
                                         <td colspan="2" class="p-3 text-center uppercase font-black">${d.headers.footer}</td>
                                         ${footTdCells}
-                                        <td class="p-3 text-center font-black">100.0%</td>
+                                        <td class="p-3 text-center font-black">${totalRes > 0 ? '100.0' : '0.0'}%</td>
                                         <td class="p-3 text-center text-green-800 text-lg font-black">${avgPos}%</td>
                                     </tr>
                                 </tfoot>
@@ -666,7 +693,7 @@
                 html += `<tr class="border-b border-indigo-50 font-black">
                             <td class="p-4 text-center text-indigo-300 font-black">${i+1}</td>
                             <td class="p-4 font-black text-slate-800">${dm.name}</td>
-                            <td class="p-4 text-center font-black text-green-600">${(pSum/dm.total*100).toFixed(1)}%</td>
+                            <td class="p-4 text-center font-black text-green-600">${dm.total > 0 ? (pSum/dm.total*100).toFixed(1) : "0.0"}%</td>
                          </tr>`; 
             });
             
@@ -674,7 +701,7 @@
                             <tfoot class="bg-indigo-100 font-black border-t-2 border-indigo-300">
                                 <tr>
                                     <td colspan="2" class="p-4 text-center uppercase font-black">المتوسط الكلي</td>
-                                    <td class="p-4 text-center text-green-800 text-xl font-black">${(gPos/gTotal*100).toFixed(1)}%</td>
+                                    <td class="p-4 text-center text-green-800 text-xl font-black">${gTotal > 0 ? (gPos/gTotal*100).toFixed(1) : "0.0"}%</td>
                                 </tr>
                             </tfoot>
                         </table>`;
@@ -694,8 +721,8 @@
             const d = languageData[currentLang];
             const container = document.getElementById('positiveNegativeItemsContainer');
             const thresh = parseInt(document.getElementById('positivesThresholdInput').value || 85);
-            const high = items.filter(i => i.posPerc >= thresh);
-            const low = items.filter(i => i.posPerc < thresh);
+            const high = items.filter(i => i.posPerc >= thresh && i.total > 0);
+            const low = items.filter(i => i.posPerc < thresh && i.total > 0);
             container.innerHTML = '';
             
             const sDiv = document.createElement('div');
@@ -920,7 +947,8 @@
                             positives: new Set(),
                             cols: [],
                             items: [],
-                            isSuggestion: false
+                            isSuggestion: false,
+                            userAddedOptions: new Set()
                         });
                     }
 
@@ -988,9 +1016,20 @@
                             await renderAISuggestionBox(headers[col], rows.map(r => r[col]));
                         }
                     } else {
+                        const domainUniqueOpts = new Set();
+                        groupData.cols.forEach(col => {
+                            rawExcelData.slice(1).forEach(r => {
+                                const val = String(r[col] || "").trim();
+                                if (val !== "") domainUniqueOpts.add(val);
+                            });
+                        });
+                        
+                        const finalOpts = groupData.options.filter(opt => domainUniqueOpts.has(opt) || (groupData.userAddedOptions && groupData.userAddedOptions.has(opt)));
+                        if (finalOpts.length === 0) finalOpts.push(...groupData.options);
+
                         const rowsData = groupData.cols.map((col, idx) => {
                             const rps = rows.map(r => r[col]);
-                            const freqs = {}; groupData.options.forEach(o => freqs[o] = 0);
+                            const freqs = {}; finalOpts.forEach(o => freqs[o] = 0);
                             let posCount = 0;
                             rps.forEach(r => { 
                                 const tr = String(r || "").trim(); 
@@ -1008,7 +1047,7 @@
                             return res;
                         });
 
-                        renderTable(domainName, rowsData, groupData.options, groupData.positives);
+                        renderTable(domainName, rowsData, finalOpts, groupData.positives);
                         
                         const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
                         const divC = document.createElement('div');
@@ -1021,7 +1060,7 @@
                         document.getElementById('chartContainer').appendChild(divC);
                         
                         const ctx = document.getElementById(canvasId).getContext('2d');
-                        const dataVals = groupData.options.map(o => { 
+                        const dataVals = finalOpts.map(o => { 
                             const sum = rowsData.reduce((s, r) => s + r.freqs[o], 0); 
                             const total = rowsData.reduce((s, r) => s + r.total, 0); 
                             return total ? (sum/total*100).toFixed(1) : 0; 
@@ -1030,7 +1069,7 @@
                         chartInstances.push(new Chart(ctx, { 
                             type: 'bar', 
                             data: { 
-                                labels: groupData.options, 
+                                labels: finalOpts, 
                                 datasets: [{ 
                                     data: dataVals, 
                                     backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], 
@@ -1078,7 +1117,7 @@
                         }));
                         
                         const dFreqs = {}; 
-                        groupData.options.forEach(o => dFreqs[o] = rowsData.reduce((s, r) => s + r.freqs[o], 0));
+                        finalOpts.forEach(o => dFreqs[o] = rowsData.reduce((s, r) => s + r.freqs[o], 0));
                         summaryDataList.push({ 
                             name: domainName, 
                             freqs: dFreqs, 
