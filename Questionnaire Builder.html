@@ -93,7 +93,7 @@
             const [domains, setDomains] = useState(initialDomains);
 
             /* Modal State for avoiding native alerts/confirms */
-            const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'alert', message: '', onConfirm: null });
+            const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'alert', message: '', onConfirm: null, inputType: 'number' });
 
             /* Drag and drop state for items */
             const [draggedItem, setDraggedItem] = useState(null);
@@ -113,11 +113,11 @@
             const [originalFileName, setOriginalFileName] = useState('Questionnaire');
 
             /* --- Custom Modal Helpers --- */
-            const showAlert = (message) => setModalConfig({ isOpen: true, type: 'alert', message, onConfirm: null });
-            const showConfirm = (message, onConfirm) => setModalConfig({ isOpen: true, type: 'confirm', message, onConfirm });
-            const showPrompt = (message, defaultValue, onConfirm) => {
+            const showAlert = (message) => setModalConfig({ isOpen: true, type: 'alert', message, onConfirm: null, inputType: 'number' });
+            const showConfirm = (message, onConfirm) => setModalConfig({ isOpen: true, type: 'confirm', message, onConfirm, inputType: 'number' });
+            const showPrompt = (message, defaultValue, onConfirm, inputType = 'number') => {
                 setTempPromptValue(defaultValue);
-                setModalConfig({ isOpen: true, type: 'prompt', message, onConfirm });
+                setModalConfig({ isOpen: true, type: 'prompt', message, onConfirm, inputType });
             };
             const closeModal = () => setModalConfig({ ...modalConfig, isOpen: false });
 
@@ -130,7 +130,7 @@
 
                 showPrompt('الرجاء إدخال المتوسط العام للإيجابيات المطلوب (%) لتوليد النسب بناءً عليه:', 88, (targetValue) => {
                     executeAutoFill(Number(targetValue));
-                });
+                }, 'number');
             };
 
             const executeAutoFill = (targetPositiveAverage) => {
@@ -386,7 +386,13 @@
 
             /* --- Handlers for Domains & Items --- */
             const addDomain = () => {
-                setDomains([...domains, { id: Date.now().toString(), name: 'محور جديد', items: [] }]);
+                const nextNum = domains.length + 1;
+                const defaultName = `محور جديد ${nextNum}`;
+                
+                showPrompt('الرجاء إدخال مسمى المحور الجديد:', defaultName, (domainName) => {
+                    const finalName = domainName.trim() || defaultName;
+                    setDomains([...domains, { id: Date.now().toString(), name: finalName, items: [] }]);
+                }, 'text');
             };
 
             const updateDomain = (id, field, value) => {
@@ -521,10 +527,10 @@
             /* --- Excel Export Functions --- */
             const exportEmptyTemplate = () => {
                 const data = [];
-                const header = ['المحور', 'البنود', ...scales.map(s => s.name), 'المجموع'];
+                const header = ['المحور', 'البنود', ...scales.map(s => s.name), 'إجمالي الصف', 'الإيجابيات'];
                 data.push(header);
-                data.push(['المحور الأول', 'البند الأول', '', '', '', '1']);
-                data.push(['المحور الأول', 'البند الثاني', '', '', '', '1']);
+                data.push(['المحور الأول', 'البند الأول', ...scales.map(() => ''), '', '']);
+                data.push(['المحور الأول', 'البند الثاني', ...scales.map(() => ''), '', '']);
 
                 const ws = XLSX.utils.aoa_to_sheet(data);
                 const wb = XLSX.utils.book_new();
@@ -538,16 +544,38 @@
                     return;
                 }
                 const data = [];
-                const header = ['المحور', 'البنود', ...scales.map(s => s.name), 'المجموع'];
+                const header = ['المحور', 'البنود', ...scales.map(s => s.name), 'إجمالي الصف', 'الإيجابيات'];
                 data.push(header);
 
                 domains.forEach(domain => {
+                    let domainPosSum = 0;
+                    
+                    // Add items for this domain
                     domain.items.forEach(item => {
                         const row = [domain.name, item.text];
                         scales.forEach(s => row.push(`${item.values[s.id] || 0}%`));
                         row.push(`${getItemRowTotal(item.values)}%`);
+                        const posTotal = getPositivesTotal(item.values);
+                        row.push(`${posTotal}%`);
                         data.push(row);
+                        domainPosSum += posTotal;
                     });
+                    
+                    // Add Summary Row for this domain
+                    if (domain.items.length > 0) {
+                        const domainPosAvg = (domainPosSum / domain.items.length).toFixed(1);
+                        const summaryRow = [
+                            `متوسط إيجابيات (${domain.name})`, 
+                            '', // البنود
+                            ...scales.map(() => ''), // المقاييس
+                            '', // إجمالي الصف
+                            `${domainPosAvg}%` // متوسط الإيجابيات
+                        ];
+                        data.push(summaryRow);
+                        
+                        // Add an empty row for visual separation
+                        data.push(Array(header.length).fill(''));
+                    }
                 });
 
                 const ws = XLSX.utils.aoa_to_sheet(data);
@@ -620,17 +648,26 @@
                         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[100] p-4 transition-opacity duration-300">
                             <div className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full text-center border-t-4 border-blue-500 transform scale-100 transition-transform duration-300">
                                 <h3 className="text-2xl font-bold mb-4 text-gray-800">
-                                    {modalConfig.type === 'alert' ? 'تنبيه' : modalConfig.type === 'confirm' ? 'تأكيد الإجراء' : 'تحديد النسبة'}
+                                    {modalConfig.type === 'alert' ? 'تنبيه' : modalConfig.type === 'confirm' ? 'تأكيد الإجراء' : 'إدخال البيانات'}
                                 </h3>
                                 <p className="text-lg text-gray-600 mb-6 font-light leading-relaxed">{modalConfig.message}</p>
                                 
-                                {modalConfig.type === 'prompt' && (
+                                {modalConfig.type === 'prompt' && modalConfig.inputType === 'number' && (
                                     <input
                                         type="number"
                                         min="0" max="100"
                                         value={tempPromptValue}
                                         onChange={(e) => setTempPromptValue(e.target.value)}
                                         className="w-full p-3 border border-gray-300 rounded-lg text-3xl text-center focus:outline-none focus:border-green-500 font-black text-green-700 mb-6 shadow-inner"
+                                    />
+                                )}
+
+                                {modalConfig.type === 'prompt' && modalConfig.inputType === 'text' && (
+                                    <input
+                                        type="text"
+                                        value={tempPromptValue}
+                                        onChange={(e) => setTempPromptValue(e.target.value)}
+                                        className="w-full p-3 border border-gray-300 rounded-lg text-2xl text-center focus:outline-none focus:border-green-500 font-black text-blue-700 mb-6 shadow-inner"
                                     />
                                 )}
                                 
