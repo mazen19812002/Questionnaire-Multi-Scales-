@@ -124,7 +124,7 @@
             /* --- Handlers for Auto Fill (Smart Percentage Generator) --- */
             const handleAutoFill = () => {
                 if (domains.length === 0) {
-                    showAlert('لا توجد مجالات أو بنود لتعبئتها. يرجى إضافة مجالات أولاً أو رفع ملف.');
+                    showAlert('لا توجد محاور أو بنود لتعبئتها. يرجى إضافة محاور أولاً أو رفع ملف.');
                     return;
                 }
 
@@ -246,7 +246,8 @@
 
                         /* 1. Parse Headers (Scales) */
                         const headers = data[0];
-                        const domainIdx = headers.indexOf('المجال') !== -1 ? headers.indexOf('المجال') : 0;
+                        /* Support for both 'المحور' and 'المجال' for backward compatibility */
+                        const domainIdx = headers.indexOf('المحور') !== -1 ? headers.indexOf('المحور') : (headers.indexOf('المجال') !== -1 ? headers.indexOf('المجال') : 0);
                         const itemIdx = headers.indexOf('البنود') !== -1 ? headers.indexOf('البنود') : 1;
                         const totalIdx = headers.indexOf('المجموع') !== -1 ? headers.indexOf('المجموع') : headers.indexOf('إجمالي الصف (%)');
                         const endScaleIdx = totalIdx !== -1 ? totalIdx : headers.length;
@@ -310,7 +311,7 @@
 
                     } catch (error) {
                         console.error("Error parsing file:", error);
-                        showAlert('حدث خطأ أثناء قراءة الملف. يرجى التأكد من أنه بصيغة Excel صالحة وأن الأعمدة تحتوي على (المجال، البنود).');
+                        showAlert('حدث خطأ أثناء قراءة الملف. يرجى التأكد من أنه بصيغة Excel صالحة وأن الأعمدة تحتوي على (المحور، البنود).');
                     }
                 };
                 reader.readAsArrayBuffer(file);
@@ -385,7 +386,7 @@
 
             /* --- Handlers for Domains & Items --- */
             const addDomain = () => {
-                setDomains([...domains, { id: Date.now().toString(), name: 'مجال جديد', items: [] }]);
+                setDomains([...domains, { id: Date.now().toString(), name: 'محور جديد', items: [] }]);
             };
 
             const updateDomain = (id, field, value) => {
@@ -393,7 +394,7 @@
             };
 
             const removeDomain = (id) => {
-                showConfirm('هل أنت متأكد من حذف هذا المجال؟', () => {
+                showConfirm('هل أنت متأكد من حذف هذا المحور؟', () => {
                     setDomains(domains.filter(d => d.id !== id));
                 });
             };
@@ -520,10 +521,10 @@
             /* --- Excel Export Functions --- */
             const exportEmptyTemplate = () => {
                 const data = [];
-                const header = ['المجال', 'البنود', ...scales.map(s => s.name), 'المجموع'];
+                const header = ['المحور', 'البنود', ...scales.map(s => s.name), 'المجموع'];
                 data.push(header);
-                data.push(['المجال الأول', 'البند الأول', '', '', '', '1']);
-                data.push(['المجال الأول', 'البند الثاني', '', '', '', '1']);
+                data.push(['المحور الأول', 'البند الأول', '', '', '', '1']);
+                data.push(['المحور الأول', 'البند الثاني', '', '', '', '1']);
 
                 const ws = XLSX.utils.aoa_to_sheet(data);
                 const wb = XLSX.utils.book_new();
@@ -537,7 +538,7 @@
                     return;
                 }
                 const data = [];
-                const header = ['المجال', 'البنود', ...scales.map(s => s.name), 'المجموع'];
+                const header = ['المحور', 'البنود', ...scales.map(s => s.name), 'المجموع'];
                 data.push(header);
 
                 domains.forEach(domain => {
@@ -776,20 +777,20 @@
                     {/* Domains & Grid Layout */}
                     <div className="mb-6">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl md:text-3xl thin-title text-gray-800 font-black">المجالات والبنود (Domains Matrix)</h2>
+                            <h2 className="text-2xl md:text-3xl thin-title text-gray-800 font-black">المحاور والبنود (Axes Matrix)</h2>
                             <button
                                 onClick={addDomain}
                                 className="bg-green-500 text-white px-5 py-2 rounded-lg text-sm md:text-base hover:bg-green-600 hover:scale-105 transition-all shadow-md flex items-center gap-2 font-black"
                             >
-                                <i className="fas fa-folder-plus"></i> إضافة مجال جديد
+                                <i className="fas fa-folder-plus"></i> إضافة محور جديد
                             </button>
                         </div>
                         
                         {domains.length === 0 && (
                             <div className="bg-white p-8 rounded-xl shadow-md border-t-2 border-gray-300 text-center hover-zoom">
                                 <i className="fas fa-folder-open text-4xl text-gray-300 mb-2"></i>
-                                <h3 className="text-xl text-gray-500 font-black">لا توجد مجالات لعرضها حالياً</h3>
-                                <p className="text-gray-400 mt-1 text-sm font-bold">قم بإضافة مجال جديد أو رفع ملف قالب Excel للبدء.</p>
+                                <h3 className="text-xl text-gray-500 font-black">لا توجد محاور لعرضها حالياً</h3>
+                                <p className="text-gray-400 mt-1 text-sm font-bold">قم بإضافة محور جديد أو رفع ملف قالب Excel للبدء.</p>
                             </div>
                         )}
 
@@ -807,22 +808,23 @@
                                 {/* Domain Header */}
                                 <div className="flex flex-col md:flex-row gap-3 mb-4 pb-4 border-b border-gray-100 items-end">
                                     <div className="flex-1 w-full">
-                                        <label className="block text-indigo-800 mb-1 text-xs font-black uppercase tracking-widest">اسم المجال</label>
+                                        <label className="block text-indigo-800 mb-1 text-xs font-black uppercase tracking-widest">اسم المحور</label>
                                         <input
                                             type="text"
                                             value={domain.name}
                                             onChange={(e) => updateDomain(domain.id, 'name', e.target.value)}
                                             className="w-full p-2 md:p-3 border border-gray-200 rounded-lg text-xl md:text-2xl font-black focus:outline-none focus:border-blue-500 bg-blue-50"
-                                            placeholder="أدخل اسم المجال"
+                                            placeholder="أدخل اسم المحور"
                                         />
                                     </div>
-                                    <button
-                                        onClick={() => removeDomain(domain.id)}
-                                        className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-600 hover:scale-105 transition-all shadow-md font-bold h-fit flex items-center gap-2 shrink-0 w-full md:w-auto justify-center"
-                                        title="حذف المجال بالكامل"
-                                    >
-                                        <i className="fas fa-trash"></i> حذف المجال
-                                    </button>
+                                    <div className="flex gap-2 shrink-0 w-full md:w-auto justify-center">
+                                        <button
+                                            onClick={() => addItem(domain.id)}
+                                            className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm md:text-base hover:bg-green-600 hover:scale-105 transition-all shadow-md font-bold h-fit flex items-center gap-2 justify-center"
+                                        >
+                                            <i className="fas fa-plus-circle"></i> إضافة بند (سؤال)
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Items Grid/Table Structure */}
@@ -931,13 +933,16 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <button
-                                    onClick={() => addItem(domain.id)}
-                                    className="mt-4 bg-green-500 text-white px-4 py-2 rounded-lg text-sm md:text-base hover:bg-green-600 hover:scale-105 transition-all shadow-md flex items-center gap-2 font-bold inline-block"
-                                >
-                                    <i className="fas fa-plus-circle"></i> إضافة بند (سؤال)
-                                </button>
+                                
+                                <div className="mt-4 flex justify-end border-t border-gray-100 pt-4">
+                                    <button
+                                        onClick={() => removeDomain(domain.id)}
+                                        className="bg-red-500 text-white px-5 py-2 rounded-lg text-sm md:text-base hover:bg-red-600 hover:scale-105 transition-all shadow-md font-bold flex items-center gap-2"
+                                        title="حذف المحور بالكامل"
+                                    >
+                                        <i className="fas fa-trash-alt"></i> حذف المحور
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
