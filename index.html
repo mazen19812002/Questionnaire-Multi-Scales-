@@ -65,11 +65,29 @@
             .flex.justify-between.items-start.mb-8 img { height: 35px !important; width: 35px !important; box-shadow: none !important; border: none !important; padding: 0 !important; display: block !important; }
 
             /* Titles and Headers - SUPER COMPACT */
-            .text-center.mb-6 { margin-bottom: 1mm !important; }
+            .mb-6.relative { margin-bottom: 1mm !important; }
             #mainTitle { font-size: 14pt !important; font-weight: 900 !important; margin-bottom: 0 !important; text-align: center !important; line-height: 1 !important; }
             #instituteTitle { font-size: 9pt !important; text-align: center !important; margin-bottom: 2mm !important; line-height: 1 !important; }
-            #fileNameDisplay { font-size: 11pt !important; display: block !important; margin-bottom: 0 !important; text-align: center !important; line-height: 1 !important; }
-            #participantCountDisplay { font-size: 9pt !important; margin-bottom: 1mm !important; line-height: 1 !important; }
+            #fileNameDisplay { font-size: 11pt !important; display: block !important; margin-bottom: 2mm !important; text-align: center !important; line-height: 1 !important; }
+            
+            /* Meta Info (Program and Participants) - COMPACT & ALIGNED LEFT */
+            #metaInfoDisplay { 
+                display: flex !important; 
+                justify-content: flex-end !important; /* يوجه العناصر لأقصى اليسار في اتجاه RTL */
+                gap: 2mm !important; 
+                margin-top: 1mm !important; 
+                margin-bottom: 2mm !important;
+            }
+            #metaInfoDisplay > div {
+                padding: 1.5mm 3mm !important;
+                border: 1pt solid #cbd5e1 !important;
+                border-radius: 4pt !important;
+                background-color: #f8fafc !important;
+                font-size: 9pt !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+            #metaInfoDisplay span { line-height: 1 !important; }
             
             h2 { font-size: 10pt !important; padding: 1mm 2mm !important; margin-bottom: 0 !important; border: none !important; background-color: transparent !important; }
             h3, h4 { font-size: 9pt !important; margin-bottom: 1mm !important; }
@@ -320,10 +338,20 @@
         </div>
 
         <div id="reportPrintScope">
-            <div class="text-center mb-6">
-                <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 mb-2 hidden font-black uppercase"></p>
-                <p id="participantCountDisplay" class="text-2xl text-indigo-800 font-black hidden uppercase tracking-tighter"></p>
+            <div class="mb-6 relative">
+                <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 hidden font-black uppercase text-center mb-4"></p>
+                
+                <!-- القسم الجديد: البرنامج والمشاركين في أقصى اليسار -->
+                <div id="metaInfoDisplay" class="hidden flex justify-end gap-4 text-lg font-black w-full">
+                    <div class="bg-indigo-50 text-indigo-800 px-4 py-2 rounded-xl border border-indigo-100 flex items-center">
+                        <span id="participantCountDisplay"></span>
+                    </div>
+                    <div class="bg-slate-50 text-slate-800 px-4 py-2 rounded-xl border border-slate-200 flex items-center">
+                        <span class="text-slate-500 ml-2">البرنامج:</span><span id="programNameText" class="text-indigo-700"></span>
+                    </div>
+                </div>
             </div>
+
             <div id="resultsContainer" class="hidden space-y-8"></div>
             <div id="chartContainer" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8"></div>
             <div id="positiveNegativeItemsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 mt-8"></div>
@@ -783,7 +811,7 @@
                 if (selectedDepts.size === 0) {
                     textEl.textContent = d.allInstitute;
                 } else {
-                    textEl.textContent = Array.from(selectedDepts).join(', ');
+                    textEl.textContent = Array.from(selectedDepts).join('، ');
                 }
             }
 
@@ -907,8 +935,20 @@
                     rows = rows.filter(r => r && selectedDepts.has(String(r[filterColIdx] || "").trim()));
                 }
                 
+                // إضافة عدد المشاركين
                 document.getElementById('participantCountDisplay').textContent = `${rows.length} ${languageData[currentLang].participants}`;
-                document.getElementById('participantCountDisplay').classList.remove('hidden');
+                
+                // إضافة البرنامج الذي تم فلترته للرأسية
+                let programText = '';
+                if (selectedDepts.size === 0) {
+                    programText = languageData[currentLang].allInstitute;
+                } else {
+                    programText = Array.from(selectedDepts).join('، ');
+                }
+                document.getElementById('programNameText').textContent = programText;
+                
+                // إظهار اللوحة العلوية المحدثة
+                document.getElementById('metaInfoDisplay').classList.remove('hidden');
 
                 const headers = rawExcelData[0];
                 const processedCols = new Set();
@@ -989,18 +1029,18 @@
                                     datasets: [{ 
                                         data: dataVals, 
                                         backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], 
-                                        borderRadius: 4, // زوايا أقل انحناء للأعمدة الرفيعة
-                                        maxBarThickness: 25, // أعمدة أرفع بكثير وأكثر أناقة
-                                        barPercentage: 0.6 // تضمن عدم احتلال الأعمدة لمساحة الفئة بالكامل
+                                        borderRadius: 4, 
+                                        maxBarThickness: 50, // تم مضاعفة السُمك ليصبح عريضاً وقوياً
+                                        barPercentage: 0.8 // زيادة المساحة المتاحة للعمود
                                     }] 
                                 }, 
                                 options: { 
                                     animation: false, 
-                                    maintainAspectRatio: false, // الاعتماد الكامل على الارتفاع الثابت (250px)
+                                    maintainAspectRatio: false, 
                                     responsive: true,
-                                    devicePixelRatio: 2, // رفع دقة الرسم لمنع التشوه عند تحويله لـ PDF
-                                    locale: 'ar-EG', // إجبار الحسابات على السياق العربي
-                                    rtl: true, // إجبار خاصية RTL بشكل صريح في إعدادات اللوحة لمنع تداخل المحاور أثناء الطباعة
+                                    devicePixelRatio: 2, 
+                                    locale: 'ar-EG', 
+                                    rtl: true, 
                                     layout: {
                                         padding: {
                                             top: 30, 
@@ -1012,18 +1052,18 @@
                                     scales: {
                                         y: { 
                                             beginAtZero: true, 
-                                            grace: '15%', // زيادة السماحية العلوية
-                                            position: 'right', // إجبار المحور على البقاء يميناً
+                                            grace: '15%', 
+                                            position: 'right', 
                                             ticks: {
                                                 font: { weight: '900', family: 'Cairo', size: 11 } 
                                             }
                                         },
                                         x: {
-                                            grid: { display: false }, // إخفاء خطوط الشبكة السينية لشكل أنظف
+                                            grid: { display: false }, 
                                             ticks: {
                                                 font: { weight: '900', family: 'Cairo', size: 10 },
-                                                autoSkip: false, // إجبار المتصفح على عدم تخطي أو إخفاء أي تسمية
-                                                maxRotation: 0 // إبقاء النصوص مسطحة لتجنب التداخل العشوائي
+                                                autoSkip: false, 
+                                                maxRotation: 0 
                                             }
                                         }
                                     },
@@ -1072,6 +1112,11 @@
             document.getElementById('copyTableButton').onclick = () => {
                 const d = languageData[currentLang];
                 let copyContent = `--- ${d.title} ---\n${d.devCredit}\n\n`;
+                
+                const programText = document.getElementById('programNameText').textContent;
+                const participantText = document.getElementById('participantCountDisplay').textContent;
+                copyContent += `البرنامج: ${programText} | المشاركون: ${participantText}\n\n`;
+                
                 document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(block => {
                     const h2 = block.querySelector('h2'); if (h2) copyContent += `\n[ ${h2.innerText} ]\n`;
                     const table = block.querySelector('table');
@@ -1095,7 +1140,17 @@
 
             document.getElementById('exportButton').onclick = () => {
                 const d = languageData[currentLang];
-                const wb = XLSX.utils.book_new(); let allD = [[d.title], [d.devCredit], []];
+                const programText = document.getElementById('programNameText').textContent;
+                const participantText = document.getElementById('participantCountDisplay').textContent;
+                
+                const wb = XLSX.utils.book_new(); 
+                let allD = [
+                    [d.title], 
+                    [d.devCredit], 
+                    [`البرنامج: ${programText}`, `المشاركون: ${participantText}`],
+                    []
+                ];
+                
                 document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(s => {
                     allD.push([sanitizeValue(s.querySelector('h2').innerText)]);
                     const tbl = s.querySelector('table');
