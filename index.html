@@ -160,11 +160,14 @@
                 display: flex !important; 
                 flex-direction: row !important; 
                 justify-content: space-between !important; 
-                margin-top: 2mm !important; 
+                margin-top: 5mm !important; 
                 border-top: 1pt solid #cbd5e1 !important; 
-                padding-top: 1mm !important;
-                font-size: 9pt !important;
+                padding-top: 3mm !important;
+                padding-left: 10mm !important;
+                padding-right: 10mm !important;
+                font-size: 11pt !important;
             }
+            #signatureSection .sig-space { height: 12mm !important; } /* مساحة مخصصة للتوقيع اليدوي في الطباعة */
             #signatureSection p { margin-bottom: 0 !important; }
             
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
@@ -325,13 +328,15 @@
             <div id="finalRecommendationContainer" class="hidden mt-10"></div>
             
             <!-- قسم التوقيعات -->
-            <div id="signatureSection" class="hidden mt-12 pt-8 border-t-2 border-slate-200 flex justify-between items-center text-lg font-black px-4 md:px-12">
+            <div id="signatureSection" class="hidden mt-12 pt-8 border-t-2 border-slate-200 flex justify-between items-center text-lg font-black px-4 md:px-16">
                 <div class="text-center">
-                    <p class="mb-1 text-slate-600">مقرر لجنة القياس والتقويم</p>
+                    <p class="text-slate-700">مقرر لجنة القياس والتقويم</p>
+                    <div class="sig-space h-16"></div> <!-- مساحة للتوقيع -->
                     <p class="text-indigo-900">د. مازن فوزي بدوي</p>
                 </div>
                 <div class="text-center">
-                    <p class="mb-1 text-slate-600">مدير وحدة ضمان الجودة</p>
+                    <p class="text-slate-700">مدير وحدة ضمان الجودة</p>
+                    <div class="sig-space h-16"></div> <!-- مساحة للتوقيع -->
                     <p class="text-indigo-900">د. هنادى عبدالرحمن الدهيمي</p>
                 </div>
             </div>
