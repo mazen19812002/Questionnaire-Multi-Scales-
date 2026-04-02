@@ -54,7 +54,7 @@
             @page { size: A4 portrait; margin: 10mm; }
             body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 10pt !important; }
             
-            /* Hide UI elements not meant for print (removed the logo container from this list) */
+            /* Hide UI elements not meant for print */
             .input-card, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .copy-btn-wrapper, #messageBoxModal { display: none !important; }
             
             main { box-shadow: none !important; padding: 0 !important; background-color: transparent !important; max-width: 100% !important; margin: 0 !important; border: none !important; }
@@ -89,10 +89,24 @@
             #positiveNegativeItemsContainer { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 2% !important; justify-content: space-between !important; align-items: stretch !important; page-break-inside: avoid !important; }
             #positiveNegativeItemsContainer > div { width: 49% !important; box-sizing: border-box !important; margin-bottom: 5mm !important; border: 1pt solid #cbd5e1 !important; padding: 4mm !important; border-radius: 6pt !important; background-color: #f8fafc !important; }
             
-            /* Charts */
+            /* ========================================= */
+            /* CHARTS AND CANVAS OVERFLOW FIX FOR PRINT */
+            /* ========================================= */
             #chartContainer { display: flex !important; flex-wrap: wrap !important; gap: 2% !important; }
-            #chartContainer > div { width: 49% !important; page-break-inside: avoid !important; border: 1pt solid #cbd5e1 !important; padding: 4mm !important; border-radius: 6pt !important; margin-bottom: 5mm !important;}
-            .h-96 { height: 200px !important; }
+            #chartContainer > div { width: 49% !important; page-break-inside: avoid !important; break-inside: avoid !important; border: 1pt solid #cbd5e1 !important; padding: 4mm !important; border-radius: 6pt !important; margin-bottom: 5mm !important;}
+            
+            /* Remove the fixed h-96 class in print to let it shrink to fit the canvas properly */
+            .h-96 { height: auto !important; }
+            
+            /* Force the canvas element to scale down like an image and stay strictly inside its box */
+            canvas {
+                max-width: 100% !important;
+                height: auto !important; 
+                max-height: 250px !important;
+                display: block !important;
+                margin: 0 auto !important;
+            }
+            /* ========================================= */
             
             /* FINAL RECOMMENDATION FIXES */
             #finalRecommendationContainer { page-break-inside: avoid !important; break-inside: avoid !important; margin-top: 5mm !important; }
@@ -906,8 +920,8 @@
                             
                             const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
                             const divC = document.createElement('div');
-                            divC.className = 'bg-white p-10 rounded-[2.5rem] shadow-xl border-2 border-blue-100 flex flex-col items-center';
-                            divC.innerHTML = `<h3 class="text-2xl font-black mb-8 text-center text-indigo-900">${dName}</h3><div class="w-full h-96"><canvas id="${canvasId}"></canvas></div>`;
+                            divC.className = 'bg-white p-10 rounded-[2.5rem] shadow-xl border-2 border-blue-100 flex flex-col items-center h-full';
+                            divC.innerHTML = `<h3 class="text-2xl font-black mb-8 text-center text-indigo-900">${dName}</h3><div class="w-full h-96 flex justify-center items-center overflow-hidden"><canvas id="${canvasId}"></canvas></div>`;
                             document.getElementById('chartContainer').appendChild(divC);
                             
                             const ctx = document.getElementById(canvasId).getContext('2d');
