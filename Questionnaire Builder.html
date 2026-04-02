@@ -56,7 +56,6 @@
     </style>
 </head>
 <body class="bg-blue-100 min-h-screen pb-24">
-
     <div id="root"></div>
 
     <!-- Personalized Footer -->
@@ -69,64 +68,64 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // --- Initial Data Structure (Starts Empty as requested) ---
+        /* --- Initial Data Structure (Starts Empty as requested) --- */
         const initialScales = [
             { id: 's1', name: 'موافق', type: 'positive' },
             { id: 's2', name: 'إلى حد ما', type: 'neutral' },
             { id: 's3', name: 'غير موافق', type: 'negative' }
         ];
 
-        // Domains start completely empty
+        /* Domains start completely empty */
         const initialDomains = [];
 
         function App() {
             const [scales, setScales] = useState(initialScales);
             const [domains, setDomains] = useState(initialDomains);
             
-            // Modal State for avoiding native alerts/confirms
+            /* Modal State for avoiding native alerts/confirms */
             const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'alert', message: '', onConfirm: null });
 
-            // Drag and drop state for items
+            /* Drag and drop state for items */
             const [draggedItem, setDraggedItem] = useState(null);
             const [draggedOverItem, setDraggedOverItem] = useState(null);
 
-            // Drag and drop state for scales (columns)
+            /* Drag and drop state for scales (columns) */
             const [draggedScaleIndex, setDraggedScaleIndex] = useState(null);
             const [draggedOverScaleIndex, setDraggedOverScaleIndex] = useState(null);
 
-            // Number of participants (Default to 100 to prevent percentage fractional drift in mock data)
+            /* Number of participants (Default to 100 to prevent percentage fractional drift in mock data) */
             const [participantsCount, setParticipantsCount] = useState(100);
 
-            // --- Custom Modal Helpers ---
+            /* --- Custom Modal Helpers --- */
             const showAlert = (message) => setModalConfig({ isOpen: true, type: 'alert', message, onConfirm: null });
             const showConfirm = (message, onConfirm) => setModalConfig({ isOpen: true, type: 'confirm', message, onConfirm });
             const closeModal = () => setModalConfig({ ...modalConfig, isOpen: false });
 
-            // --- Handlers for Auto Fill (Smart Percentage Generator) ---
+            /* --- Handlers for Auto Fill (Smart Percentage Generator) --- */
             const handleAutoFill = () => {
                 if (domains.length === 0) {
                     showAlert('لا توجد مجالات أو بنود لتعبئتها. يرجى إضافة مجالات أولاً أو رفع ملف.');
                     return;
                 }
 
-                // Immediate execution: No confirm needed to keep it fast and responsive
+                /* Immediate execution: No confirm needed to keep it fast and responsive */
                 setDomains(prevDomains => prevDomains.map(domain => {
                     const newItems = domain.items.map(item => {
                         const posScales = scales.filter(s => s.type === 'positive');
                         const negScales = scales.filter(s => s.type === 'negative');
                         const neuScales = scales.filter(s => s.type === 'neutral');
 
-                        // Positive: roughly 70% (random between 65% and 75%)
+                        /* Positive: roughly 70% (random between 65% and 75%) */
                         let posBudget = posScales.length > 0 ? Math.floor(Math.random() * 11) + 65 : 0;
                         
-                        // Negative: less than 15% (random between 5% and 14%)
+                        /* Negative: less than 15% (random between 5% and 14%) */
                         let negBudget = negScales.length > 0 ? Math.floor(Math.random() * 10) + 5 : 0;
                         
-                        // Adjust if we have no neutral scales to soak up the remainder
+                        /* Adjust if we have no neutral scales to soak up the remainder */
                         if (neuScales.length === 0) {
                             if (posScales.length > 0 && negScales.length > 0) {
                                 negBudget = Math.floor(Math.random() * 10) + 5;
-                                posBudget = 100 - negBudget; 
+                                posBudget = 100 - negBudget;
                             } else if (posScales.length > 0) {
                                 posBudget = 100;
                             } else if (negScales.length > 0) {
@@ -134,13 +133,13 @@
                             }
                         }
 
-                        // Neutral takes whatever is left to guarantee row equals exactly 100%
+                        /* Neutral takes whatever is left to guarantee row equals exactly 100% */
                         let neuBudget = 100 - posBudget - negBudget;
                         if (neuBudget < 0) neuBudget = 0;
 
                         const newValues = { ...item.values };
 
-                        // Distribute function across multiple scales of the same type if they exist
+                        /* Distribute function across multiple scales of the same type if they exist */
                         const distribute = (budget, scalesArray) => {
                             if (scalesArray.length === 0) return;
                             if (scalesArray.length === 1) {
@@ -170,7 +169,7 @@
                 }));
             };
 
-            // --- Handlers for Excel Upload ---
+            /* --- Handlers for Excel Upload --- */
             const handleFileUpload = (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -189,7 +188,7 @@
                             return;
                         }
 
-                        // 1. Parse Headers (Scales)
+                        /* 1. Parse Headers (Scales) */
                         const headers = data[0];
                         const domainIdx = headers.indexOf('المجال') !== -1 ? headers.indexOf('المجال') : 0;
                         const itemIdx = headers.indexOf('البنود') !== -1 ? headers.indexOf('البنود') : 1;
@@ -204,7 +203,7 @@
                             type: idx === 0 ? 'positive' : (idx === scaleNames.length - 1 ? 'negative' : 'neutral')
                         }));
 
-                        // 2. Parse Domains and Items
+                        /* 2. Parse Domains and Items */
                         const newDomainsMap = new Map();
 
                         for (let i = 1; i < data.length; i++) {
@@ -252,7 +251,7 @@
                         setScales(newScales);
                         setDomains(parsedDomains);
                         
-                        // Clear the input
+                        /* Clear the input */
                         e.target.value = '';
 
                     } catch (error) {
@@ -263,7 +262,7 @@
                 reader.readAsArrayBuffer(file);
             };
 
-            // --- Handlers for Scales (Columns) ---
+            /* --- Handlers for Scales (Columns) --- */
             const addScale = () => {
                 const newId = Date.now().toString();
                 setScales([...scales, { id: newId, name: 'مقياس جديد', type: 'positive' }]);
@@ -299,7 +298,7 @@
                 });
             };
 
-            // --- Drag and Drop Logic for Scales ---
+            /* --- Drag and Drop Logic for Scales --- */
             const handleScaleDragStart = (e, index) => {
                 setDraggedScaleIndex(index);
                 e.dataTransfer.effectAllowed = "move";
@@ -333,7 +332,7 @@
                 setDraggedOverScaleIndex(null);
             };
 
-            // --- Handlers for Domains & Items ---
+            /* --- Handlers for Domains & Items --- */
             const addDomain = () => {
                 setDomains([...domains, { id: Date.now().toString(), name: 'مجال جديد', items: [] }]);
             };
@@ -375,9 +374,9 @@
                     if (d.id === domainId) {
                         return { 
                             ...d, 
-                            items: d.items.map(i => i.id === itemId ? { 
-                                ...i, 
-                                values: { ...i.values, [scaleId]: finalValue } 
+                            items: d.items.map(i => i.id === itemId ? {
+                                ...i,
+                                values: { ...i.values, [scaleId]: finalValue }
                             } : i) 
                         };
                     }
@@ -394,7 +393,7 @@
                 }));
             };
 
-            // --- Drag and Drop Logic for Items ---
+            /* --- Drag and Drop Logic for Items --- */
             const handleDragStart = (e, domainId, itemIndex) => {
                 setDraggedItem({ domainId, itemIndex });
                 e.dataTransfer.effectAllowed = "move";
@@ -441,7 +440,7 @@
                 setDraggedOverItem(null);
             };
 
-            // --- Calculation Helpers (Mirroring the Analyzer Math) ---
+            /* --- Calculation Helpers (Mirroring the Analyzer Math) --- */
             const getItemRowTotal = (values) => {
                 return scales.reduce((sum, scale) => sum + (Number(values[scale.id]) || 0), 0);
             };
@@ -450,12 +449,12 @@
                 return scales.filter(s => s.type === 'positive').reduce((sum, scale) => sum + (Number(values[scale.id]) || 0), 0);
             };
 
-            // --- Excel Export Functions ---
+            /* --- Excel Export Functions --- */
             const exportEmptyTemplate = () => {
                 const data = [];
                 const header = ['المجال', 'البنود', ...scales.map(s => s.name), 'المجموع'];
                 data.push(header);
-                // إضافة صفوف نموذجية فارغة لتوضيح طريقة الإدخال
+                /* إضافة صفوف نموذجية فارغة لتوضيح طريقة الإدخال */
                 data.push(['المجال الأول', 'البند الأول', '', '', '', '1']);
                 data.push(['المجال الأول', 'البند الثاني', '', '', '', '1']);
 
@@ -478,7 +477,7 @@
                     domain.items.forEach(item => {
                         const row = [domain.name, item.text];
                         scales.forEach(s => row.push(`${item.values[s.id] || 0}%`));
-                        // Using raw unrounded item for export exactly like original layout requested
+                        /* Using raw unrounded item for export exactly like original layout requested */
                         row.push(`${getItemRowTotal(item.values)}%`);
                         data.push(row);
                     });
@@ -504,7 +503,7 @@
                 const header = ['Timestamp', ...allItems.map(i => i.question)];
                 data.push(header);
 
-                // Pre-calculate exact distribution for each item column based on percentages
+                /* Pre-calculate exact distribution for each item column based on percentages */
                 const itemColumns = allItems.map(itemObj => {
                     let distribution = [];
                     let counts = scales.map(s => {
@@ -516,7 +515,7 @@
                         };
                     });
                     
-                    // Handle rounding remainders to ensure exact participant count
+                    /* Handle rounding remainders to ensure exact participant count */
                     let currentTotal = counts.reduce((sum, c) => sum + c.exactCount, 0);
                     let remainder = participantsCount - currentTotal;
                     counts.sort((a, b) => b.fraction - a.fraction);
@@ -524,14 +523,14 @@
                         counts[i % counts.length].exactCount++;
                     }
                     
-                    // Populate array with exact counts
+                    /* Populate array with exact counts */
                     counts.forEach(c => {
                         for(let i = 0; i < c.exactCount; i++) {
                             distribution.push(c.name);
                         }
                     });
                     
-                    // Shuffle the answers for realism
+                    /* Shuffle the answers for realism */
                     for (let i = distribution.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));
                         [distribution[i], distribution[j]] = [distribution[j], distribution[i]];
@@ -540,13 +539,13 @@
                     return distribution;
                 });
 
-                // Build rows for each participant
+                /* Build rows for each participant */
                 for (let i = 0; i < participantsCount; i++) {
                     const row = [];
                     const date = new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000));
                     row.push(date.toLocaleString('en-GB'));
                     
-                    // Grab the pre-calculated, shuffled answer for this specific row
+                    /* Grab the pre-calculated, shuffled answer for this specific row */
                     itemColumns.forEach(column => {
                         row.push(column[i]);
                     });
@@ -588,6 +587,20 @@
                             </div>
                         </div>
                     )}
+
+                    {/* Top Navigation & Logos */}
+                    <div className="flex justify-between items-center mb-8 bg-white p-4 rounded-3xl shadow-lg hover-zoom border-t-4 border-blue-500">
+                        {/* Right Logo (00.png) - since dir="rtl", this is first in the DOM */}
+                        <img src="https://mazen19812002.github.io/Questionnaire-Multi-Scales-/00.png" alt="Logo Right" className="h-16 md:h-20 w-auto object-contain drop-shadow-md" />
+                        
+                        {/* Home Button */}
+                        <a href="https://mazen19812002.github.io/Questionnaire-Multi-Scales-/" className="bg-blue-600 text-white px-6 py-3 rounded-2xl text-xl md:text-2xl hover:bg-blue-700 hover:scale-105 transition-all duration-200 shadow-xl flex items-center gap-3 font-black">
+                            <i className="fas fa-home"></i> الرئيسية (Home)
+                        </a>
+
+                        {/* Left Logo (02.jpg) */}
+                        <img src="https://mazen19812002.github.io/Questionnaire-Multi-Scales-/02.jpg" alt="Logo Left" className="h-16 md:h-20 w-auto object-contain rounded-xl shadow-sm" />
+                    </div>
 
                     {/* Header */}
                     <div className="text-center mb-10">
@@ -775,7 +788,7 @@
                                                 const isDraggedOver = draggedOverItem && draggedOverItem.domainId === domain.id && draggedOverItem.itemIndex === iIndex;
                                                 const rowTotal = getItemRowTotal(item.values);
                                                 const posTotal = getPositivesTotal(item.values);
-                                                const isRowValid = Math.abs(rowTotal - 100) < 0.1; // Allows safe floating point evaluation
+                                                const isRowValid = Math.abs(rowTotal - 100) < 0.1; /* Allows safe floating point evaluation */
 
                                                 return (
                                                     <div 
