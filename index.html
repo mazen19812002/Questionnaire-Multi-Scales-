@@ -52,44 +52,54 @@
         /* --- OPTIMIZED PRINT MEDIA QUERY FOR FITTING EVERYTHING --- */
         /* ------------------------------------------------------------- */
         @media print {
-            @page { size: A4 portrait; margin: 10mm; }
-            body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 10pt !important; }
+            @page { size: A4 portrait; margin: 8mm; } /* تقليل هوامش الصفحة */
+            body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 9pt !important; line-height: 1.15 !important; } /* ضغط النصوص */
             
             /* Hide UI elements not meant for print */
             .input-card, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .copy-btn-wrapper, #messageBoxModal { display: none !important; }
             
             main { box-shadow: none !important; padding: 0 !important; background-color: transparent !important; max-width: 100% !important; margin: 0 !important; border: none !important; }
             
-            /* Logos Header Fix */
-            .flex.justify-between.items-start.mb-8 { display: flex !important; margin-bottom: 5mm !important; align-items: center !important; }
-            .flex.justify-between.items-start.mb-8 img { height: 60px !important; width: 60px !important; box-shadow: none !important; border: none !important; padding: 0 !important; display: block !important; }
+            /* Logos Header Fix - COMPACT */
+            .flex.justify-between.items-start.mb-8 { display: flex !important; margin-bottom: 2mm !important; align-items: center !important; }
+            .flex.justify-between.items-start.mb-8 img { height: 40px !important; width: 40px !important; box-shadow: none !important; border: none !important; padding: 0 !important; display: block !important; }
 
-            /* Titles and Headers */
-            #mainTitle { font-size: 18pt !important; font-weight: 900 !important; margin-bottom: 2mm !important; text-align: center !important; }
-            #instituteTitle { font-size: 11pt !important; text-align: center !important; margin-bottom: 6mm !important; }
-            #fileNameDisplay { font-size: 14pt !important; display: block !important; margin-bottom: 5mm !important; text-align: center !important; }
+            /* Titles and Headers - COMPACT */
+            .text-center.mb-6 { margin-bottom: 2mm !important; }
+            #mainTitle { font-size: 16pt !important; font-weight: 900 !important; margin-bottom: 1mm !important; text-align: center !important; line-height: 1 !important; }
+            #instituteTitle { font-size: 10pt !important; text-align: center !important; margin-bottom: 3mm !important; }
+            #fileNameDisplay { font-size: 12pt !important; display: block !important; margin-bottom: 1mm !important; text-align: center !important; line-height: 1 !important; }
+            #participantCountDisplay { font-size: 10pt !important; margin-bottom: 2mm !important; }
             
-            h2 { font-size: 13pt !important; padding: 4pt !important; margin-bottom: 0 !important; border: none !important; background-color: transparent !important; }
-            h3, h4 { font-size: 12pt !important; margin-bottom: 4pt !important; }
+            h2 { font-size: 11pt !important; padding: 2mm !important; margin-bottom: 0 !important; border: none !important; background-color: transparent !important; }
+            h3, h4 { font-size: 10pt !important; margin-bottom: 2mm !important; }
 
-            /* General Wrappers */
+            /* Overriding Tailwind Spacing for Print */
+            #resultsContainer.space-y-8 > div { margin-bottom: 4mm !important; margin-top: 0 !important; }
+            #chartContainer.mt-8 { margin-top: 4mm !important; }
+            #positiveNegativeItemsContainer.mt-8 { margin-top: 4mm !important; }
+            #finalRecommendationContainer.mt-10 { margin-top: 4mm !important; }
+
+            /* General Wrappers - COMPACT */
             .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper {
-                margin-bottom: 8mm !important;
+                margin-bottom: 4mm !important;
                 border: 1pt solid #cbd5e1 !important;
-                border-radius: 6pt !important;
+                border-radius: 4pt !important;
                 box-shadow: none !important;
                 padding: 0 !important; 
                 background-color: white !important;
             }
-            .domain-result-wrapper h2, .summary-table-wrapper h2, .suggestion-wrapper h2 { padding: 4mm !important; background-color: #f8fafc !important; border-bottom: 1pt solid #cbd5e1 !important; margin: 0 !important; border-top-left-radius: 6pt !important; border-top-right-radius: 6pt !important; }
-            .suggestion-wrapper .p-8 { padding: 4mm !important; }
+            .domain-result-wrapper h2, .summary-table-wrapper h2, .suggestion-wrapper h2 { padding: 2mm 3mm !important; background-color: #f8fafc !important; border-bottom: 1pt solid #cbd5e1 !important; margin: 0 !important; border-top-left-radius: 4pt !important; border-top-right-radius: 4pt !important; }
+            .suggestion-wrapper .p-4 { padding: 2mm !important; }
+            .suggestion-box { min-height: 10px !important; padding: 2mm !important; }
 
             /* Prevent breaks inside smaller containers. Let large tables break naturally. */
             .suggestion-wrapper, .summary-table-wrapper { page-break-inside: avoid !important; break-inside: avoid !important; }
 
-            /* 2-Column Layout Forces (Highlights) */
+            /* 2-Column Layout Forces (Highlights) - COMPACT */
             #positiveNegativeItemsContainer { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 2% !important; justify-content: space-between !important; align-items: stretch !important; page-break-inside: avoid !important; }
-            #positiveNegativeItemsContainer > div { width: 49% !important; box-sizing: border-box !important; margin-bottom: 5mm !important; border: 1pt solid #cbd5e1 !important; padding: 4mm !important; border-radius: 6pt !important; background-color: #f8fafc !important; }
+            #positiveNegativeItemsContainer > div { width: 49% !important; box-sizing: border-box !important; margin-bottom: 3mm !important; border: 1pt solid #cbd5e1 !important; padding: 3mm !important; border-radius: 4pt !important; background-color: #f8fafc !important; }
+            #positiveNegativeItemsContainer ul.space-y-3 > li { margin-bottom: 1mm !important; padding: 2mm !important; }
             
             /* ========================================= */
             /* STRICT CHARTS PRINT CAGE FIX */
@@ -101,16 +111,16 @@
                 page-break-inside: avoid !important; 
                 break-inside: avoid !important; 
                 border: 1pt solid #cbd5e1 !important; 
-                padding: 4mm !important; 
-                border-radius: 6pt !important; 
-                margin-bottom: 5mm !important;
+                padding: 2mm !important; 
+                border-radius: 4pt !important; 
+                margin-bottom: 3mm !important;
                 background-color: white !important;
             }
             
             /* Caging the canvas heavily for print */
             #chartContainer .relative {
-                height: 220px !important;
-                max-height: 220px !important;
+                height: 180px !important;
+                max-height: 180px !important;
                 width: 100% !important;
             }
             canvas {
@@ -119,23 +129,23 @@
             }
             /* ========================================= */
             
-            /* FINAL RECOMMENDATION FIXES */
-            #finalRecommendationContainer { page-break-inside: avoid !important; break-inside: avoid !important; margin-top: 5mm !important; }
-            #finalRecommendationContainer > div { padding: 6mm !important; border: 1.5pt solid #818cf8 !important; border-radius: 10pt !important; box-shadow: none !important; background-color: white !important; }
-            #finalRecommendationContainer h2 { font-size: 16pt !important; margin-bottom: 4mm !important; border-bottom: 1pt solid #e0e7ff !important; padding-bottom: 2mm !important; background-color: transparent !important; }
-            #finalRecommendationContainer > div > .grid { display: flex !important; flex-direction: row !important; gap: 4% !important; justify-content: center !important; }
-            #finalRecommendationContainer > div > .grid > div { width: 48% !important; padding: 4mm !important; border-radius: 6pt !important; border: 1pt solid #cbd5e1 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; background-color: #f8fafc !important; }
-            #finalRecommendationContainer .text-6xl { font-size: 24pt !important; line-height: 1.2 !important; margin-top: 2mm !important; }
-            #finalRecommendationContainer .text-xs { font-size: 10pt !important; }
+            /* FINAL RECOMMENDATION FIXES - COMPACT */
+            #finalRecommendationContainer { page-break-inside: avoid !important; break-inside: avoid !important; }
+            #finalRecommendationContainer > div { padding: 4mm !important; border: 1pt solid #818cf8 !important; border-radius: 6pt !important; box-shadow: none !important; background-color: white !important; margin-bottom: 2mm !important;}
+            #finalRecommendationContainer h2 { font-size: 14pt !important; margin-bottom: 2mm !important; border-bottom: 1pt solid #e0e7ff !important; padding-bottom: 1mm !important; background-color: transparent !important; }
+            #finalRecommendationContainer > div > .grid { display: flex !important; flex-direction: row !important; gap: 2% !important; justify-content: center !important; }
+            #finalRecommendationContainer > div > .grid > div { width: 48% !important; padding: 2mm !important; border-radius: 4pt !important; border: 1pt solid #cbd5e1 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; background-color: #f8fafc !important; }
+            #finalRecommendationContainer .text-5xl { font-size: 20pt !important; line-height: 1 !important; margin-top: 1mm !important; } /* تصغير خط النسب العملاقة */
+            #finalRecommendationContainer .text-xs { font-size: 9pt !important; }
             
-            /* Table Optimization to fit on Page and Break Cleanly */
+            /* Table Optimization to fit on Page and Break Cleanly - COMPACT */
             .overflow-x-auto { overflow: visible !important; } /* Fixes horizontal clipping */
             table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; margin: 0 !important; background-color: white !important; }
             thead { display: table-header-group !important; } /* Repeats headers on new pages */
             tfoot { display: table-row-group !important; } /* Prevents overlapping text bugs at page bottom */
             tr { page-break-inside: avoid !important; break-inside: avoid !important; } /* Prevents cutting a single row in half */
             
-            th, td { border: 1pt solid #cbd5e1 !important; padding: 4pt !important; font-size: 8.5pt !important; word-wrap: break-word !important; overflow-wrap: break-word !important; white-space: normal !important; vertical-align: middle !important; }
+            th, td { border: 1pt solid #cbd5e1 !important; padding: 2pt 4pt !important; font-size: 8pt !important; word-wrap: break-word !important; overflow-wrap: break-word !important; white-space: normal !important; vertical-align: middle !important; }
             th { background-color: #f1f5f9 !important; font-weight: 900 !important; color: #1e293b !important; }
             
             /* Column Width Distribution */
@@ -147,8 +157,18 @@
             /* Ensure background colors and styling prints correctly */
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
             
-            /* Signature Print Fix */
-            #signatureSection { page-break-inside: avoid !important; display: flex !important; flex-direction: row !important; justify-content: space-between !important; margin-top: 10mm !important; border-top: 2pt solid #cbd5e1 !important; padding-top: 5mm !important; }
+            /* Signature Print Fix - COMPACT */
+            #signatureSection { 
+                page-break-inside: avoid !important; 
+                display: flex !important; 
+                flex-direction: row !important; 
+                justify-content: space-between !important; 
+                margin-top: 4mm !important; 
+                border-top: 1pt solid #cbd5e1 !important; 
+                padding-top: 2mm !important;
+                font-size: 10pt !important;
+            }
+            #signatureSection p { margin-bottom: 0 !important; }
         }
     </style>
 </head>
