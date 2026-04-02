@@ -18,6 +18,7 @@
             display: flex;
             flex-direction: column;
             scroll-behavior: smooth;
+            line-height: 1.3;
         }
         .thin-title { font-weight: 300; letter-spacing: -0.01em; }
         .hover-zoom { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
@@ -145,6 +146,9 @@
             
             /* Ensure background colors and styling prints correctly */
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+            
+            /* Signature Print Fix */
+            #signatureSection { page-break-inside: avoid !important; display: flex !important; flex-direction: row !important; justify-content: space-between !important; margin-top: 10mm !important; border-top: 2pt solid #cbd5e1 !important; padding-top: 5mm !important; }
         }
     </style>
 </head>
@@ -292,18 +296,30 @@
         </div>
 
         <div id="reportPrintScope">
-            <div class="text-center mb-10">
+            <div class="text-center mb-6">
                 <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 mb-2 hidden font-black uppercase"></p>
                 <p id="participantCountDisplay" class="text-2xl text-indigo-800 font-black hidden uppercase tracking-tighter"></p>
             </div>
-            <div id="resultsContainer" class="hidden space-y-16"></div>
-            <div id="chartContainer" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-10 mt-12"></div>
-            <div id="positiveNegativeItemsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 mt-12"></div>
-            <div id="finalRecommendationContainer" class="hidden mt-16"></div>
+            <div id="resultsContainer" class="hidden space-y-8"></div>
+            <div id="chartContainer" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8"></div>
+            <div id="positiveNegativeItemsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 mt-8"></div>
+            <div id="finalRecommendationContainer" class="hidden mt-10"></div>
+            
+            <!-- قسم التوقيعات -->
+            <div id="signatureSection" class="hidden mt-12 pt-8 border-t-2 border-slate-200 flex justify-between items-center text-lg font-black px-4 md:px-12">
+                <div class="text-center">
+                    <p class="mb-1 text-slate-600">مقرر لجنة القياس والتقويم</p>
+                    <p class="text-indigo-900">د. مازن فوزي بدوي</p>
+                </div>
+                <div class="text-center">
+                    <p class="mb-1 text-slate-600">مدير وحدة ضمان الجودة</p>
+                    <p class="text-indigo-900">د. هنادى عبدالرحمن الدهيمي</p>
+                </div>
+            </div>
         </div>
     </main>
 
-    <footer class="w-full text-center py-10 mt-auto text-slate-900 font-black border-t border-blue-200 bg-blue-100/95 backdrop-blur-sm uppercase text-sm tracking-widest">
+    <footer class="w-full text-center py-6 mt-auto text-slate-900 font-black border-t border-blue-200 bg-blue-100/95 backdrop-blur-sm uppercase text-sm tracking-widest">
         All rights are reserved to Dr. Mazen Badawy – Doctorate of English Teaching & Testing
     </footer>
 
@@ -422,14 +438,14 @@
             identifiedScaleGroups.forEach((group, sig) => {
                 if (group.isSuggestion) return;
                 const wrap = document.createElement('div');
-                wrap.className = 'bg-white p-6 rounded-3xl border-2 border-blue-200 shadow-md hover-zoom';
-                wrap.innerHTML = `<h3 class="font-black text-indigo-900 uppercase tracking-tighter text-xl mb-4 pr-4">${languageData[currentLang].groupLabel}: ${group.options.join(', ')}</h3><div class="scale-list space-y-3 font-black" data-sig="${sig}"></div>`;
+                wrap.className = 'bg-white p-4 rounded-2xl border-2 border-blue-200 shadow-md hover-zoom';
+                wrap.innerHTML = `<h3 class="font-black text-indigo-900 uppercase tracking-tighter text-lg mb-3 pr-2">${languageData[currentLang].groupLabel}: ${group.options.join(', ')}</h3><div class="scale-list space-y-2 font-black" data-sig="${sig}"></div>`;
                 const list = wrap.querySelector('.scale-list');
                 group.options.forEach((opt, idx) => {
                     const item = document.createElement('div');
-                    item.className = 'p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl flex justify-between items-center cursor-move font-black';
+                    item.className = 'p-3 bg-slate-50 border-2 border-slate-200 rounded-xl flex justify-between items-center cursor-move font-black';
                     item.draggable = true;
-                    item.innerHTML = `<span class="font-bold text-slate-900">${opt}</span><label class="flex items-center cursor-pointer font-black"><input type="checkbox" class="w-6 h-6 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="mr-2 text-xs font-black text-indigo-800">${languageData[currentLang].pos}</span></label>`;
+                    item.innerHTML = `<span class="font-bold text-slate-900">${opt}</span><label class="flex items-center cursor-pointer font-black"><input type="checkbox" class="w-5 h-5 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="mr-2 text-xs font-black text-indigo-800">${languageData[currentLang].pos}</span></label>`;
                     item.querySelector('input').onchange = (e) => e.target.checked ? group.positives.add(opt) : group.positives.delete(opt);
                     item.ondragstart = (e) => { e.dataTransfer.setData('idx', idx); e.dataTransfer.setData('sig', sig); };
                     item.ondragover = (e) => e.preventDefault();
@@ -447,25 +463,25 @@
             const d = languageData[currentLang];
             const container = document.getElementById('resultsContainer');
             const div = document.createElement('div');
-            div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-blue-100 overflow-hidden hover-zoom mb-10 domain-result-wrapper';
+            div.className = 'bg-white rounded-2xl shadow-lg border border-blue-100 overflow-hidden hover-zoom mb-6 domain-result-wrapper';
             
             const totalRes = rows.reduce((s, r) => s + r.total, 0);
             const domainPos = rows.reduce((s, r) => s + Array.from(positives).reduce((sum, opt) => sum + (r.freqs[opt] || 0), 0), 0);
             const avgPos = totalRes ? (domainPos / totalRes * 100).toFixed(1) : '0.0';
             const align = 'text-right';
             
-            const thCells = opts.map(o => `<th class="p-6 text-center text-indigo-700 font-black">${o}</th>`).join('');
+            const thCells = opts.map(o => `<th class="p-3 text-center text-indigo-700 font-black">${o}</th>`).join('');
             
-            let html = `<h2 class="text-3xl thin-title p-8 bg-blue-50 border-b-2 border-blue-100 text-slate-900 font-black ${align}">${title}</h2>
+            let html = `<h2 class="text-2xl thin-title p-4 bg-blue-50 border-b border-blue-100 text-slate-900 font-black ${align}">${title}</h2>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm ${align} font-black">
                                 <thead class="bg-slate-100">
                                     <tr>
-                                        <th class="p-6 text-center font-black">#</th>
-                                        <th class="p-6 text-right font-black">${d.headers.item}</th>
+                                        <th class="p-3 text-center font-black">#</th>
+                                        <th class="p-3 text-right font-black">${d.headers.item}</th>
                                         ${thCells}
-                                        <th class="p-6 text-center font-bold text-blue-600 font-black">${d.headers.checkTotal}</th>
-                                        <th class="p-6 text-center font-black">${d.headers.positives}</th>
+                                        <th class="p-3 text-center font-bold text-blue-600 font-black">${d.headers.checkTotal}</th>
+                                        <th class="p-3 text-center font-black">${d.headers.positives}</th>
                                     </tr>
                                 </thead>
                                 <tbody>`;
@@ -474,30 +490,30 @@
                 const rowCheckSum = opts.reduce((acc, o) => acc + (r.freqs[o] / r.total * 100), 0);
                 const tdCells = opts.map(o => {
                     const cellVal = (r.freqs[o] / r.total * 100).toFixed(1);
-                    return `<td class="p-6 text-center font-black">${cellVal}%</td>`;
+                    return `<td class="p-3 text-center font-black">${cellVal}%</td>`;
                 }).join('');
                 
                 html += `<tr class="border-b border-slate-50 font-black">
-                            <td class="p-6 text-center text-slate-500 font-bold font-black">${r.originalIdx}</td>
-                            <td class="p-6 font-bold text-slate-800 text-right font-black">${r.item}</td>
+                            <td class="p-3 text-center text-slate-500 font-bold font-black">${r.originalIdx}</td>
+                            <td class="p-3 font-bold text-slate-800 text-right font-black">${r.item}</td>
                             ${tdCells}
-                            <td class="p-6 text-center font-bold text-blue-500 bg-blue-50/30 font-black">${rowCheckSum.toFixed(1)}%</td>
-                            <td class="p-6 text-center font-black text-green-700 bg-green-50 font-black">${r.posPerc.toFixed(1)}%</td>
+                            <td class="p-3 text-center font-bold text-blue-500 bg-blue-50/30 font-black">${rowCheckSum.toFixed(1)}%</td>
+                            <td class="p-3 text-center font-black text-green-700 bg-green-50 font-black">${r.posPerc.toFixed(1)}%</td>
                         </tr>`;
             });
             
             const footTdCells = opts.map(o => {
                 const footVal = ((rows.reduce((s, r) => s + r.freqs[o], 0) / totalRes) * 100).toFixed(1);
-                return `<td class="p-6 text-center font-black">${footVal}%</td>`;
+                return `<td class="p-3 text-center font-black">${footVal}%</td>`;
             }).join('');
             
             html += `           </tbody>
-                                <tfoot class="bg-slate-50 font-black border-t-4 border-slate-200">
+                                <tfoot class="bg-slate-50 font-black border-t-2 border-slate-200">
                                     <tr>
-                                        <td colspan="2" class="p-6 text-center uppercase font-black">${d.headers.footer}</td>
+                                        <td colspan="2" class="p-3 text-center uppercase font-black">${d.headers.footer}</td>
                                         ${footTdCells}
-                                        <td class="p-6 text-center font-black">100.0%</td>
-                                        <td class="p-6 text-center text-green-800 text-lg font-black">${avgPos}%</td>
+                                        <td class="p-3 text-center font-black">100.0%</td>
+                                        <td class="p-3 text-center text-green-800 text-lg font-black">${avgPos}%</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -521,17 +537,17 @@
             const d = languageData[currentLang];
             const container = document.getElementById('resultsContainer');
             const div = document.createElement('div');
-            div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-100 overflow-hidden hover-zoom mb-10 suggestion-wrapper';
+            div.className = 'bg-white rounded-2xl shadow-lg border border-indigo-100 overflow-hidden hover-zoom mb-6 suggestion-wrapper';
             const align = 'text-right';
-            div.innerHTML = `<div class="p-8 bg-indigo-50 border-b-2 border-indigo-100 ${align} font-black">
-                                <h2 class="text-3xl font-black">${title}</h2>
-                                <div class="mt-2 flex items-center font-black">
+            div.innerHTML = `<div class="p-4 bg-indigo-50 border-b border-indigo-100 ${align} font-black">
+                                <h2 class="text-2xl font-black">${title}</h2>
+                                <div class="mt-1 flex items-center font-black">
                                     <span class="ai-badge font-black">Gemini AI</span> 
                                     <span class="text-xs font-black text-indigo-500 uppercase tracking-widest">${d.suggestionsTitle}</span>
                                 </div>
                              </div>
-                             <div class="p-8 ${align} font-black">
-                                <div class="suggestion-box italic text-slate-400 font-black">${d.loadingAI}</div>
+                             <div class="p-4 ${align} font-black">
+                                <div class="suggestion-box italic text-slate-400 font-black !p-4 !min-h-[60px]">${d.loadingAI}</div>
                              </div>`;
             container.appendChild(div);
             const summary = await summarizeWithAI(rawText);
@@ -545,19 +561,19 @@
             const d = languageData[currentLang];
             const container = document.getElementById('resultsContainer');
             const div = document.createElement('div');
-            div.className = 'bg-white rounded-[2.5rem] shadow-xl border-2 border-indigo-200 overflow-hidden hover-zoom mt-16 summary-table-wrapper font-black';
+            div.className = 'bg-white rounded-2xl shadow-lg border border-indigo-200 overflow-hidden hover-zoom mt-8 summary-table-wrapper font-black';
             
             const gTotal = summaryDataList.reduce((s, dm) => s + dm.total, 0);
             const gPos = summaryDataList.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
             const align = 'text-right';
             
-            let html = `<h2 class="text-3xl thin-title p-8 bg-indigo-700 text-white font-black text-center">ملخص كل المحاور</h2>
-                        <table class="w-full text-lg ${align} font-black">
+            let html = `<h2 class="text-2xl thin-title p-4 bg-indigo-700 text-white font-black text-center">ملخص كل المحاور</h2>
+                        <table class="w-full text-base ${align} font-black">
                             <thead class="bg-indigo-50 font-black">
                                 <tr>
-                                    <th class="p-8 text-center font-black">#</th>
-                                    <th class="p-8 font-black">المحور</th>
-                                    <th class="p-8 text-center font-black">${d.headers.positives}</th>
+                                    <th class="p-4 text-center font-black">#</th>
+                                    <th class="p-4 font-black">المحور</th>
+                                    <th class="p-4 text-center font-black">${d.headers.positives}</th>
                                 </tr>
                             </thead>
                             <tbody>`;
@@ -565,17 +581,17 @@
             summaryDataList.forEach((dm, i) => { 
                 const pSum = Array.from(dm.positives).reduce((s,o)=>s+(dm.freqs[o]||0),0); 
                 html += `<tr class="border-b border-indigo-50 font-black">
-                            <td class="p-8 text-center text-indigo-300 font-black">${i+1}</td>
-                            <td class="p-8 font-black text-slate-800">${dm.name}</td>
-                            <td class="p-8 text-center font-black text-green-600">${(pSum/dm.total*100).toFixed(1)}%</td>
+                            <td class="p-4 text-center text-indigo-300 font-black">${i+1}</td>
+                            <td class="p-4 font-black text-slate-800">${dm.name}</td>
+                            <td class="p-4 text-center font-black text-green-600">${(pSum/dm.total*100).toFixed(1)}%</td>
                          </tr>`; 
             });
             
             html += `       </tbody>
-                            <tfoot class="bg-indigo-100 font-black border-t-4 border-indigo-300">
+                            <tfoot class="bg-indigo-100 font-black border-t-2 border-indigo-300">
                                 <tr>
-                                    <td colspan="2" class="p-8 text-center uppercase font-black">المتوسط الكلي</td>
-                                    <td class="p-8 text-center text-green-800 text-2xl font-black">${(gPos/gTotal*100).toFixed(1)}%</td>
+                                    <td colspan="2" class="p-4 text-center uppercase font-black">المتوسط الكلي</td>
+                                    <td class="p-4 text-center text-green-800 text-xl font-black">${(gPos/gTotal*100).toFixed(1)}%</td>
                                 </tr>
                             </tfoot>
                         </table>`;
@@ -600,14 +616,14 @@
             container.innerHTML = '';
             
             const sDiv = document.createElement('div');
-            sDiv.className = `p-10 bg-green-50 rounded-[3rem] border-4 border-green-200 shadow-lg hover-zoom w-full font-black`;
-            const highItemsStr = high.length ? high.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-green-100 shadow-sm font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`;
-            sDiv.innerHTML = `<h4 class="text-3xl font-black text-green-800 mb-8">${d.strengths}</h4><ul class="space-y-4 text-green-900 font-bold font-black">${highItemsStr}</ul>`;
+            sDiv.className = `p-6 bg-green-50 rounded-2xl border-2 border-green-200 shadow-md hover-zoom w-full font-black`;
+            const highItemsStr = high.length ? high.map(i => `<li class="bg-white/80 p-3 rounded-xl border border-green-100 shadow-sm font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`;
+            sDiv.innerHTML = `<h4 class="text-2xl font-black text-green-800 mb-4">${d.strengths}</h4><ul class="space-y-3 text-green-900 font-bold font-black">${highItemsStr}</ul>`;
             
             const iDiv = document.createElement('div');
-            iDiv.className = `p-10 bg-red-50 rounded-[3rem] border-4 border-red-200 shadow-lg hover-zoom w-full font-black`;
-            const lowItemsStr = low.length ? low.map(i => `<li class="bg-white/80 p-4 rounded-2xl border border-red-100 shadow-sm font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`;
-            iDiv.innerHTML = `<h4 class="text-3xl font-black text-red-800 mb-8">${d.improvement}</h4><ul class="space-y-4 text-red-900 font-bold font-black">${lowItemsStr}</ul>`;
+            iDiv.className = `p-6 bg-red-50 rounded-2xl border-2 border-red-200 shadow-md hover-zoom w-full font-black`;
+            const lowItemsStr = low.length ? low.map(i => `<li class="bg-white/80 p-3 rounded-xl border border-red-100 shadow-sm font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`;
+            iDiv.innerHTML = `<h4 class="text-2xl font-black text-red-800 mb-4">${d.improvement}</h4><ul class="space-y-3 text-red-900 font-bold font-black">${lowItemsStr}</ul>`;
             
             container.appendChild(sDiv); 
             container.appendChild(iDiv);
@@ -618,18 +634,18 @@
             const d = languageData[currentLang];
             const container = document.getElementById('finalRecommendationContainer');
             const div = document.createElement('div');
-            div.className = 'relative p-12 bg-white rounded-[3.5rem] shadow-2xl border-4 border-indigo-400 hover-zoom mb-20 text-center animate-in fade-in duration-700 font-black';
+            div.className = 'relative p-8 bg-white rounded-2xl shadow-xl border-2 border-indigo-400 hover-zoom mb-8 text-center animate-in fade-in duration-700 font-black';
             let evalTxt = score > 85 ? d.evaluations[0] : score > 75 ? d.evaluations[1] : score > 65 ? d.evaluations[2] : score > 50 ? d.evaluations[3] : d.evaluations[4];
             
-            div.innerHTML = `<h2 class="text-4xl thin-title mb-10 text-center text-indigo-900 font-black border-b-2 border-indigo-50 pb-6">${d.recommendation}</h2>
-                             <div class="grid grid-cols-1 md:grid-cols-2 gap-10 font-black">
-                                <div class="p-8 bg-indigo-50 rounded-[2.5rem] text-center border-2 border-indigo-100 flex flex-col justify-center items-center font-black">
-                                    <span class="text-xs font-black text-indigo-400 mb-2 uppercase">${d.finalResult}</span>
-                                    <span class="text-6xl font-black text-indigo-800">${score.toFixed(2)}%</span>
+            div.innerHTML = `<h2 class="text-3xl thin-title mb-6 text-center text-indigo-900 font-black border-b border-indigo-50 pb-4">${d.recommendation}</h2>
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-black">
+                                <div class="p-6 bg-indigo-50 rounded-xl text-center border border-indigo-100 flex flex-col justify-center items-center font-black">
+                                    <span class="text-xs font-black text-indigo-400 mb-1 uppercase">${d.finalResult}</span>
+                                    <span class="text-5xl font-black text-indigo-800">${score.toFixed(2)}%</span>
                                 </div>
-                                <div class="p-8 bg-green-50 rounded-[2.5rem] text-center border-2 border-green-100 flex flex-col justify-center items-center font-black">
-                                    <span class="text-xs font-black text-green-400 mb-2 uppercase">${d.evalLabel}</span>
-                                    <span class="text-6xl font-black text-green-700">${evalTxt}</span>
+                                <div class="p-6 bg-green-50 rounded-xl text-center border border-green-100 flex flex-col justify-center items-center font-black">
+                                    <span class="text-xs font-black text-green-400 mb-1 uppercase">${d.evalLabel}</span>
+                                    <span class="text-5xl font-black text-green-700">${evalTxt}</span>
                                 </div>
                              </div>`;
                              
@@ -928,10 +944,10 @@
                             
                             const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
                             const divC = document.createElement('div');
-                            divC.className = 'bg-white p-6 rounded-[2rem] shadow-xl border-2 border-blue-100 flex flex-col items-center';
+                            divC.className = 'bg-white p-4 rounded-2xl shadow-xl border border-blue-100 flex flex-col items-center';
                             
                             // USING A STRICT HEIGHT WRAPPER FOR BOTH SCREEN AND PRINT TO PREVENT ANY CROP/DISTORTION
-                            divC.innerHTML = `<h3 class="text-xl font-black mb-4 text-center text-indigo-900">${dName}</h3>
+                            divC.innerHTML = `<h3 class="text-lg font-black mb-3 text-center text-indigo-900">${dName}</h3>
                                               <div class="w-full relative flex-grow" style="height: 250px; max-height: 250px;">
                                                   <canvas id="${canvasId}"></canvas>
                                               </div>`;
@@ -1021,6 +1037,7 @@
                     renderFinalRecommendation(gTotal ? (gPos / gTotal * 100) : 0);
                 }
                 resultsContainer.classList.remove('hidden'); document.getElementById('chartContainer').classList.remove('hidden'); 
+                document.getElementById('signatureSection').classList.remove('hidden');
                 resultsContainer.scrollIntoView({ behavior: 'smooth' });
             };
 
