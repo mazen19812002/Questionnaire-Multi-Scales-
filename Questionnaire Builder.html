@@ -778,12 +778,6 @@
                     <div className="mb-6">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-2xl md:text-3xl thin-title text-gray-800 font-black">المحاور والبنود (Axes Matrix)</h2>
-                            <button
-                                onClick={addDomain}
-                                className="bg-green-500 text-white px-5 py-2 rounded-lg text-sm md:text-base hover:bg-green-600 hover:scale-105 transition-all shadow-md flex items-center gap-2 font-black"
-                            >
-                                <i className="fas fa-folder-plus"></i> إضافة محور جديد
-                            </button>
                         </div>
                         
                         {domains.length === 0 && (
@@ -791,6 +785,13 @@
                                 <i className="fas fa-folder-open text-4xl text-gray-300 mb-2"></i>
                                 <h3 className="text-xl text-gray-500 font-black">لا توجد محاور لعرضها حالياً</h3>
                                 <p className="text-gray-400 mt-1 text-sm font-bold">قم بإضافة محور جديد أو رفع ملف قالب Excel للبدء.</p>
+                                
+                                <button
+                                    onClick={addDomain}
+                                    className="mt-6 bg-green-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-green-600 hover:scale-105 transition-all shadow-md font-black flex items-center gap-2 mx-auto"
+                                >
+                                    <i className="fas fa-folder-plus"></i> إضافة محور جديد
+                                </button>
                             </div>
                         )}
 
@@ -945,6 +946,18 @@
                                 </div>
                             </div>
                         ))}
+
+                        {/* Button moved to the very bottom of the domains list */}
+                        {domains.length > 0 && (
+                            <div className="flex justify-center mt-8 mb-4 hover-zoom">
+                                <button
+                                    onClick={addDomain}
+                                    className="bg-green-500 text-white px-8 py-4 rounded-xl text-xl md:text-2xl hover:bg-green-600 hover:scale-105 transition-all shadow-xl font-black flex items-center gap-3 border-b-4 border-green-700"
+                                >
+                                    <i className="fas fa-folder-plus text-3xl"></i> إضافة محور جديد
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             );
