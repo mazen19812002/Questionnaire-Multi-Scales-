@@ -211,9 +211,7 @@
                             });
                         };
 
-                        distribute(posBudget, posScales);
-                        distribute(negBudget, negScales);
-                        distribute(neuBudget, neuScales);
+                        distribute(posBudget, posScales);                        distribute(negBudget, negScales);                        distribute(neuBudget, neuScales);
 
                         return { ...item, values: newValues };
                     });
@@ -268,6 +266,9 @@
 
                             const domainName = row[domainIdx];
                             const itemText = row[itemIdx] || 'بند بدون نص';
+
+                            /* تخطي صفوف العناوين المكررة وصفوف المجاميع عند إعادة الرفع */
+                            if (domainName === 'المحور' || domainName === 'المجال' || (typeof domainName === 'string' && domainName.includes('متوسط إيجابيات'))) continue;
 
                             if (!newDomainsMap.has(domainName)) {
                                 newDomainsMap.set(domainName, {
@@ -545,9 +546,11 @@
                 }
                 const data = [];
                 const header = ['المحور', 'البنود', ...scales.map(s => s.name), 'إجمالي الصف', 'الإيجابيات'];
-                data.push(header);
 
                 domains.forEach(domain => {
+                    /* إضافة صف العناوين (المقاييس) قبل كل محور */
+                    data.push(header);
+
                     let domainPosSum = 0;
                     
                     // Add items for this domain
@@ -821,8 +824,7 @@
                                         {scales.length > 1 && (
                                             <button onClick={() => removeScale(scale.id)} className="text-red-500 hover:text-red-700 px-2 text-xl hover:scale-110 transition-transform" title="حذف العمود">
                                                 <i className="fas fa-trash-alt"></i>
-                                            </button>
-                                        )}
+                                            </button>                                        )}
                                     </div>
                                 );
                             })}
@@ -933,8 +935,8 @@
                                                         onDragOver={(e) => handleDragOver(e, domain.id, iIndex)}
                                                         onDrop={(e) => handleDrop(e, domain.id, iIndex)}
                                                         onDragEnd={handleDragEnd}
-                                                        className={`flex items-center gap-1 p-1 md:p-2 rounded-lg bg-white border border-gray-200 shadow-sm transition-all cursor-move hover:shadow-md
-                                                            ${isDraggedOver ? 'border-dashed border-2 border-blue-400 bg-blue-50' : ''}
+                                                        className={`flex items-center gap-1 p-1 md:p-2 rounded-lg bg-white border shadow-sm transition-all cursor-move hover:shadow-md
+                                                            ${isDraggedOver ? 'border-dashed border-2 border-blue-400 bg-blue-50' : (isRowValid ? 'border-gray-200' : 'border-2 border-red-600 ring-2 ring-red-100')}
                                                         `}
                                                     >
                                                         {/* Drag Handle */}
