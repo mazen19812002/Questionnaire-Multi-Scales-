@@ -108,6 +108,7 @@
 
             /* Temp state for prompt modal */
             const [tempPromptValue, setTempPromptValue] = useState(88);
+            const [tempItemCount, setTempItemCount] = useState(5); // New state for domain items count
 
             /* Base file name state for exports */
             const [originalFileName, setOriginalFileName] = useState('Questionnaire');
@@ -127,7 +128,6 @@
                     showAlert('لا توجد محاور أو بنود لتعبئتها. يرجى إضافة محاور أولاً أو رفع ملف.');
                     return;
                 }
-
                 showPrompt('الرجاء إدخال المتوسط العام للإيجابيات المطلوب (%) لتوليد النسب بناءً عليه:', 88, (targetValue) => {
                     executeAutoFill(Number(targetValue));
                 }, 'number');
@@ -147,7 +147,8 @@
 
                 for (let i = 0; i < totalItemsCount; i++) {
                     let val = targetPositiveAverage + Math.floor(Math.random() * 11) - 5; /* +/- 5 fluctuation */
-                    val = Math.max(0, Math.min(100, val));
+                    const minRemaining = (negScales.length > 0 ? negScales.length : 0) + (neuScales.length > 0 ? neuScales.length : 0);
+                    val = Math.max(posScales.length, Math.min(100 - minRemaining, val));
                     posBudgets.push(val);
                 }
 
@@ -180,9 +181,13 @@
                         let neuBudget = 0;
 
                         if (negScales.length > 0 && neuScales.length > 0) {
-                            /* Randomly assign a small portion to negative, rest to neutral */
-                            negBudget = Math.floor(Math.random() * Math.min(15, remainingBudget + 1));
-                            neuBudget = remainingBudget - negBudget;
+                            if (remainingBudget >= 2) {
+                                negBudget = Math.floor(Math.random() * Math.min(15, remainingBudget - 1)) + 1; /* At least 1 */
+                                neuBudget = remainingBudget - negBudget;
+                            } else {
+                                negBudget = remainingBudget;
+                                neuBudget = 0;
+                            }
                         } else if (negScales.length > 0) {
                             negBudget = remainingBudget;
                         } else if (neuScales.length > 0) {
@@ -203,10 +208,12 @@
                                 if (index === scalesArray.length - 1) {
                                     newValues[s.id] = remaining;
                                 } else {
-                                    const alloc = Math.floor(Math.random() * (remaining / 2)) + Math.floor(remaining / scalesArray.length);
-                                    const finalAlloc = Math.min(alloc, remaining);
-                                    newValues[s.id] = finalAlloc;
-                                    remaining -= finalAlloc;
+                                    const minAlloc = 1;
+                                    let avg = remaining / (scalesArray.length - index);
+                                    let alloc = Math.floor(Math.random() * avg) + Math.floor(avg * 0.5);
+                                    alloc = Math.max(minAlloc, Math.min(alloc, remaining - (scalesArray.length - 1 - index)));
+                                    newValues[s.id] = alloc;
+                                    remaining -= alloc;
                                 }
                             });
                         };
@@ -389,10 +396,28 @@
                 const nextNum = domains.length + 1;
                 const defaultName = `محور جديد ${nextNum}`;
                 
-                showPrompt('الرجاء إدخال مسمى المحور الجديد:', defaultName, (domainName) => {
-                    const finalName = domainName.trim() || defaultName;
-                    setDomains([...domains, { id: Date.now().toString(), name: finalName, items: [] }]);
-                }, 'text');
+                setTempPromptValue(defaultName);
+                setTempItemCount(5); /* Default 5 items */
+                
+                setModalConfig({ 
+                    isOpen: true, 
+                    type: 'addDomain', 
+                    message: 'الرجاء إدخال بيانات المحور الجديد:', 
+                    onConfirm: (inputValue, itemCount) => {
+                        const finalName = String(inputValue || '').trim() || defaultName;
+                        const newDomainId = Date.now().toString();
+                        const initialVals = {};
+                        scales.forEach(s => initialVals[s.id] = '');
+                        
+                        const newItems = Array.from({ length: itemCount || 5 }, (_, i) => ({
+                            id: `item_${newDomainId}_${i}_${Math.random()}`,
+                            text: `بند ${i + 1}`,
+                            values: { ...initialVals }
+                        }));
+
+                        setDomains(prev => [...prev, { id: newDomainId, name: finalName, items: newItems }]);
+                    }
+                });
             };
 
             const updateDomain = (id, field, value) => {
@@ -550,7 +575,7 @@
                 domains.forEach(domain => {
                     let domainPosSum = 0;
                     
-                    // Add items for this domain
+                    /* Add items for this domain */
                     domain.items.forEach(item => {
                         const row = [domain.name, item.text];
                         scales.forEach(s => row.push(`${item.values[s.id] || 0}%`));
@@ -561,19 +586,19 @@
                         domainPosSum += posTotal;
                     });
                     
-                    // Add Summary Row for this domain
+                    /* Add Summary Row for this domain */
                     if (domain.items.length > 0) {
                         const domainPosAvg = (domainPosSum / domain.items.length).toFixed(1);
                         const summaryRow = [
-                            `متوسط إيجابيات (${domain.name})`, 
-                            '', // البنود
-                            ...scales.map(() => ''), // المقاييس
-                            '', // إجمالي الصف
-                            `${domainPosAvg}%` // متوسط الإيجابيات
+                            `متوسط إيجابيات (${domain.name})`,
+                            '', /* البنود */
+                            ...scales.map(() => ''), /* المقاييس */
+                            '', /* إجمالي الصف */
+                            `${domainPosAvg}%` /* متوسط الإيجابيات */
                         ];
                         data.push(summaryRow);
                         
-                        // Add an empty row for visual separation
+                        /* Add an empty row for visual separation */
                         data.push(Array(header.length).fill(''));
                     }
                 });
@@ -684,11 +709,35 @@
                                         className="w-full p-3 border border-gray-300 rounded-lg text-2xl text-center focus:outline-none focus:border-green-500 font-black text-blue-700 mb-6 shadow-inner"
                                     />
                                 )}
+
+                                {modalConfig.type === 'addDomain' && (
+                                    <div className="mb-6 space-y-4">
+                                        <div>
+                                            <label className="block text-gray-700 font-bold mb-2 text-right">اسم المحور</label>
+                                            <input
+                                                type="text"
+                                                value={tempPromptValue}
+                                                onChange={(e) => setTempPromptValue(e.target.value)}
+                                                className="w-full p-3 border border-gray-300 rounded-lg text-xl text-center focus:outline-none focus:border-blue-500 font-black text-blue-700 shadow-inner"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-700 font-bold mb-2 text-right">عدد البنود</label>
+                                            <input
+                                                type="number"
+                                                min="1" max="100"
+                                                value={tempItemCount}
+                                                onChange={(e) => setTempItemCount(Math.max(1, parseInt(e.target.value) || 1))}
+                                                className="w-full p-3 border border-gray-300 rounded-lg text-xl text-center focus:outline-none focus:border-green-500 font-black text-green-700 shadow-inner"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                                 
                                 <div className="flex justify-center gap-3">
-                                    {(modalConfig.type === 'confirm' || modalConfig.type === 'prompt') && (
+                                    {(modalConfig.type === 'confirm' || modalConfig.type === 'prompt' || modalConfig.type === 'addDomain') && (
                                         <button
-                                            onClick={() => { if (modalConfig.onConfirm) modalConfig.onConfirm(tempPromptValue); closeModal(); }}
+                                            onClick={() => { if (modalConfig.onConfirm) modalConfig.onConfirm(tempPromptValue, tempItemCount); closeModal(); }}
                                             className="bg-green-500 text-white px-6 py-2 rounded-lg text-lg hover:bg-green-600 hover:scale-105 transition-all duration-200 shadow-md font-bold"
                                         >
                                             تأكيد
@@ -730,8 +779,8 @@
                                 <i className="fas fa-upload"></i> رفع قالب (Excel)
                                 <input type="file" accept=".xlsx, .xls, .csv" className="hidden" onChange={handleFileUpload} />
                             </label>
-                            <button onClick={handleAutoFill} className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm md:text-base hover:bg-green-600 hover:scale-105 transition-all shadow-md flex items-center gap-2 font-bold leading-tight">
-                                <i className="fas fa-magic"></i> تعبئة تلقائية
+                            <button onClick={handleAutoFill} className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white px-5 py-2 rounded-lg text-sm md:text-base hover:scale-110 transition-transform shadow-lg shadow-orange-200 flex items-center gap-2 font-black leading-tight border border-orange-300">
+                                <i className="fas fa-magic animate-pulse"></i> تعبئة تلقائية
                             </button>
                             <button onClick={exportTemplate} className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm md:text-base hover:bg-green-600 hover:scale-105 transition-all shadow-md flex items-center gap-2 font-bold leading-tight">
                                 <i className="fas fa-file-excel"></i> تحميل التقييم
@@ -924,6 +973,8 @@
                                                 const rowTotal = getItemRowTotal(item.values);
                                                 const posTotal = getPositivesTotal(item.values);
                                                 const isRowValid = Math.abs(rowTotal - 100) < 0.1;
+                                                const hasValues = scales.some(s => item.values[s.id] !== '' && Number(item.values[s.id]) > 0);
+                                                const needsRedBorder = hasValues && !isRowValid;
 
                                                 return (
                                                     <div
@@ -933,8 +984,9 @@
                                                         onDragOver={(e) => handleDragOver(e, domain.id, iIndex)}
                                                         onDrop={(e) => handleDrop(e, domain.id, iIndex)}
                                                         onDragEnd={handleDragEnd}
-                                                        className={`flex items-center gap-1 p-1 md:p-2 rounded-lg bg-white border border-gray-200 shadow-sm transition-all cursor-move hover:shadow-md
+                                                        className={`flex items-center gap-1 p-1 md:p-2 rounded-lg bg-white shadow-sm transition-all cursor-move hover:shadow-md
                                                             ${isDraggedOver ? 'border-dashed border-2 border-blue-400 bg-blue-50' : ''}
+                                                            ${needsRedBorder ? 'border-2 border-red-500 ring-2 ring-red-200' : 'border border-gray-200'}
                                                         `}
                                                     >
                                                         {/* Drag Handle */}
