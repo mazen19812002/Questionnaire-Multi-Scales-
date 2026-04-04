@@ -182,11 +182,27 @@
 
                         if (negScales.length > 0 && neuScales.length > 0) {
                             if (remainingBudget >= 2) {
-                                negBudget = Math.floor(Math.random() * Math.min(15, remainingBudget - 1)) + 1; /* At least 1 */
-                                neuBudget = remainingBudget - negBudget;
+                                const firstNeuIdx = scales.findIndex(s => s.type === 'neutral');
+                                const firstNegIdx = scales.findIndex(s => s.type === 'negative');
+                                
+                                /* Give the larger share to whichever type appears first visually */
+                                if (firstNeuIdx !== -1 && firstNegIdx !== -1 && firstNeuIdx < firstNegIdx) {
+                                    neuBudget = Math.floor(remainingBudget * (0.6 + Math.random() * 0.25)); /* 60% to 85% */
+                                    negBudget = remainingBudget - neuBudget;
+                                } else {
+                                    negBudget = Math.floor(remainingBudget * (0.6 + Math.random() * 0.25)); /* 60% to 85% */
+                                    neuBudget = remainingBudget - negBudget;
+                                }
                             } else {
-                                negBudget = remainingBudget;
-                                neuBudget = 0;
+                                const firstNeuIdx = scales.findIndex(s => s.type === 'neutral');
+                                const firstNegIdx = scales.findIndex(s => s.type === 'negative');
+                                if (firstNeuIdx !== -1 && firstNegIdx !== -1 && firstNeuIdx < firstNegIdx) {
+                                    neuBudget = remainingBudget;
+                                    negBudget = 0;
+                                } else {
+                                    negBudget = remainingBudget;
+                                    neuBudget = 0;
+                                }
                             }
                         } else if (negScales.length > 0) {
                             negBudget = remainingBudget;
@@ -196,31 +212,43 @@
 
                         const newValues = { ...item.values };
 
-                        /* Distribute function across multiple scales of the same type if they exist */
-                        const distribute = (budget, scalesArray) => {
+                        /* Distribute function ensuring descending values from left to right */
+                        const distributeDescending = (budget, scalesArray) => {
                             if (scalesArray.length === 0) return;
                             if (scalesArray.length === 1) {
                                 newValues[scalesArray[0].id] = budget;
                                 return;
                             }
+
+                            let parts = [];
                             let remaining = budget;
-                            scalesArray.forEach((s, index) => {
-                                if (index === scalesArray.length - 1) {
-                                    newValues[s.id] = remaining;
+                            for (let i = 0; i < scalesArray.length - 1; i++) {
+                                const maxAlloc = remaining - (scalesArray.length - 1 - i);
+                                const minAlloc = 1;
+                                if (maxAlloc <= minAlloc) {
+                                    parts.push(minAlloc);
+                                    remaining -= minAlloc;
                                 } else {
-                                    const minAlloc = 1;
-                                    let avg = remaining / (scalesArray.length - index);
-                                    let alloc = Math.floor(Math.random() * avg) + Math.floor(avg * 0.5);
-                                    alloc = Math.max(minAlloc, Math.min(alloc, remaining - (scalesArray.length - 1 - index)));
-                                    newValues[s.id] = alloc;
+                                    let avg = remaining / (scalesArray.length - i);
+                                    let alloc = Math.floor(avg * 0.5) + Math.floor(Math.random() * (avg * 0.8));
+                                    alloc = Math.max(minAlloc, Math.min(alloc, maxAlloc));
+                                    parts.push(alloc);
                                     remaining -= alloc;
                                 }
+                            }
+                            parts.push(remaining);
+
+                            /* Sort descending so first columns get the highest values */
+                            parts.sort((a, b) => b - a);
+
+                            scalesArray.forEach((s, index) => {
+                                newValues[s.id] = parts[index];
                             });
                         };
 
-                        distribute(posBudget, posScales);
-                        distribute(negBudget, negScales);
-                        distribute(neuBudget, neuScales);
+                        distributeDescending(posBudget, posScales);
+                        distributeDescending(negBudget, negScales);
+                        distributeDescending(neuBudget, neuScales);
 
                         return { ...item, values: newValues };
                     });
