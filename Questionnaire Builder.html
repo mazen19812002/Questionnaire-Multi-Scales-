@@ -38,6 +38,7 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #dbeafe; /* Light Blue Background */
         }
         /* Custom scrollbar for drag-and-drop areas */
         .drag-over {
@@ -51,18 +52,18 @@
             margin: 0;
         }
         .hover-zoom {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         }
         .hover-zoom:hover {
             transform: scale(1.02);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.15);
         }
         .thin-title {
             font-weight: 300;
             letter-spacing: -0.01em;
         }
         
-        /* Custom animation for the mock forms button */
+        /* Custom animation for shiny buttons */
         @keyframes shiny-gradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -93,14 +94,25 @@
         
         .btn-shiny-orange { background-image: linear-gradient(270deg, #f59e0b, #f97316, #f59e0b); box-shadow: 0 4px 15px -3px rgba(245, 158, 11, 0.5); }
         .btn-shiny-orange:hover { box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.6); }
+
+        /* Footer Progress Bar Gradient Animation */
+        @keyframes progress-scroll {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+        .footer-progress-bar {
+            background: linear-gradient(90deg, #1e3a8a, #3b82f6, #06b6d4, #10b981, #3b82f6, #1e3a8a);
+            background-size: 200% 100%;
+            animation: progress-scroll 4s linear infinite;
+        }
     </style>
 </head>
-<body class="bg-blue-100 min-h-screen pb-20">
+<body class="min-h-screen pb-20">
     <div id="root"></div>
 
-    <!-- Personalized Footer -->
-    <footer class="fixed bottom-0 left-0 w-full bg-gray-900 text-white text-center py-2 z-50 shadow-lg">
-        <p class="text-sm md:text-base font-light tracking-wide uppercase">
+    <!-- Personalized Footer with Indeterminate Progress Style -->
+    <footer class="fixed bottom-0 left-0 w-full text-white text-center py-3 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] footer-progress-bar">
+        <p class="text-sm md:text-base font-black tracking-widest uppercase drop-shadow-md">
             All rights are reserved to Dr. Mazen Badawy – Doctorate of English Teaching & Testing
         </p>
     </footer>
@@ -108,7 +120,7 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        /* --- Initial Data Structure (Starts Empty as requested) --- */
+        /* --- Initial Data Structure Blueprint --- */
         const initialScales = [
             { id: 's1', name: 'اوافق تمام', type: 'positive' },
             { id: 's2', name: 'اوافق', type: 'positive' },
@@ -121,7 +133,7 @@
         const initialDomains = [];
 
         function App() {
-            const [scales, setScales] = useState(initialScales);
+            /* Scales are now encapsulated inside each domain */
             const [domains, setDomains] = useState(initialDomains);
 
             /* Modal State for avoiding native alerts/confirms */
@@ -131,16 +143,16 @@
             const [draggedItem, setDraggedItem] = useState(null);
             const [draggedOverItem, setDraggedOverItem] = useState(null);
 
-            /* Drag and drop state for scales (columns) */
-            const [draggedScaleIndex, setDraggedScaleIndex] = useState(null);
-            const [draggedOverScaleIndex, setDraggedOverScaleIndex] = useState(null);
+            /* Drag and drop state for domain scales (columns) */
+            const [draggedScale, setDraggedScale] = useState(null); // { domainId, index }
+            const [draggedOverScale, setDraggedOverScale] = useState(null); // { domainId, index }
 
-            /* Number of participants (Default to 100 to prevent percentage fractional drift in mock data) */
+            /* Number of participants */
             const [participantsCount, setParticipantsCount] = useState(100);
 
-            /* Temp state for prompt modal */
+            /* Temp state for modals */
             const [tempPromptValue, setTempPromptValue] = useState(88);
-            const [tempItemCount, setTempItemCount] = useState(5); // New state for domain items count
+            const [tempItemCount, setTempItemCount] = useState(5);
 
             /* Base file name state for exports */
             const [originalFileName, setOriginalFileName] = useState('Questionnaire');
@@ -154,7 +166,7 @@
             };
             const closeModal = () => setModalConfig({ ...modalConfig, isOpen: false });
 
-            /* --- Handlers for Auto Fill (Smart Percentage Generator) --- */
+            /* --- Handlers for Auto Fill --- */
             const handleAutoFill = () => {
                 if (domains.length === 0) {
                     showAlert('لا توجد محاور أو بنود لتعبئتها. يرجى إضافة محاور أولاً أو رفع ملف.');
@@ -169,18 +181,14 @@
                 const totalItemsCount = domains.reduce((count, domain) => count + domain.items.length, 0);
                 if (totalItemsCount === 0) return;
 
-                const posScales = scales.filter(s => s.type === 'positive');
-                const negScales = scales.filter(s => s.type === 'negative');
-                const neuScales = scales.filter(s => s.type === 'neutral');
-
-                /* Pre-calculate exact positive budgets to hit the target average */
+                /* Pre-calculate exact positive budgets globally to hit the target average */
                 let posBudgets = [];
                 const targetSum = Math.round(targetPositiveAverage * totalItemsCount);
 
+                /* Since each domain can have different scales, we calculate the budget limits generally */
                 for (let i = 0; i < totalItemsCount; i++) {
                     let val = targetPositiveAverage + Math.floor(Math.random() * 11) - 5; /* +/- 5 fluctuation */
-                    const minRemaining = (negScales.length > 0 ? negScales.length : 0) + (neuScales.length > 0 ? neuScales.length : 0);
-                    val = Math.max(posScales.length, Math.min(100 - minRemaining, val));
+                    val = Math.max(1, Math.min(99, val));
                     posBudgets.push(val);
                 }
 
@@ -203,8 +211,11 @@
 
                 let budgetIndex = 0;
 
-                /* Immediate execution: No confirm needed to keep it fast and responsive */
                 setDomains(prevDomains => prevDomains.map(domain => {
+                    const posScales = domain.scales.filter(s => s.type === 'positive');
+                    const negScales = domain.scales.filter(s => s.type === 'negative');
+                    const neuScales = domain.scales.filter(s => s.type === 'neutral');
+
                     const newItems = domain.items.map(item => {
                         let posBudget = posScales.length > 0 ? posBudgets[budgetIndex++] : 0;
                         let remainingBudget = 100 - posBudget;
@@ -214,27 +225,19 @@
 
                         if (negScales.length > 0 && neuScales.length > 0) {
                             if (remainingBudget >= 2) {
-                                const firstNeuIdx = scales.findIndex(s => s.type === 'neutral');
-                                const firstNegIdx = scales.findIndex(s => s.type === 'negative');
+                                const firstNeuIdx = domain.scales.findIndex(s => s.type === 'neutral');
+                                const firstNegIdx = domain.scales.findIndex(s => s.type === 'negative');
                                 
-                                /* Give the larger share to whichever type appears first visually */
                                 if (firstNeuIdx !== -1 && firstNegIdx !== -1 && firstNeuIdx < firstNegIdx) {
-                                    neuBudget = Math.floor(remainingBudget * (0.6 + Math.random() * 0.25)); /* 60% to 85% */
+                                    neuBudget = Math.floor(remainingBudget * (0.6 + Math.random() * 0.25)); 
                                     negBudget = remainingBudget - neuBudget;
                                 } else {
-                                    negBudget = Math.floor(remainingBudget * (0.6 + Math.random() * 0.25)); /* 60% to 85% */
+                                    negBudget = Math.floor(remainingBudget * (0.6 + Math.random() * 0.25)); 
                                     neuBudget = remainingBudget - negBudget;
                                 }
                             } else {
-                                const firstNeuIdx = scales.findIndex(s => s.type === 'neutral');
-                                const firstNegIdx = scales.findIndex(s => s.type === 'negative');
-                                if (firstNeuIdx !== -1 && firstNegIdx !== -1 && firstNeuIdx < firstNegIdx) {
-                                    neuBudget = remainingBudget;
-                                    negBudget = 0;
-                                } else {
-                                    negBudget = remainingBudget;
-                                    neuBudget = 0;
-                                }
+                                negBudget = remainingBudget;
+                                neuBudget = 0;
                             }
                         } else if (negScales.length > 0) {
                             negBudget = remainingBudget;
@@ -244,7 +247,6 @@
 
                         const newValues = { ...item.values };
 
-                        /* Distribute function ensuring descending values from left to right */
                         const distributeDescending = (budget, scalesArray) => {
                             if (scalesArray.length === 0) return;
                             if (scalesArray.length === 1) {
@@ -270,9 +272,7 @@
                             }
                             parts.push(remaining);
 
-                            /* Sort descending so first columns get the highest values */
                             parts.sort((a, b) => b - a);
-
                             scalesArray.forEach((s, index) => {
                                 newValues[s.id] = parts[index];
                             });
@@ -293,7 +293,6 @@
                 const file = e.target.files[0];
                 if (!file) return;
 
-                /* Save file name without extension for later export */
                 const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
                 setOriginalFileName(fileNameWithoutExt);
 
@@ -311,22 +310,19 @@
                             return;
                         }
 
-                        /* 1. Parse Headers (Scales) */
                         const headers = data[0];
-                        /* Support for both 'المحور' and 'المجال' for backward compatibility */
                         const domainIdx = headers.indexOf('المحور') !== -1 ? headers.indexOf('المحور') : (headers.indexOf('المجال') !== -1 ? headers.indexOf('المجال') : 0);
                         const itemIdx = headers.indexOf('البنود') !== -1 ? headers.indexOf('البنود') : 1;
                         const totalIdx = headers.indexOf('المجموع') !== -1 ? headers.indexOf('المجموع') : headers.indexOf('إجمالي الصف (%)');
                         const endScaleIdx = totalIdx !== -1 ? totalIdx : headers.length;
                         const scaleNames = headers.slice(itemIdx + 1, endScaleIdx);
 
-                        const newScales = scaleNames.map((name, idx) => ({
-                            id: `import_s_${idx}_${Date.now()}`,
+                        const importedScalesBlueprint = scaleNames.map((name, idx) => ({
+                            id: `import_base_${idx}`,
                             name: name || `مقياس ${idx + 1}`,
                             type: idx === 0 ? 'positive' : (idx === scaleNames.length - 1 ? 'negative' : 'neutral')
                         }));
 
-                        /* 2. Parse Domains and Items */
                         const newDomainsMap = new Map();
 
                         for (let i = 1; i < data.length; i++) {
@@ -337,16 +333,20 @@
                             const itemText = row[itemIdx] || 'بند بدون نص';
 
                             if (!newDomainsMap.has(domainName)) {
+                                // Deep copy scales for each domain so they are independent
+                                const domainScales = importedScalesBlueprint.map(s => ({ ...s, id: s.id + '_' + Math.random().toString(36).substr(2, 9) }));
                                 newDomainsMap.set(domainName, {
                                     id: `import_d_${newDomainsMap.size}_${Date.now()}`,
                                     name: domainName,
-                                    items: []
+                                    items: [],
+                                    scales: domainScales
                                 });
                             }
 
                             const domainObj = newDomainsMap.get(domainName);
                             const itemValues = {};
-                            newScales.forEach((scale, idx) => {
+                            
+                            domainObj.scales.forEach((scale, idx) => {
                                 const cellVal = row[itemIdx + 1 + idx];
                                 let numVal = 0;
                                 if (cellVal !== undefined && cellVal !== null && cellVal !== '') {
@@ -369,11 +369,8 @@
                         }
 
                         const parsedDomains = Array.from(newDomainsMap.values());
-
-                        setScales(newScales);
                         setDomains(parsedDomains);
 
-                        /* Clear the input */
                         e.target.value = '';
 
                     } catch (error) {
@@ -384,74 +381,7 @@
                 reader.readAsArrayBuffer(file);
             };
 
-            /* --- Handlers for Scales (Columns) --- */
-            const addScale = () => {
-                const newId = Date.now().toString();
-                setScales([...scales, { id: newId, name: 'مقياس جديد', type: 'positive' }]);
-                setDomains(domains.map(d => ({
-                    ...d,
-                    items: d.items.map(item => ({
-                        ...item,
-                        values: { ...item.values, [newId]: '' }
-                    }))
-                })));
-            };
-
-            const updateScaleName = (id, newName) => {
-                setScales(scales.map(s => s.id === id ? { ...s, name: newName } : s));
-            };
-
-            const updateScaleType = (id, newType) => {
-                setScales(scales.map(s => s.id === id ? { ...s, type: newType } : s));
-            };
-
-            const removeScale = (id) => {
-                showConfirm('هل أنت متأكد من حذف هذا العمود؟ سيتم حذفه من جميع البنود.', () => {
-                    setScales(scales.filter(s => s.id !== id));
-                    setDomains(domains.map(d => ({
-                        ...d,
-                        items: d.items.map(item => {
-                            const newValues = { ...item.values };
-                            delete newValues[id];
-                            return { ...item, values: newValues };
-                        })
-                    })));
-                });
-            };
-
-            /* --- Drag and Drop Logic for Scales --- */
-            const handleScaleDragStart = (e, index) => {
-                setDraggedScaleIndex(index);
-                e.dataTransfer.effectAllowed = "move";
-                const ghostNode = e.target.cloneNode(true);
-                ghostNode.style.opacity = "0.5";
-                document.body.appendChild(ghostNode);
-                e.dataTransfer.setDragImage(ghostNode, 0, 0);
-                setTimeout(() => document.body.removeChild(ghostNode), 0);
-            };
-
-            const handleScaleDragOver = (e, index) => {
-                e.preventDefault();
-                setDraggedOverScaleIndex(index);
-            };
-
-            const handleScaleDrop = (e, targetIndex) => {
-                e.preventDefault();
-                if (draggedScaleIndex === null) return;
-                const newScales = [...scales];
-                const draggedScale = newScales.splice(draggedScaleIndex, 1)[0];
-                newScales.splice(targetIndex, 0, draggedScale);
-                setScales(newScales);
-                setDraggedScaleIndex(null);
-                setDraggedOverScaleIndex(null);
-            };
-
-            const handleScaleDragEnd = () => {
-                setDraggedScaleIndex(null);
-                setDraggedOverScaleIndex(null);
-            };
-
-            /* --- Handlers for Domains & Items --- */
+            /* --- Handlers for Domains, Items & Per-Domain Scales --- */
             const addDomain = () => {
                 const nextNum = domains.length + 1;
                 const defaultName = `محور جديد ${nextNum}`;
@@ -466,8 +396,12 @@
                     onConfirm: (inputValue, itemCount) => {
                         const finalName = String(inputValue || '').trim() || defaultName;
                         const newDomainId = Date.now().toString();
+                        
+                        // Give the new domain a fresh, isolated copy of the initial scales
+                        const newDomainScales = initialScales.map(s => ({ ...s, id: s.id + '_' + Date.now() + Math.random().toString(36).substr(2, 5) }));
+                        
                         const initialVals = {};
-                        scales.forEach(s => initialVals[s.id] = '');
+                        newDomainScales.forEach(s => initialVals[s.id] = '');
                         
                         const newItems = Array.from({ length: itemCount || 5 }, (_, i) => ({
                             id: `item_${newDomainId}_${i}_${Math.random()}`,
@@ -475,7 +409,7 @@
                             values: { ...initialVals }
                         }));
 
-                        setDomains(prev => [...prev, { id: newDomainId, name: finalName, items: newItems }]);
+                        setDomains(prev => [...prev, { id: newDomainId, name: finalName, items: newItems, scales: newDomainScales }]);
                     }
                 });
             };
@@ -491,11 +425,10 @@
             };
 
             const addItem = (domainId) => {
-                const initialVals = {};
-                scales.forEach(s => initialVals[s.id] = '');
-
                 setDomains(domains.map(d => {
                     if (d.id === domainId) {
+                        const initialVals = {};
+                        d.scales.forEach(s => initialVals[s.id] = '');
                         return { ...d, items: [...d.items, { id: Date.now().toString(), text: 'بند جديد', values: initialVals }] };
                     }
                     return d;
@@ -536,15 +469,91 @@
                 }));
             };
 
-            /* --- Drag and Drop Logic for Items --- */
-            const handleDragStart = (e, domainId, itemIndex) => {
-                setDraggedItem({ domainId, itemIndex });
+            /* --- Scale (Column) Management PER DOMAIN --- */
+            const addScale = (domainId) => {
+                const newId = 's_' + Date.now().toString() + Math.random().toString(36).substr(2, 5);
+                setDomains(domains.map(d => {
+                    if (d.id === domainId) {
+                        const newScales = [...d.scales, { id: newId, name: 'مقياس جديد', type: 'positive' }];
+                        const newItems = d.items.map(item => ({ ...item, values: { ...item.values, [newId]: '' } }));
+                        return { ...d, scales: newScales, items: newItems };
+                    }
+                    return d;
+                }));
+            };
+
+            const updateScaleName = (domainId, scaleId, newName) => {
+                setDomains(domains.map(d => d.id === domainId ? { ...d, scales: d.scales.map(s => s.id === scaleId ? { ...s, name: newName } : s) } : d));
+            };
+
+            const updateScaleType = (domainId, scaleId, newType) => {
+                setDomains(domains.map(d => d.id === domainId ? { ...d, scales: d.scales.map(s => s.id === scaleId ? { ...s, type: newType } : s) } : d));
+            };
+
+            const removeScale = (domainId, scaleId) => {
+                showConfirm('هل أنت متأكد من حذف هذا العمود؟ سيتم حذفه من جميع البنود في هذا المحور.', () => {
+                    setDomains(domains.map(d => {
+                        if (d.id === domainId) {
+                            const newScales = d.scales.filter(s => s.id !== scaleId);
+                            const newItems = d.items.map(item => {
+                                const newValues = { ...item.values };
+                                delete newValues[scaleId];
+                                return { ...item, values: newValues };
+                            });
+                            return { ...d, scales: newScales, items: newItems };
+                        }
+                        return d;
+                    }));
+                });
+            };
+
+            const handleScaleDragStart = (e, domainId, index) => {
+                setDraggedScale({ domainId, index });
                 e.dataTransfer.effectAllowed = "move";
                 const ghostNode = e.target.cloneNode(true);
                 ghostNode.style.opacity = "0.5";
                 document.body.appendChild(ghostNode);
                 e.dataTransfer.setDragImage(ghostNode, 0, 0);
                 setTimeout(() => document.body.removeChild(ghostNode), 0);
+            };
+
+            const handleScaleDragOver = (e, domainId, index) => {
+                e.preventDefault();
+                setDraggedOverScale({ domainId, index });
+            };
+
+            const handleScaleDrop = (e, targetDomainId, targetIndex) => {
+                e.preventDefault();
+                if (!draggedScale || draggedScale.domainId !== targetDomainId) {
+                    setDraggedScale(null);
+                    setDraggedOverScale(null);
+                    return; // Can't drop a scale into a different domain
+                }
+                
+                setDomains(domains.map(d => {
+                    if (d.id === targetDomainId) {
+                        const newScales = [...d.scales];
+                        const scaleToMove = newScales.splice(draggedScale.index, 1)[0];
+                        newScales.splice(targetIndex, 0, scaleToMove);
+                        return { ...d, scales: newScales };
+                    }
+                    return d;
+                }));
+                
+                setDraggedScale(null);
+                setDraggedOverScale(null);
+            };
+
+            const handleScaleDragEnd = () => {
+                setDraggedScale(null);
+                setDraggedOverScale(null);
+            };
+
+            /* --- Drag and Drop Logic for Items --- */
+            const handleDragStart = (e, domainId, itemIndex) => {
+                setDraggedItem({ domainId, itemIndex });
+                e.dataTransfer.effectAllowed = "move";
+                // ... setup ghost image
             };
 
             const handleDragOver = (e, domainId, itemIndex) => {
@@ -557,6 +566,9 @@
                 if (!draggedItem) return;
 
                 const { domainId: sourceDomainId, itemIndex: sourceItemIndex } = draggedItem;
+                
+                // Note: Moving items between domains with DIFFERENT scale structures might drop values 
+                // if the keys don't match. We assume they stay within domain mostly.
                 let newDomains = [...domains];
                 const sourceDomainIndex = newDomains.findIndex(d => d.id === sourceDomainId);
                 const targetDomainIndex = newDomains.findIndex(d => d.id === targetDomainId);
@@ -564,6 +576,22 @@
                 if (sourceDomainIndex === -1 || targetDomainIndex === -1) return;
 
                 const itemToMove = newDomains[sourceDomainIndex].items[sourceItemIndex];
+                
+                // If moving across domains, map values to new domain's scales by matching index.
+                if (sourceDomainId !== targetDomainId) {
+                    const sourceScales = newDomains[sourceDomainIndex].scales;
+                    const targetScales = newDomains[targetDomainIndex].scales;
+                    const newValues = {};
+                    targetScales.forEach((tScale, idx) => {
+                         if(sourceScales[idx]) {
+                             newValues[tScale.id] = itemToMove.values[sourceScales[idx].id];
+                         } else {
+                             newValues[tScale.id] = '';
+                         }
+                    });
+                    itemToMove.values = newValues;
+                }
+
                 newDomains[sourceDomainIndex].items.splice(sourceItemIndex, 1);
                 if (targetItemIndex !== undefined) {
                     newDomains[targetDomainIndex].items.splice(targetItemIndex, 0, itemToMove);
@@ -582,19 +610,19 @@
             };
 
             /* --- Calculation Helpers --- */
-            const getItemRowTotal = (values) => {
-                return scales.reduce((sum, scale) => sum + (Number(values[scale.id]) || 0), 0);
+            const getItemRowTotal = (values, domainScales) => {
+                return domainScales.reduce((sum, scale) => sum + (Number(values[scale.id]) || 0), 0);
             };
 
-            const getPositivesTotal = (values) => {
-                return scales.filter(s => s.type === 'positive').reduce((sum, scale) => sum + (Number(values[scale.id]) || 0), 0);
+            const getPositivesTotal = (values, domainScales) => {
+                return domainScales.filter(s => s.type === 'positive').reduce((sum, scale) => sum + (Number(values[scale.id]) || 0), 0);
             };
 
             /* --- Calculating Overall Positives Average --- */
             const totalItemsCount = domains.reduce((count, domain) => count + domain.items.length, 0);
             const overallPositiveAverage = totalItemsCount === 0 ? 0 :
                 domains.reduce((sum, domain) => {
-                    return sum + domain.items.reduce((itemSum, item) => itemSum + getPositivesTotal(item.values), 0);
+                    return sum + domain.items.reduce((itemSum, item) => itemSum + getPositivesTotal(item.values, domain.scales), 0);
                 }, 0) / totalItemsCount;
 
             /* --- Get formatted date and time string --- */
@@ -612,10 +640,10 @@
             /* --- Excel Export Functions --- */
             const exportEmptyTemplate = () => {
                 const data = [];
-                const header = ['المحور', 'البنود', ...scales.map(s => s.name), 'إجمالي الصف', 'الإيجابيات'];
+                const header = ['المحور', 'البنود', ...initialScales.map(s => s.name), 'إجمالي الصف', 'الإيجابيات'];
                 data.push(header);
-                data.push(['المحور الأول', 'البند الأول', ...scales.map(() => ''), '', '']);
-                data.push(['المحور الأول', 'البند الثاني', ...scales.map(() => ''), '', '']);
+                data.push(['المحور الأول', 'البند الأول', ...initialScales.map(() => ''), '', '']);
+                data.push(['المحور الأول', 'البند الثاني', ...initialScales.map(() => ''), '', '']);
 
                 const ws = XLSX.utils.aoa_to_sheet(data);
                 const wb = XLSX.utils.book_new();
@@ -629,37 +657,35 @@
                     return;
                 }
                 const data = [];
-                const header = ['المحور', 'البنود', ...scales.map(s => s.name), 'إجمالي الصف', 'الإيجابيات'];
-                data.push(header);
-
+                
                 domains.forEach(domain => {
+                    // Create specific header for this domain since scales vary
+                    const header = ['المحور', 'البنود', ...domain.scales.map(s => s.name), 'إجمالي الصف', 'الإيجابيات'];
+                    data.push(header);
+
                     let domainPosSum = 0;
                     
-                    /* Add items for this domain */
                     domain.items.forEach(item => {
                         const row = [domain.name, item.text];
-                        scales.forEach(s => row.push(`${item.values[s.id] || 0}%`));
-                        row.push(`${getItemRowTotal(item.values)}%`);
-                        const posTotal = getPositivesTotal(item.values);
+                        domain.scales.forEach(s => row.push(`${item.values[s.id] || 0}%`));
+                        row.push(`${getItemRowTotal(item.values, domain.scales)}%`);
+                        const posTotal = getPositivesTotal(item.values, domain.scales);
                         row.push(`${posTotal}%`);
                         data.push(row);
                         domainPosSum += posTotal;
                     });
                     
-                    /* Add Summary Row for this domain */
                     if (domain.items.length > 0) {
                         const domainPosAvg = (domainPosSum / domain.items.length).toFixed(1);
                         const summaryRow = [
                             `متوسط إيجابيات (${domain.name})`,
-                            '', /* البنود */
-                            ...scales.map(() => ''), /* المقاييس */
-                            '', /* إجمالي الصف */
-                            `${domainPosAvg}%` /* متوسط الإيجابيات */
+                            '', 
+                            ...domain.scales.map(() => ''),
+                            '', 
+                            `${domainPosAvg}%` 
                         ];
                         data.push(summaryRow);
-                        
-                        /* Add an empty row for visual separation */
-                        data.push(Array(header.length).fill(''));
+                        data.push(Array(header.length).fill('')); // Empty row separator
                     }
                 });
 
@@ -676,15 +702,18 @@
                 }
                 const data = [];
                 const allItems = domains.flatMap(d => d.items.map(i => ({
+                    domainId: d.id,
                     question: `${d.name} [${i.text}]`,
                     values: i.values
                 })));
+                
                 const header = ['Timestamp', ...allItems.map(i => i.question)];
                 data.push(header);
 
                 const itemColumns = allItems.map(itemObj => {
+                    const domainScales = domains.find(d => d.id === itemObj.domainId).scales;
                     let distribution = [];
-                    let counts = scales.map(s => {
+                    let counts = domainScales.map(s => {
                         const percentage = Number(itemObj.values[s.id]) || 0;
                         return {
                             name: s.name,
@@ -692,9 +721,11 @@
                             fraction: ((percentage / 100) * participantsCount) % 1
                         };
                     });
+                    
                     let currentTotal = counts.reduce((sum, c) => sum + c.exactCount, 0);
                     let remainder = participantsCount - currentTotal;
                     counts.sort((a, b) => b.fraction - a.fraction);
+                    
                     for (let i = 0; i < remainder; i++) {
                         counts[i % counts.length].exactCount++;
                     }
@@ -727,7 +758,7 @@
             };
 
             return (
-                <div className="max-w-screen-2xl mx-auto p-4 md:p-6 font-sans">
+                <div className="max-w-screen-2xl mx-auto p-4 md:p-6 font-sans relative">
                     {/* --- Custom Modal Overlay --- */}
                     {modalConfig.isOpen && (
                         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[100] p-4 transition-opacity duration-300">
@@ -798,14 +829,14 @@
                                     {(modalConfig.type === 'confirm' || modalConfig.type === 'prompt' || modalConfig.type === 'addDomain') && (
                                         <button
                                             onClick={() => { if (modalConfig.onConfirm) modalConfig.onConfirm(tempPromptValue, tempItemCount); closeModal(); }}
-                                            className="btn-shiny btn-shiny-green px-6 py-2 rounded-lg text-lg font-bold"
+                                            className="btn-shiny btn-shiny-green px-6 py-3 rounded-lg text-lg font-bold w-full"
                                         >
                                             تأكيد
                                         </button>
                                     )}
                                     <button
                                         onClick={closeModal}
-                                        className="btn-shiny btn-shiny-red px-6 py-2 rounded-lg text-lg font-bold"
+                                        className="btn-shiny btn-shiny-red px-6 py-3 rounded-lg text-lg font-bold w-full"
                                     >
                                         {modalConfig.type === 'alert' ? 'حسناً' : 'إلغاء'}
                                     </button>
@@ -817,8 +848,8 @@
                     {/* Top Navigation & Logos */}
                     <div className="flex justify-between items-center mb-6 bg-white p-3 md:p-4 rounded-xl shadow-lg hover-zoom border-t-4 border-blue-500">
                         <img src="https://mazen19812002.github.io/Questionnaire-Multi-Scales-/00.png" alt="Logo Right" className="h-12 md:h-16 w-auto object-contain drop-shadow-md" />
-                        <a href="https://mazen19812002.github.io/Questionnaire-Multi-Scales-/" className="btn-shiny btn-shiny-blue px-4 py-2 rounded-lg text-sm md:text-lg flex items-center gap-2 font-bold leading-tight">
-                            <i className="fas fa-home"></i> الرئيسية
+                        <a href="https://mazen19812002.github.io/Questionnaire-Multi-Scales-/" className="btn-shiny btn-shiny-blue px-6 py-3 rounded-lg text-sm md:text-lg flex items-center gap-2 font-bold leading-tight">
+                            <i className="fas fa-home text-xl"></i> الرئيسية
                         </a>
                         <img src="https://mazen19812002.github.io/Questionnaire-Multi-Scales-/02.jpg" alt="Logo Left" className="h-12 md:h-16 w-auto object-contain rounded-lg shadow-sm" />
                     </div>
@@ -829,24 +860,24 @@
                         <p className="text-lg md:text-xl thin-title text-blue-700 font-bold">Design Sub-items, Columns, and Percentages</p>
                     </div>
 
-                    {/* Advanced Tools Section & Exports (Combined and Compact) */}
+                    {/* Advanced Tools Section & Exports */}
                     <div className="bg-white p-4 rounded-xl shadow-lg mb-6 border-t-4 border-green-500 hover-zoom">
                         <div className="flex flex-wrap justify-center gap-3">
-                            <button onClick={exportEmptyTemplate} className="btn-shiny btn-shiny-blue px-4 py-2 rounded-lg text-sm md:text-base flex items-center gap-2 font-bold leading-tight">
-                                <i className="fas fa-file-download"></i> تحميل قالب فارغ
+                            <button onClick={exportEmptyTemplate} className="btn-shiny btn-shiny-blue px-6 py-3 rounded-lg text-sm md:text-base flex items-center gap-2 font-bold leading-tight">
+                                <i className="fas fa-file-download text-lg"></i> تحميل قالب فارغ
                             </button>
-                            <label className="btn-shiny btn-shiny-blue px-4 py-2 rounded-lg text-sm md:text-base cursor-pointer flex items-center gap-2 m-0 font-bold leading-tight">
-                                <i className="fas fa-upload"></i> رفع قالب (Excel)
+                            <label className="btn-shiny btn-shiny-blue px-6 py-3 rounded-lg text-sm md:text-base cursor-pointer flex items-center gap-2 m-0 font-bold leading-tight">
+                                <i className="fas fa-upload text-lg"></i> رفع قالب (Excel)
                                 <input type="file" accept=".xlsx, .xls, .csv" className="hidden" onChange={handleFileUpload} />
                             </label>
-                            <button onClick={handleAutoFill} className="btn-shiny btn-shiny-orange px-5 py-2 rounded-lg text-sm md:text-base flex items-center gap-2 font-black leading-tight group">
-                                <i className="fas fa-magic group-hover:animate-pulse"></i> تعبئة تلقائية
+                            <button onClick={handleAutoFill} className="btn-shiny btn-shiny-orange px-8 py-3 rounded-lg text-sm md:text-base flex items-center gap-2 font-black leading-tight group">
+                                <i className="fas fa-magic text-xl group-hover:animate-pulse"></i> تعبئة تلقائية
                             </button>
-                            <button onClick={exportTemplate} className="btn-shiny btn-shiny-green px-4 py-2 rounded-lg text-sm md:text-base flex items-center gap-2 font-bold leading-tight">
-                                <i className="fas fa-file-excel"></i> تحميل التقييم
+                            <button onClick={exportTemplate} className="btn-shiny btn-shiny-green px-6 py-3 rounded-lg text-sm md:text-base flex items-center gap-2 font-bold leading-tight">
+                                <i className="fas fa-file-excel text-lg"></i> تحميل التقييم
                             </button>
-                            <button onClick={exportGoogleFormsMock} className="btn-shiny btn-shiny-purple px-5 py-2 rounded-lg text-sm md:text-base flex items-center gap-2 font-black leading-tight group">
-                                <i className="fas fa-chart-pie group-hover:animate-spin"></i> نتائج وهمية (Forms)
+                            <button onClick={exportGoogleFormsMock} className="btn-shiny btn-shiny-purple px-6 py-3 rounded-lg text-sm md:text-base flex items-center gap-2 font-black leading-tight group">
+                                <i className="fas fa-chart-pie text-lg group-hover:animate-spin"></i> نتائج وهمية (Forms)
                             </button>
                         </div>
                     </div>
@@ -859,7 +890,7 @@
                             <div className="flex items-stretch shadow-sm rounded-lg overflow-hidden border border-gray-300">
                                 <button 
                                     onClick={() => setParticipantsCount(Math.max(1, participantsCount - 1))}
-                                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 flex items-center justify-center transition-colors border-l border-gray-300"
+                                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 flex items-center justify-center transition-colors border-l border-gray-300"
                                 >
                                     <i className="fas fa-minus"></i>
                                 </button>
@@ -868,11 +899,11 @@
                                     min="1"
                                     value={participantsCount}
                                     onChange={(e) => setParticipantsCount(Math.max(1, Number(e.target.value)))}
-                                    className="w-20 p-2 text-xl text-center focus:outline-none font-black text-indigo-800 leading-none"
+                                    className="w-24 p-3 text-2xl text-center focus:outline-none font-black text-indigo-800 leading-none"
                                 />
                                 <button 
                                     onClick={() => setParticipantsCount(participantsCount + 1)}
-                                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 flex items-center justify-center transition-colors border-r border-gray-300"
+                                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 flex items-center justify-center transition-colors border-r border-gray-300"
                                 >
                                     <i className="fas fa-plus"></i>
                                 </button>
@@ -880,65 +911,7 @@
                         </div>
                     </div>
 
-                    {/* Scale Columns Manager (Global) */}
-                    <div className="bg-white p-4 md:p-6 rounded-xl shadow-lg mb-6 hover-zoom">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl md:text-2xl thin-title text-gray-800 font-black">إدارة الأعمدة / المقاييس</h2>
-                            <button
-                                onClick={addScale}
-                                className="btn-shiny btn-shiny-green px-4 py-2 rounded-lg text-sm flex items-center gap-2 font-bold"
-                            >
-                                <i className="fas fa-columns"></i> إضافة عمود
-                            </button>
-                        </div>
-                        <div className="flex flex-wrap gap-3">
-                            {scales.map((scale, index) => {
-                                const isDraggedOver = draggedOverScaleIndex === index;
-                                return (
-                                    <div
-                                        key={scale.id}
-                                        draggable
-                                        onDragStart={(e) => handleScaleDragStart(e, index)}
-                                        onDragOver={(e) => handleScaleDragOver(e, index)}
-                                        onDrop={(e) => handleScaleDrop(e, index)}
-                                        onDragEnd={handleScaleDragEnd}
-                                        className={`flex flex-col sm:flex-row items-center gap-2 bg-blue-50 border p-2 rounded-lg shadow-sm cursor-move transition-all hover:shadow-md
-                                            ${isDraggedOver ? 'border-dashed border-blue-500 bg-blue-100 scale-105' : 'border-blue-200'}
-                                        `}
-                                        title="اسحب لتغيير الترتيب"
-                                    >
-                                        <i className="fas fa-grip-vertical text-gray-400 px-1 cursor-move hover:text-blue-500 text-sm"></i>
-                                        <input
-                                            type="text"
-                                            value={scale.name}
-                                            onChange={(e) => updateScaleName(scale.id, e.target.value)}
-                                            className="p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-blue-500 w-32 text-center font-bold"
-                                            placeholder="اسم العمود"
-                                        />
-                                        <select
-                                            value={scale.type || 'neutral'}
-                                            onChange={(e) => updateScaleType(scale.id, e.target.value)}
-                                            className={`p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-blue-500 font-bold cursor-pointer
-                                                ${scale.type === 'positive' ? 'text-green-700 bg-green-100' :
-                                                    scale.type === 'negative' ? 'text-red-700 bg-red-100' :
-                                                        'text-gray-700 bg-gray-100'}`}
-                                        >
-                                            <option value="positive">إيجابي (+)</option>
-                                            <option value="neutral">محايد (0)</option>
-                                            <option value="negative">سلبي (-)</option>
-                                        </select>
-                                        {scales.length > 1 && (
-                                            <button onClick={() => removeScale(scale.id)} className="text-red-500 hover:text-red-700 px-2 text-xl hover:scale-110 transition-transform" title="حذف العمود">
-                                                <i className="fas fa-trash-alt"></i>
-                                            </button>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* Overall Positives Average Banner (Appears only when data exists) */}
+                    {/* Overall Positives Average Banner */}
                     {totalItemsCount > 0 && (
                         <div className="bg-green-100 border-t-4 border-green-500 p-4 md:p-6 rounded-xl shadow-lg mb-6 flex flex-col md:flex-row justify-between items-center gap-4 hover-zoom">
                             <h2 className="text-2xl md:text-3xl thin-title text-green-900 font-black">المتوسط العام للإيجابيات (Overall Positive Average)</h2>
@@ -948,23 +921,23 @@
                         </div>
                     )}
 
-                    {/* Domains & Grid Layout */}
+                    {/* Domains Layout */}
                     <div className="mb-6">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl md:text-3xl thin-title text-gray-800 font-black">المحاور والبنود (Axes Matrix)</h2>
+                            <h2 className="text-2xl md:text-3xl thin-title text-gray-800 font-black drop-shadow-sm">المحاور والبنود (Axes Matrix)</h2>
                         </div>
                         
                         {domains.length === 0 && (
-                            <div className="bg-white p-8 rounded-xl shadow-md border-t-2 border-gray-300 text-center hover-zoom">
-                                <i className="fas fa-folder-open text-4xl text-gray-300 mb-2"></i>
-                                <h3 className="text-xl text-gray-500 font-black">لا توجد محاور لعرضها حالياً</h3>
-                                <p className="text-gray-400 mt-1 text-sm font-bold">قم بإضافة محور جديد أو رفع ملف قالب Excel للبدء.</p>
+                            <div className="bg-white p-10 rounded-xl shadow-lg border-t-4 border-blue-400 text-center hover-zoom">
+                                <i className="fas fa-folder-open text-6xl text-blue-200 mb-4 drop-shadow"></i>
+                                <h3 className="text-2xl text-blue-800 font-black mb-2">لا توجد محاور لعرضها حالياً</h3>
+                                <p className="text-gray-500 mt-1 text-lg font-bold">قم بإضافة محور جديد أو رفع ملف قالب Excel للبدء في تصميم استبيانك.</p>
                                 
                                 <button
                                     onClick={addDomain}
-                                    className="mt-6 btn-shiny btn-shiny-green px-6 py-3 rounded-lg text-lg font-black flex items-center gap-2 mx-auto"
+                                    className="mt-8 btn-shiny btn-shiny-green px-8 py-4 rounded-xl text-xl font-black flex items-center gap-3 mx-auto"
                                 >
-                                    <i className="fas fa-folder-plus"></i> إضافة محور جديد
+                                    <i className="fas fa-folder-plus text-2xl"></i> إضافة محور جديد
                                 </button>
                             </div>
                         )}
@@ -972,7 +945,7 @@
                         {domains.map(domain => (
                             <div
                                 key={domain.id}
-                                className="bg-white p-4 md:p-6 rounded-xl shadow-lg mb-6 border-r-4 border-blue-500 hover-zoom"
+                                className="bg-white p-4 md:p-6 rounded-xl shadow-lg mb-8 border-r-4 border-blue-500 hover-zoom"
                                 onDragOver={(e) => {
                                     if (domain.items.length === 0) handleDragOver(e, domain.id, 0);
                                 }}
@@ -981,59 +954,120 @@
                                 }}
                             >
                                 {/* Domain Header */}
-                                <div className="flex flex-col md:flex-row gap-3 mb-4 pb-4 border-b border-gray-100 items-end">
+                                <div className="flex flex-col md:flex-row gap-3 mb-6 pb-6 border-b-2 border-blue-100 items-end">
                                     <div className="flex-1 w-full">
-                                        <label className="block text-indigo-800 mb-1 text-xs font-black uppercase tracking-widest">اسم المحور</label>
+                                        <label className="block text-indigo-800 mb-2 text-sm font-black uppercase tracking-widest drop-shadow-sm">اسم المحور</label>
                                         <input
                                             type="text"
                                             value={domain.name}
                                             onChange={(e) => updateDomain(domain.id, 'name', e.target.value)}
-                                            className="w-full p-2 md:p-3 border border-gray-200 rounded-lg text-xl md:text-2xl font-black focus:outline-none focus:border-blue-500 bg-blue-50"
+                                            className="w-full p-3 md:p-4 border-2 border-blue-200 rounded-xl text-2xl md:text-3xl font-black focus:outline-none focus:border-blue-500 bg-blue-50/50 shadow-inner"
                                             placeholder="أدخل اسم المحور"
                                         />
                                     </div>
                                     <div className="flex gap-2 shrink-0 w-full md:w-auto justify-center">
                                         <button
                                             onClick={() => addItem(domain.id)}
-                                            className="btn-shiny btn-shiny-green px-4 py-2 rounded-lg text-sm md:text-base font-bold h-fit flex items-center gap-2 justify-center"
+                                            className="btn-shiny btn-shiny-blue px-6 py-4 rounded-xl text-base md:text-lg font-bold h-fit flex items-center gap-2 justify-center shadow-md"
                                         >
-                                            <i className="fas fa-plus-circle"></i> إضافة بند (سؤال)
+                                            <i className="fas fa-plus-circle text-xl"></i> إضافة بند (سؤال)
                                         </button>
                                     </div>
                                 </div>
 
+                                {/* --- Independent Scale Columns Manager for this Domain --- */}
+                                <div className="bg-slate-50 p-4 rounded-xl border border-gray-200 mb-6 shadow-inner">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-lg font-bold text-gray-700 flex items-center gap-2">
+                                            <i className="fas fa-sliders-h text-blue-500"></i> أعمدة / مقاييس المحور
+                                        </h3>
+                                        <button
+                                            onClick={() => addScale(domain.id)}
+                                            className="bg-green-100 text-green-700 px-4 py-2 rounded-lg text-sm hover:bg-green-200 transition-colors shadow-sm font-bold flex items-center gap-2"
+                                        >
+                                            <i className="fas fa-plus"></i> عمود جديد
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="flex flex-wrap gap-2">
+                                        {domain.scales.map((scale, index) => {
+                                            const isDraggedOver = draggedOverScale && draggedOverScale.domainId === domain.id && draggedOverScale.index === index;
+                                            return (
+                                                <div
+                                                    key={scale.id}
+                                                    draggable
+                                                    onDragStart={(e) => handleScaleDragStart(e, domain.id, index)}
+                                                    onDragOver={(e) => handleScaleDragOver(e, domain.id, index)}
+                                                    onDrop={(e) => handleScaleDrop(e, domain.id, index)}
+                                                    onDragEnd={handleScaleDragEnd}
+                                                    className={`flex flex-col sm:flex-row items-center gap-1 bg-white border p-1.5 rounded-lg shadow-sm cursor-move transition-all hover:shadow-md
+                                                        ${isDraggedOver ? 'border-dashed border-2 border-blue-500 bg-blue-50 scale-105' : 'border-gray-300'}
+                                                    `}
+                                                    title="اسحب لتغيير الترتيب داخل المحور"
+                                                >
+                                                    <i className="fas fa-grip-vertical text-gray-400 px-2 hover:text-blue-500"></i>
+                                                    <input
+                                                        type="text"
+                                                        value={scale.name}
+                                                        onChange={(e) => updateScaleName(domain.id, scale.id, e.target.value)}
+                                                        className="p-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-blue-500 w-28 text-center font-bold bg-gray-50"
+                                                        placeholder="اسم العمود"
+                                                    />
+                                                    <select
+                                                        value={scale.type || 'neutral'}
+                                                        onChange={(e) => updateScaleType(domain.id, scale.id, e.target.value)}
+                                                        className={`p-1.5 border border-gray-200 rounded text-xs focus:outline-none font-bold cursor-pointer
+                                                            ${scale.type === 'positive' ? 'text-green-700 bg-green-50' :
+                                                                scale.type === 'negative' ? 'text-red-700 bg-red-50' :
+                                                                    'text-gray-700 bg-gray-50'}`}
+                                                    >
+                                                        <option value="positive">إيجابي (+)</option>
+                                                        <option value="neutral">محايد (0)</option>
+                                                        <option value="negative">سلبي (-)</option>
+                                                    </select>
+                                                    {domain.scales.length > 1 && (
+                                                        <button onClick={() => removeScale(domain.id, scale.id)} className="text-red-400 hover:text-red-600 px-1 text-lg hover:scale-110 transition-transform">
+                                                            <i className="fas fa-times-circle"></i>
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
                                 {/* Items Grid/Table Structure */}
-                                <div className="w-full overflow-x-auto">
+                                <div className="w-full overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
                                     <div className="min-w-[1050px]">
                                         {/* Table Header */}
-                                        <div className="flex bg-slate-100 p-2 rounded-t-lg font-black text-gray-700 border border-gray-200">
+                                        <div className="flex bg-slate-100 p-3 rounded-t-xl font-black text-gray-700 border-b border-gray-300 items-center">
                                             <div className="w-8"></div>
-                                            <div className="flex-1 px-2 text-sm md:text-base">البنود (Sub-items)</div>
-                                            {scales.map(scale => (
-                                                <div key={scale.id} className={`w-28 text-center px-1 text-xs md:text-sm flex flex-col items-center justify-center
+                                            <div className="flex-1 px-2 text-base md:text-lg text-indigo-900">البنود (Sub-items)</div>
+                                            {domain.scales.map(scale => (
+                                                <div key={scale.id} className={`w-28 text-center px-1 text-sm md:text-base flex flex-col items-center justify-center
                                                     ${scale.type === 'positive' ? 'text-green-700' :
                                                         scale.type === 'negative' ? 'text-red-700' :
                                                             'text-gray-600'}`}
                                                 >
-                                                    <span className="font-black truncate w-full">{scale.name}</span>
-                                                    {scale.type === 'positive' && <i className="fas fa-plus text-[10px] mt-0.5"></i>}
-                                                    {scale.type === 'negative' && <i className="fas fa-minus text-[10px] mt-0.5"></i>}
-                                                    {scale.type === 'neutral' && <i className="fas fa-circle text-[8px] mt-0.5 opacity-50"></i>}
+                                                    <span className="font-black truncate w-full drop-shadow-sm">{scale.name}</span>
+                                                    {scale.type === 'positive' && <i className="fas fa-plus text-xs mt-1"></i>}
+                                                    {scale.type === 'negative' && <i className="fas fa-minus text-xs mt-1"></i>}
+                                                    {scale.type === 'neutral' && <i className="fas fa-circle text-[8px] mt-1 opacity-50"></i>}
                                                 </div>
                                             ))}
-                                            <div className="w-24 text-center px-1 font-black text-xs md:text-sm text-blue-800">إجمالي الصف</div>
-                                            <div className="w-24 text-center px-1 font-black text-xs md:text-sm text-green-700">إيجابيات</div>
-                                            <div className="w-10 text-center"></div>
+                                            <div className="w-24 text-center px-1 font-black text-sm md:text-base text-blue-800">إجمالي الصف</div>
+                                            <div className="w-24 text-center px-1 font-black text-sm md:text-base text-green-700">إيجابيات</div>
+                                            <div className="w-12 text-center"></div>
                                         </div>
 
                                         {/* Items Rows */}
-                                        <div className="border-x border-b border-gray-200 rounded-b-lg pb-2 bg-gray-50 space-y-1 p-2">
+                                        <div className="rounded-b-xl pb-2 bg-gray-50 space-y-1 p-2">
                                             {domain.items.map((item, iIndex) => {
                                                 const isDraggedOver = draggedOverItem && draggedOverItem.domainId === domain.id && draggedOverItem.itemIndex === iIndex;
-                                                const rowTotal = getItemRowTotal(item.values);
-                                                const posTotal = getPositivesTotal(item.values);
+                                                const rowTotal = getItemRowTotal(item.values, domain.scales);
+                                                const posTotal = getPositivesTotal(item.values, domain.scales);
                                                 const isRowValid = Math.abs(rowTotal - 100) < 0.1;
-                                                const hasValues = scales.some(s => item.values[s.id] !== '' && Number(item.values[s.id]) > 0);
+                                                const hasValues = domain.scales.some(s => item.values[s.id] !== '' && Number(item.values[s.id]) > 0);
                                                 const needsRedBorder = hasValues && !isRowValid;
 
                                                 return (
@@ -1044,14 +1078,14 @@
                                                         onDragOver={(e) => handleDragOver(e, domain.id, iIndex)}
                                                         onDrop={(e) => handleDrop(e, domain.id, iIndex)}
                                                         onDragEnd={handleDragEnd}
-                                                        className={`flex items-center gap-1 p-1 md:p-2 rounded-lg bg-white shadow-sm transition-all cursor-move hover:shadow-md
+                                                        className={`flex items-center gap-1 p-2 md:p-3 rounded-lg bg-white shadow-sm transition-all cursor-move hover:shadow-md
                                                             ${isDraggedOver ? 'border-dashed border-2 border-blue-400 bg-blue-50' : ''}
-                                                            ${needsRedBorder ? 'border-2 border-red-500 ring-2 ring-red-200' : 'border border-gray-200'}
+                                                            ${needsRedBorder ? 'border-2 border-red-500 ring-4 ring-red-100' : 'border border-gray-200'}
                                                         `}
                                                     >
                                                         {/* Drag Handle */}
                                                         <div className="w-8 flex justify-center text-gray-400 hover:text-indigo-600 transition-colors">
-                                                            <i className="fas fa-grip-vertical text-lg"></i>
+                                                            <i className="fas fa-grip-vertical text-xl"></i>
                                                         </div>
                                                         
                                                         {/* Item Text Input */}
@@ -1060,25 +1094,25 @@
                                                                 type="text"
                                                                 value={item.text}
                                                                 onChange={(e) => updateItemText(domain.id, item.id, e.target.value)}
-                                                                className="w-full p-2 border border-gray-300 rounded-md text-sm md:text-base font-bold focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-100"
+                                                                className="w-full p-3 border border-gray-300 rounded-lg text-base md:text-lg font-bold focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-50 hover:bg-white transition-colors"
                                                                 placeholder="أدخل نص البند..."
                                                             />
                                                         </div>
 
-                                                        {/* Percentage Cells with Custom +/- */}
-                                                        {scales.map(scale => (
+                                                        {/* Percentage Cells */}
+                                                        {domain.scales.map(scale => (
                                                             <div key={`cell-${scale.id}`} className="w-28 px-1 flex items-center justify-center">
-                                                                <div className={`flex w-full items-stretch rounded-md overflow-hidden border transition-colors
-                                                                    ${scale.type === 'positive' ? 'border-green-200 focus-within:border-green-500 focus-within:ring-1 focus-within:ring-green-200' :
-                                                                    scale.type === 'negative' ? 'border-red-200 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-200' :
-                                                                    'border-gray-300 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-200'}`}
+                                                                <div className={`flex w-full items-stretch rounded-lg overflow-hidden border shadow-inner transition-all
+                                                                    ${scale.type === 'positive' ? 'border-green-200 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-200' :
+                                                                    scale.type === 'negative' ? 'border-red-200 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-200' :
+                                                                    'border-gray-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200'}`}
                                                                 >
                                                                     <button 
                                                                         onClick={() => updateItemValue(domain.id, item.id, scale.id, Math.max(0, (Number(item.values[scale.id]) || 0) - 1))}
                                                                         className={`px-2 flex items-center justify-center transition-colors border-l
-                                                                            ${scale.type === 'positive' ? 'bg-green-100 hover:bg-green-200 text-green-800 border-green-200' :
-                                                                            scale.type === 'negative' ? 'bg-red-100 hover:bg-red-200 text-red-800 border-red-200' :
-                                                                            'bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300'}`}
+                                                                            ${scale.type === 'positive' ? 'bg-green-100 hover:bg-green-200 text-green-800' :
+                                                                            scale.type === 'negative' ? 'bg-red-100 hover:bg-red-200 text-red-800' :
+                                                                            'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
                                                                     >
                                                                         <i className="fas fa-minus text-[10px]"></i>
                                                                     </button>
@@ -1086,7 +1120,7 @@
                                                                         type="number"
                                                                         value={item.values[scale.id] !== undefined ? item.values[scale.id] : ''}
                                                                         onChange={(e) => updateItemValue(domain.id, item.id, scale.id, e.target.value)}
-                                                                        className={`w-full py-2 text-center text-sm md:text-base focus:outline-none font-black transition-colors flex-1
+                                                                        className={`w-full py-2.5 text-center text-base md:text-lg focus:outline-none font-black transition-colors flex-1
                                                                             ${scale.type === 'positive' ? 'bg-green-50 text-green-800' :
                                                                             scale.type === 'negative' ? 'bg-red-50 text-red-800' :
                                                                             'bg-white text-gray-800'}`}
@@ -1094,9 +1128,9 @@
                                                                     <button 
                                                                         onClick={() => updateItemValue(domain.id, item.id, scale.id, Math.min(100, (Number(item.values[scale.id]) || 0) + 1))}
                                                                         className={`px-2 flex items-center justify-center transition-colors border-r
-                                                                            ${scale.type === 'positive' ? 'bg-green-100 hover:bg-green-200 text-green-800 border-green-200' :
-                                                                            scale.type === 'negative' ? 'bg-red-100 hover:bg-red-200 text-red-800 border-red-200' :
-                                                                            'bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300'}`}
+                                                                            ${scale.type === 'positive' ? 'bg-green-100 hover:bg-green-200 text-green-800' :
+                                                                            scale.type === 'negative' ? 'bg-red-100 hover:bg-red-200 text-red-800' :
+                                                                            'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
                                                                     >
                                                                         <i className="fas fa-plus text-[10px]"></i>
                                                                     </button>
@@ -1106,26 +1140,26 @@
 
                                                         {/* Row Total */}
                                                         <div className="w-24 flex items-center justify-center">
-                                                            <div className={`w-full text-center font-black text-sm md:text-base px-1 py-1.5 rounded-md transition-colors ${isRowValid ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}`}>
+                                                            <div className={`w-full text-center font-black text-base md:text-lg px-2 py-2 rounded-lg shadow-sm transition-colors ${isRowValid ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-red-500 text-white shadow-red-200 animate-pulse'}`}>
                                                                 {rowTotal.toFixed(1)}%
                                                             </div>
                                                         </div>
 
                                                         {/* Positives Total */}
                                                         <div className="w-24 flex items-center justify-center">
-                                                            <div className={`w-full text-center font-black text-sm md:text-base px-1 py-1.5 rounded-md transition-colors bg-green-100 text-green-700`}>
+                                                            <div className={`w-full text-center font-black text-base md:text-lg px-2 py-2 rounded-lg shadow-sm transition-colors bg-green-100 text-green-800 border border-green-200`}>
                                                                 {posTotal.toFixed(1)}%
                                                             </div>
                                                         </div>
 
                                                         {/* Delete Row */}
-                                                        <div className="w-10 flex justify-center">
+                                                        <div className="w-12 flex justify-center">
                                                             <button
                                                                 onClick={() => removeItem(domain.id, item.id)}
-                                                                className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 w-7 h-7 rounded-full transition-all flex items-center justify-center hover:scale-110 shadow-sm"
+                                                                className="text-red-500 hover:text-white bg-red-50 hover:bg-red-500 w-9 h-9 rounded-full transition-all flex items-center justify-center hover:scale-110 shadow-sm border border-red-100 hover:shadow-red-300"
                                                                 title="حذف البند"
                                                             >
-                                                                <i className="fas fa-times text-sm"></i>
+                                                                <i className="fas fa-trash-alt text-sm"></i>
                                                             </button>
                                                         </div>
                                                     </div>
@@ -1137,36 +1171,36 @@
                                 
                                 {/* --- Bar Chart for Domain Averages --- */}
                                 {domain.items.length > 0 && (
-                                    <div className="mt-8 bg-slate-50 p-4 md:p-6 rounded-xl border border-indigo-100 shadow-inner hover-zoom transition-all">
-                                        <h3 className="text-xl font-black text-indigo-900 mb-8 text-center flex items-center justify-center gap-2">
-                                            <i className="fas fa-chart-column text-blue-500"></i> متوسطات المقاييس للمحور
+                                    <div className="mt-8 bg-slate-50 p-6 rounded-2xl border border-indigo-100 shadow-inner hover-zoom transition-all">
+                                        <h3 className="text-2xl font-black text-indigo-900 mb-10 text-center flex items-center justify-center gap-3 drop-shadow-sm">
+                                            <i className="fas fa-chart-column text-blue-500 text-3xl"></i> متوسطات المقاييس للمحور
                                         </h3>
-                                        <div className="flex justify-around items-end h-48 md:h-60 gap-2 md:gap-4 px-2 md:px-8 border-b-2 border-gray-300 pb-2 relative">
+                                        <div className="flex justify-around items-end h-56 md:h-72 gap-2 md:gap-4 px-2 md:px-8 border-b-4 border-gray-300 pb-2 relative">
                                             {/* Background Grid Lines (Decorative) */}
                                             <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-10 pb-8">
-                                                <div className="border-t-2 border-gray-800 w-full"></div>
+                                                <div className="border-t-4 border-gray-800 w-full"></div>
                                                 <div className="border-t-2 border-gray-800 w-full"></div>
                                                 <div className="border-t-2 border-gray-800 w-full"></div>
                                                 <div className="border-t-2 border-gray-800 w-full"></div>
                                             </div>
 
-                                            {scales.map((scale) => {
+                                            {domain.scales.map((scale) => {
                                                 const columnSum = domain.items.reduce((sum, item) => sum + (Number(item.values[scale.id]) || 0), 0);
                                                 const avg = columnSum / domain.items.length;
                                                 return (
-                                                    <div key={`chart-${scale.id}`} className="flex flex-col items-center flex-1 group h-full justify-end z-10">
-                                                        <span className="mb-2 text-sm md:text-lg font-black text-gray-700 transition-transform duration-300 group-hover:-translate-y-2 group-hover:scale-110 group-hover:text-blue-600 drop-shadow-sm">
+                                                    <div key={`chart-${scale.id}`} className="flex flex-col items-center flex-1 group h-full justify-end z-10 relative">
+                                                        <span className="mb-3 text-base md:text-xl font-black text-gray-800 transition-transform duration-300 group-hover:-translate-y-3 group-hover:scale-125 group-hover:text-blue-600 drop-shadow-md bg-white/80 px-2 rounded-lg">
                                                             {avg.toFixed(1)}%
                                                         </span>
                                                         <div
-                                                            className={`w-full max-w-[60px] md:max-w-[80px] rounded-t-lg transition-all duration-700 ease-out relative shadow-md hover:shadow-xl cursor-pointer border-t border-white/30
-                                                                ${scale.type === 'positive' ? 'bg-gradient-to-t from-green-600 to-green-400 shadow-green-200' :
-                                                                  scale.type === 'negative' ? 'bg-gradient-to-t from-red-600 to-red-400 shadow-red-200' :
-                                                                  'bg-gradient-to-t from-slate-500 to-slate-400 shadow-slate-200'}
+                                                            className={`w-full max-w-[70px] md:max-w-[90px] rounded-t-xl transition-all duration-700 ease-out relative shadow-lg cursor-pointer border-t-2 border-white/50
+                                                                ${scale.type === 'positive' ? 'bg-gradient-to-t from-green-600 to-green-400 group-hover:shadow-green-400/50' :
+                                                                  scale.type === 'negative' ? 'bg-gradient-to-t from-red-600 to-red-400 group-hover:shadow-red-400/50' :
+                                                                  'bg-gradient-to-t from-slate-500 to-slate-400 group-hover:shadow-slate-400/50'}
                                                             `}
-                                                            style={{ height: `${Math.max(avg, 2)}%`, minHeight: '8px' }}
+                                                            style={{ height: `${Math.max(avg, 2)}%`, minHeight: '12px' }}
                                                         >
-                                                            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity rounded-t-lg"></div>
+                                                            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-25 transition-opacity rounded-t-xl"></div>
                                                         </div>
                                                         <span className="mt-4 text-xs md:text-sm font-bold text-gray-800 text-center truncate w-full px-1">{scale.name}</span>
                                                     </div>
@@ -1176,26 +1210,26 @@
                                     </div>
                                 )}
 
-                                <div className="mt-6 flex justify-end border-t border-gray-100 pt-4">
+                                <div className="mt-8 flex justify-end border-t-2 border-gray-100 pt-6">
                                     <button
                                         onClick={() => removeDomain(domain.id)}
-                                        className="btn-shiny btn-shiny-red px-5 py-2 rounded-lg text-sm md:text-base font-bold flex items-center gap-2"
+                                        className="btn-shiny btn-shiny-red px-6 py-3 rounded-xl text-base font-bold flex items-center gap-2 shadow-lg"
                                         title="حذف المحور بالكامل"
                                     >
-                                        <i className="fas fa-trash-alt"></i> حذف المحور
+                                        <i className="fas fa-trash-alt text-lg"></i> حذف المحور نهائياً
                                     </button>
                                 </div>
                             </div>
                         ))}
 
-                        {/* Button moved to the very bottom of the domains list */}
+                        {/* Sticky Add Domain Button */}
                         {domains.length > 0 && (
-                            <div className="flex justify-center mt-8 mb-4 hover-zoom">
+                            <div className="flex justify-center mt-12 mb-8 hover-zoom">
                                 <button
                                     onClick={addDomain}
-                                    className="btn-shiny btn-shiny-green px-8 py-4 rounded-xl text-xl md:text-2xl font-black flex items-center gap-3"
+                                    className="btn-shiny btn-shiny-green px-10 py-5 rounded-2xl text-2xl font-black flex items-center gap-4 shadow-2xl border-b-4 border-green-700"
                                 >
-                                    <i className="fas fa-folder-plus text-3xl"></i> إضافة محور جديد
+                                    <i className="fas fa-folder-plus text-4xl"></i> إضافة محور جديد
                                 </button>
                             </div>
                         )}
