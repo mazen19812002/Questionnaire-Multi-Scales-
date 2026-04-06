@@ -36,6 +36,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        html {
+            font-size: 130% !important; /* Uniformly scales all Tailwind rem-based fonts, buttons, and spacing by 130% */
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #dbeafe; /* Light Blue Background */
@@ -1055,7 +1059,7 @@
                                                     <select
                                                         value={scale.type || 'neutral'}
                                                         onChange={(e) => updateScaleType(domain.id, scale.id, e.target.value)}
-                                                        className={`p-1 border border-gray-200 rounded text-[10px] focus:outline-none font-bold cursor-pointer
+                                                        className={`p-1 border border-gray-200 rounded text-xs focus:outline-none font-bold cursor-pointer
                                                             ${scale.type === 'positive' ? 'text-green-700 bg-green-50' : 
                                                                 scale.type === 'negative' ? 'text-red-700 bg-red-50' : 
                                                                     'text-gray-700 bg-gray-50'}`}
@@ -1077,11 +1081,11 @@
                                 
                                 {/* Items Grid/Table Structure */}
                                 <div className="w-full overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
-                                    <div className="min-w-[800px] md:min-w-[1000px]">
+                                    <div className="min-w-[1040px] md:min-w-[1300px]">
                                         {/* Table Header */}
-                                        <div className="flex bg-slate-100 p-2 rounded-t-xl font-bold text-gray-700 border-b border-gray-300 items-center">
+                                        <div className="flex gap-1.5 bg-slate-100 p-1.5 md:p-2 rounded-t-xl font-bold text-gray-700 border-b border-gray-300 items-center">
                                             <div className="w-8"></div>
-                                            <div className="flex-1 px-2 text-xs md:text-sm text-blue-900 drop-shadow-sm">البنود (Sub-items)</div>
+                                            <div className="flex-1 px-1 text-xs md:text-sm text-blue-900 drop-shadow-sm">البنود (Sub-items)</div>
                                             {domain.scales.map(scale => (
                                                 <div key={scale.id} className={`w-24 text-center px-1 text-xs flex flex-col items-center justify-center
                                                     ${scale.type === 'positive' ? 'text-green-700' : 
@@ -1089,13 +1093,13 @@
                                                             'text-gray-600'}`}
                                                 >
                                                     <span className="font-bold truncate w-full drop-shadow-sm">{scale.name}</span>
-                                                    {scale.type === 'positive' && <i className="fas fa-plus text-[8px] mt-0.5"></i>}
-                                                    {scale.type === 'negative' && <i className="fas fa-minus text-[8px] mt-0.5"></i>}
-                                                    {scale.type === 'neutral' && <i className="fas fa-circle text-[6px] mt-0.5 opacity-50"></i>}
+                                                    {scale.type === 'positive' && <i className="fas fa-plus text-[10px] mt-0.5"></i>}
+                                                    {scale.type === 'negative' && <i className="fas fa-minus text-[10px] mt-0.5"></i>}
+                                                    {scale.type === 'neutral' && <i className="fas fa-circle text-[8px] mt-0.5 opacity-50"></i>}
                                                 </div>
                                             ))}
-                                            <div className="w-20 text-center px-1 font-bold text-xs text-blue-800 drop-shadow-sm">إجمالي الصف</div>
-                                            <div className="w-20 text-center px-1 font-bold text-xs text-green-700 drop-shadow-sm">إيجابيات</div>
+                                            <div className="w-20 text-center font-bold text-xs text-blue-800 drop-shadow-sm">إجمالي الصف</div>
+                                            <div className="w-20 text-center font-bold text-xs text-green-700 drop-shadow-sm">إيجابيات</div>
                                             <div className="w-12 text-center"></div>
                                         </div>
                                         
@@ -1153,7 +1157,7 @@
                                                                             scale.type === 'negative' ? 'bg-red-100 hover:bg-red-200 text-red-800' : 
                                                                             'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
                                                                     >
-                                                                        <i className="fas fa-minus text-[10px]"></i>
+                                                                        <i className="fas fa-minus text-[13px]"></i>
                                                                     </button>
                                                                     <input
                                                                         type="number"
@@ -1171,7 +1175,7 @@
                                                                             scale.type === 'negative' ? 'bg-red-100 hover:bg-red-200 text-red-800' : 
                                                                             'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
                                                                     >
-                                                                        <i className="fas fa-plus text-[10px]"></i>
+                                                                        <i className="fas fa-plus text-[13px]"></i>
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -1208,9 +1212,9 @@
                                         
                                         {/* Column Averages Row */}
                                         {domain.items.length > 0 && (
-                                            <div className="flex bg-blue-100/80 p-2 rounded-b-xl font-black text-blue-900 border-t border-blue-200 items-center shadow-inner mt-1">
+                                            <div className="flex gap-1.5 bg-blue-100/80 p-1.5 md:p-2 rounded-b-xl font-black text-blue-900 border-t border-blue-200 items-center shadow-inner mt-1">
                                                 <div className="w-8"></div>
-                                                <div className="flex-1 px-2 text-sm md:text-base text-center tracking-wide drop-shadow-sm">متوسطات الأعمدة (Column Averages)</div>
+                                                <div className="flex-1 px-1 text-sm md:text-base text-center tracking-wide drop-shadow-sm">متوسطات الأعمدة (Column Averages)</div>
                                                 {domain.scales.map(scale => {
                                                     const columnSum = domain.items.reduce((sum, item) => sum + (Number(item.values[scale.id]) || 0), 0);
                                                     const avg = columnSum / domain.items.length;
@@ -1222,10 +1226,10 @@
                                                         </div>
                                                     );
                                                 })}
-                                                <div className="w-20 text-center px-1 font-black text-sm md:text-base text-blue-800 drop-shadow-sm">
+                                                <div className="w-20 text-center font-black text-sm md:text-base text-blue-800 drop-shadow-sm">
                                                     {(domain.items.reduce((sum, item) => sum + getItemRowTotal(item.values, domain.scales), 0) / domain.items.length).toFixed(1)}%
                                                 </div>
-                                                <div className="w-20 text-center px-1 font-black text-sm md:text-base text-green-800 drop-shadow-sm">
+                                                <div className="w-20 text-center font-black text-sm md:text-base text-green-800 drop-shadow-sm">
                                                     {(domain.items.reduce((sum, item) => sum + getPositivesTotal(item.values, domain.scales), 0) / domain.items.length).toFixed(1)}%
                                                 </div>
                                                 <div className="w-12 text-center"></div>
@@ -1267,7 +1271,7 @@
                                                         >
                                                             <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity rounded-t-lg"></div>
                                                         </div>
-                                                        <span className="mt-2 text-[10px] md:text-xs font-bold text-gray-800 text-center truncate w-full px-1 drop-shadow-sm">{scale.name}</span>
+                                                        <span className="mt-2 text-xs md:text-sm font-bold text-gray-800 text-center truncate w-full px-1 drop-shadow-sm">{scale.name}</span>
                                                     </div>
                                                 );
                                             })}
