@@ -701,26 +701,30 @@
                     const header = ['المحور', 'البنود', ...domain.scales.map(s => s.name), 'إجمالي الصف', 'الإيجابيات'];
                     data.push(header);
                     
-                    let domainPosSum = 0;
-                    
                     domain.items.forEach(item => {
                         const row = [domain.name, item.text];
-                        domain.scales.forEach(s => row.push(`${item.values[s.id] || 0}%`));
-                        row.push(`${getItemRowTotal(item.values, domain.scales)}%`);
+                        domain.scales.forEach(s => row.push(Number(item.values[s.id]) || 0));
+                        row.push(Number(getItemRowTotal(item.values, domain.scales).toFixed(1)));
                         const posTotal = getPositivesTotal(item.values, domain.scales);
-                        row.push(`${posTotal}%`);
+                        row.push(Number(posTotal.toFixed(1)));
                         data.push(row);
-                        domainPosSum += posTotal;
                     });
                     
                     if (domain.items.length > 0) {
-                        const domainPosAvg = (domainPosSum / domain.items.length).toFixed(1);
+                        const scaleAverages = domain.scales.map(scale => {
+                            const columnSum = domain.items.reduce((sum, item) => sum + (Number(item.values[scale.id]) || 0), 0);
+                            return Number((columnSum / domain.items.length).toFixed(1));
+                        });
+                        
+                        const rowTotalAvg = Number((domain.items.reduce((sum, item) => sum + getItemRowTotal(item.values, domain.scales), 0) / domain.items.length).toFixed(1));
+                        const posTotalAvg = Number((domain.items.reduce((sum, item) => sum + getPositivesTotal(item.values, domain.scales), 0) / domain.items.length).toFixed(1));
+
                         const summaryRow = [
-                            `متوسط إيجابيات (${domain.name})`,
+                            `متوسطات الأعمدة (${domain.name})`,
                             '', 
-                            ...domain.scales.map(() => ''),
-                            '', 
-                            `${domainPosAvg}%` 
+                            ...scaleAverages,
+                            rowTotalAvg, 
+                            posTotalAvg 
                         ];
                         data.push(summaryRow);
                         data.push(Array(header.length).fill('')); 
@@ -728,6 +732,17 @@
                 });
                 
                 const ws = XLSX.utils.aoa_to_sheet(data);
+                
+                // Apply Excel number formatting to show the % sign while keeping the raw numeric value for calculations
+                for (const cellRef in ws) {
+                    if (cellRef.startsWith('!')) continue;
+                    const cell = ws[cellRef];
+                    if (typeof cell.v === 'number') {
+                        // Display integers as "85%" and floats as "85.5%"
+                        cell.z = Number.isInteger(cell.v) ? '0"%"' : '0.0"%"';
+                    }
+                }
+                
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Template");
                 XLSX.writeFile(wb, `${originalFileName}_${getFormattedDateTime()}.xlsx`);
