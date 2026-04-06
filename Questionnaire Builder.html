@@ -763,6 +763,60 @@
                 setDraggedOverItem(null);
             };
             
+            /* --- Handler for Excel Column Paste --- */
+            const handleColumnPaste = (e, domainId, startItemIndex, fieldType, scaleId = null) => {
+                const pasteData = e.clipboardData.getData('text');
+                if (!pasteData) return;
+
+                // Split by newline. Excel copies columns with trailing newlines.
+                let lines = pasteData.split(/\r\n|\n|\r/);
+                if (lines.length > 0 && lines[lines.length - 1] === '') {
+                    lines.pop(); // Remove the last empty element caused by trailing newline
+                }
+
+                // If it's more than one line, handle as a vertical column paste
+                if (lines.length > 1) {
+                    e.preventDefault(); // Stop default paste into single cell
+
+                    setDomains(prevDomains => prevDomains.map(d => {
+                        if (d.id === domainId) {
+                            let newItems = [...d.items];
+
+                            // Auto-expand rows if pasted data exceeds current rows
+                            const rowsNeeded = startItemIndex + lines.length - newItems.length;
+                            for (let i = 0; i < rowsNeeded; i++) {
+                                const initialVals = {};
+                                d.scales.forEach(s => initialVals[s.id] = '');
+                                newItems.push({
+                                    id: `item_pasted_${Date.now()}_${Math.random()}`,
+                                    text: 'بند جديد',
+                                    values: initialVals
+                                });
+                            }
+
+                            // Apply pasted data sequentially downwards
+                            lines.forEach((line, idx) => {
+                                const targetIdx = startItemIndex + idx;
+                                const cleanLine = line.trim();
+                                
+                                if (fieldType === 'text') {
+                                    newItems[targetIdx] = { ...newItems[targetIdx], text: cleanLine };
+                                } else if (fieldType === 'value' && scaleId) {
+                                    let numVal = Number(cleanLine.replace(/%/g, ''));
+                                    newItems[targetIdx] = { 
+                                        ...newItems[targetIdx], 
+                                        values: { ...newItems[targetIdx].values, [scaleId]: isNaN(numVal) ? '' : numVal } 
+                                    };
+                                }
+                            });
+
+                            return { ...d, items: newItems };
+                        }
+                        return d;
+                    }));
+                }
+            };
+            
             /* --- Calculation Helpers --- */
             const getItemRowTotal = (values, domainScales) => {
                 return domainScales.reduce((sum, scale) => sum + (Number(values[scale.id]) || 0), 0);
@@ -1271,6 +1325,7 @@
                                                                 type="text"
                                                                 value={item.text}
                                                                 onChange={(e) => updateItemText(domain.id, item.id, e.target.value)}
+                                                                onPaste={(e) => handleColumnPaste(e, domain.id, iIndex, 'text')}
                                                                 className="w-full p-2 border border-gray-300 rounded-lg text-sm md:text-base font-bold focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200 bg-gray-50 hover:bg-white transition-colors shadow-inner"
                                                                 placeholder="أدخل نص البند..."
                                                             />
@@ -1297,6 +1352,7 @@
                                                                         type="number"
                                                                         value={item.values[scale.id] !== undefined ? item.values[scale.id] : ''}
                                                                         onChange={(e) => updateItemValue(domain.id, item.id, scale.id, e.target.value)}
+                                                                        onPaste={(e) => handleColumnPaste(e, domain.id, iIndex, 'value', scale.id)}
                                                                         className={`w-full py-1.5 text-center text-sm focus:outline-none font-bold transition-colors flex-1
                                                                             ${scale.type === 'positive' ? 'bg-green-50 text-green-800' : 
                                                                             scale.type === 'negative' ? 'bg-red-50 text-red-800' : 
