@@ -569,7 +569,7 @@
                 const list = wrap.querySelector('.scale-list');
                 group.options.forEach((opt, idx) => {
                     const item = document.createElement('div');
-                    item.className = 'p-3 bg-slate-50 border-2 border-slate-200 rounded-xl flex justify-between items-center cursor-move font-black';
+                    item.className = 'p-3 bg-slate-50 border-2 border-slate-200 rounded-xl flex justify-between items-center cursor-move font-black hover-zoom';
                     item.draggable = true;
                     item.innerHTML = `<span class="font-bold text-slate-900">${opt}</span><label class="flex items-center cursor-pointer font-black"><input type="checkbox" class="w-5 h-5 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="mr-2 text-xs font-black text-indigo-800">${languageData[currentLang].pos}</span></label>`;
                     item.querySelector('input').onchange = (e) => e.target.checked ? group.positives.add(opt) : group.positives.delete(opt);
