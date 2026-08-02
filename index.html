@@ -118,6 +118,7 @@
                 align-items: center !important;
                 white-space: nowrap !important;
             }
+            /* يسمح لخانة البرنامج بالانكماش ووضع نقاط نهاية الجملة إذا ضاق المكان */
             #metaInfoDisplay > div.min-w-0 {
                 flex-shrink: 1 !important;
                 overflow: hidden !important;
@@ -173,6 +174,11 @@
                 border-radius: 4pt !important; 
                 margin-bottom: 2mm !important;
                 background-color: white !important;
+            }
+            
+            /* Chart for Multi-select needs full width in print sometimes */
+            #chartContainer > div.lg\\:col-span-2 {
+                width: 100% !important;
             }
             
             /* Caging the canvas heavily for print */
@@ -536,7 +542,7 @@
             const container = document.getElementById('scaleGroupsContainer');
             container.innerHTML = '';
             identifiedScaleGroups.forEach((group, domainName) => {
-                if (group.isSuggestion) return;
+                if (group.isSuggestion || group.isMultiSelect) return; // Skip multi-select items from this step
                 const wrap = document.createElement('div');
                 wrap.className = 'bg-white p-4 rounded-2xl border-2 border-blue-200 shadow-md transition-all';
                 
@@ -658,6 +664,123 @@
                 copyToClipboard(tableContent); showStatus(btn);
             });
             container.appendChild(div);
+        }
+
+        // New Render Function for Multi-select frequency tables
+        function renderMultiSelectTable(title, options, freqs, totalRespondents) {
+            const container = document.getElementById('resultsContainer');
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-2xl shadow-lg border border-blue-100 overflow-hidden hover-zoom mb-6 domain-result-wrapper';
+            const align = 'text-right';
+            
+            let html = `<h2 class="text-2xl thin-title p-4 bg-blue-50 border-b border-blue-100 text-slate-900 font-black ${align}">${title} (تكرارات)</h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm ${align} font-black">
+                                <thead class="bg-slate-100">
+                                    <tr>
+                                        <th class="p-3 text-center font-black">#</th>
+                                        <th class="p-3 text-right font-black">العنصر</th>
+                                        <th class="p-3 text-center font-black">التكرار</th>
+                                        <th class="p-3 text-center font-black">النسبة (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+            
+            options.forEach((opt, i) => {
+                const count = freqs[opt] || 0;
+                const perc = totalRespondents > 0 ? ((count / totalRespondents) * 100).toFixed(1) : "0.0";
+                html += `<tr class="border-b border-slate-50 font-black">
+                            <td class="p-3 text-center text-slate-500 font-bold font-black">${i + 1}</td>
+                            <td class="p-3 font-bold text-slate-800 text-right font-black">${opt}</td>
+                            <td class="p-3 text-center font-bold text-blue-500 font-black">${count}</td>
+                            <td class="p-3 text-center font-black text-green-700 bg-green-50 font-black">${perc}%</td>
+                        </tr>`;
+            });
+            
+            html += `           </tbody>
+                            </table>
+                        </div>`;
+            div.innerHTML = html;
+            attachCopyButton(div, (btn) => {
+                let tableContent = title + '\n';
+                div.querySelectorAll('table tr').forEach(tr => {
+                    let rArr = []; 
+                    tr.querySelectorAll('th, td').forEach(c => { 
+                        rArr.push(c.innerText.trim()); 
+                    });
+                    tableContent += rArr.join('\t') + '\n';
+                });
+                copyToClipboard(tableContent); showStatus(btn);
+            });
+            container.appendChild(div);
+        }
+
+        // New Render Function for Multi-select Bar Charts
+        function renderMultiSelectChart(title, options, freqs, totalRespondents) {
+            const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
+            const divC = document.createElement('div');
+            // Full width for multi-select as texts are often long
+            divC.className = 'bg-white p-4 rounded-2xl shadow-xl border border-blue-100 flex flex-col items-center lg:col-span-2';
+            
+            divC.innerHTML = `<h3 class="text-lg font-black mb-3 text-center text-indigo-900">${title}</h3>
+                              <div class="w-full relative flex-grow" style="height: 350px; max-height: 350px;">
+                                  <canvas id="${canvasId}"></canvas>
+                              </div>`;
+            document.getElementById('chartContainer').appendChild(divC);
+            
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const dataVals = options.map(o => totalRespondents > 0 ? ((freqs[o] / totalRespondents) * 100).toFixed(1) : 0);
+            
+            chartInstances.push(new Chart(ctx, { 
+                type: 'bar', 
+                data: {
+                    labels: options,
+                    datasets: [{
+                        data: dataVals,
+                        backgroundColor: '#10b981', // green for standard frequencies
+                        borderRadius: 4,
+                        maxBarThickness: 60,
+                        barPercentage: 0.8
+                    }]
+                },
+                options: {
+                    animation: false,
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    devicePixelRatio: 2,
+                    locale: 'en-US',
+                    rtl: true,
+                    layout: {
+                        padding: { top: 30, bottom: 20, left: 10, right: 10 }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grace: '15%', 
+                            position: 'right', 
+                            ticks: { font: { weight: '900', family: 'Cairo', size: 11 } }
+                        },
+                        x: {
+                            grid: { display: false }, 
+                            ticks: {
+                                font: { weight: '900', family: 'Cairo', size: 11 },
+                                autoSkip: false, 
+                                maxRotation: 45, // Angle for better readability
+                                minRotation: 45
+                            }
+                        }
+                    },
+                    plugins: { 
+                        legend: { display: false }, 
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            font: { weight: '900', size: 11, family: 'Cairo' },
+                            formatter: v => v+'%'
+                        } 
+                    } 
+                } 
+            }));
         }
 
         async function renderAISuggestionBox(title, responses) {
@@ -1127,6 +1250,29 @@
                         for (const col of groupData.cols) {
                             await renderAISuggestionBox(headers[col], rows.map(r => r[col]));
                         }
+                    } else if (groupData.isMultiSelect) {
+                        let validRespondents = 0;
+                        const freqs = {};
+                        groupData.options.forEach(o => freqs[o] = 0);
+                        
+                        rows.forEach(r => {
+                            let answered = false;
+                            groupData.cols.forEach(c => {
+                                const val = String(r[c] || "").trim();
+                                if (val) {
+                                    answered = true;
+                                    val.split(/[,،]/).map(p => p.trim()).filter(p => p !== "").forEach(p => {
+                                        if (freqs[p] !== undefined) freqs[p]++;
+                                    });
+                                }
+                            });
+                            if (answered) validRespondents++;
+                        });
+
+                        renderMultiSelectTable(domainName, groupData.options, freqs, validRespondents);
+                        renderMultiSelectChart(domainName, groupData.options, freqs, validRespondents);
+                        // Multi-select is excluded from standard Highlights and Final Score.
+                        
                     } else {
                         const domainUniqueOpts = new Set();
                         groupData.cols.forEach(col => {
@@ -1150,16 +1296,8 @@
                                 if (!tr) return;
                                 validRespondents++;
 
-                                if (groupData.isMultiSelect) {
-                                    const parts = tr.split(/[,،]/).map(p => p.trim()).filter(p => p !== "");
-                                    parts.forEach(p => {
-                                        if (freqs[p] !== undefined) freqs[p]++;
-                                        if (groupData.positives.has(p)) posCount++;
-                                    });
-                                } else {
-                                    if (freqs[tr] !== undefined) freqs[tr]++;
-                                    if (groupData.positives.has(tr)) posCount++;
-                                }
+                                if (freqs[tr] !== undefined) freqs[tr]++;
+                                if (groupData.positives.has(tr)) posCount++;
                             });
 
                             const res = {
