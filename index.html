@@ -118,7 +118,6 @@
                 align-items: center !important;
                 white-space: nowrap !important;
             }
-            /* يسمح لخانة البرنامج بالانكماش ووضع نقاط نهاية الجملة إذا ضاق المكان */
             #metaInfoDisplay > div.min-w-0 {
                 flex-shrink: 1 !important;
                 overflow: hidden !important;
@@ -615,7 +614,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>`;
-                                
+            
             rows.forEach((r, i) => {
                 const rowCheckSum = opts.reduce((acc, o) => acc + (r.freqs[o] / r.total * 100), 0);
                 const tdCells = opts.map(o => {
@@ -707,7 +706,7 @@
                                 </tr>
                             </thead>
                             <tbody>`;
-                            
+            
             summaryDataList.forEach((dm, i) => { 
                 const pSum = Array.from(dm.positives).reduce((s,o)=>s+(dm.freqs[o]||0),0); 
                 html += `<tr class="border-b border-indigo-50 font-black">
@@ -879,14 +878,50 @@
             });
 
             document.getElementById('fetchGoogleBtn').onclick = async () => {
-                const link = document.getElementById('googleLink').value; if(!link) return;
+                const link = document.getElementById('googleLink').value; 
+                if(!link) return;
+                
+                const loadingMessage = document.getElementById('loadingMessage');
                 loadingMessage.classList.remove('hidden');
+                
                 try {
-                    const match = link.match(/[-\w]{25,}/); if (!match) throw new Error();
-                    const resp = await fetch(`https://docs.google.com/spreadsheets/d/${match[0]}/export?format=csv`);
-                    if (!resp.ok) throw new Error();
-                    processWorkbook(XLSX.read(await resp.text(), { type: 'string' }), "Google Data");
-                } catch(e) { showMessage(languageData[currentLang].googleErrorTitle, languageData[currentLang].googleErrorBody); loadingMessage.classList.add('hidden'); }
+                    const match = link.match(/[-\w]{25,}/); 
+                    if (!match) throw new Error("Invalid Link");
+                    
+                    const sheetId = match[0];
+                    const targetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=xlsx`;
+                    
+                    let arrayBuffer = null;
+                    
+                    try {
+                        const resp = await fetch(targetUrl);
+                        if (!resp.ok) throw new Error("Network error");
+                        arrayBuffer = await resp.arrayBuffer();
+                        
+                        const textCheck = new TextDecoder().decode(new Uint8Array(arrayBuffer).slice(0, 100));
+                        if (textCheck.toLowerCase().includes("<!doctype html>")) {
+                            throw new Error("HTML response");
+                        }
+                    } catch (err) {
+                        console.log("Direct fetch failed, using proxy...");
+                        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+                        const proxyResp = await fetch(proxyUrl);
+                        if (!proxyResp.ok) throw new Error("Proxy error");
+                        arrayBuffer = await proxyResp.arrayBuffer();
+                        
+                        const textCheck = new TextDecoder().decode(new Uint8Array(arrayBuffer).slice(0, 100));
+                        if (textCheck.toLowerCase().includes("<!doctype html>")) {
+                            throw new Error("Private sheet");
+                        }
+                    }
+
+                    processWorkbook(XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' }), "Google Data");
+                    
+                } catch(e) { 
+                    console.error("Fetch Error:", e);
+                    showMessage(languageData[currentLang].googleErrorTitle, languageData[currentLang].googleErrorBody); 
+                    loadingMessage.classList.add('hidden'); 
+                }
             };
 
             /* Multi-select Dropdown toggle */
@@ -911,7 +946,7 @@
 
             document.getElementById('confirmMappingBtn').onclick = () => {
                 if (!rawExcelData) return;
-                identifiedScaleGroups.clear(); 
+                identifiedScaleGroups.clear();
                 
                 const filterColIdx = parseInt(document.getElementById('filterColSelect').value);
                 const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
@@ -988,21 +1023,51 @@
                             cols: [],
                             items: [],
                             isSuggestion: false,
+                            isMultiSelect: false,
                             userAddedOptions: new Set(),
                             frequencies: new Map() // Track overall frequency for sorting
                         });
                     }
-
                     const group = identifiedScaleGroups.get(dName);
                     group.cols.push(col);
                     group.items.push(iName);
 
+                    const colVals = [];
                     for (let r = 1; r < rawExcelData.length; r++) {
                         const val = String(rawExcelData[r][col] || "").trim();
-                        if (val !== "") {
+                        if (val !== "") colVals.push(val);
+                    }
+
+                    // Multi-select heuristic
+                    let isColMultiSelect = false;
+                    let splitTokens = [];
+                    const hasCommas = colVals.some(v => v.includes(',') || v.includes('،'));
+                    
+                    if (hasCommas) {
+                        colVals.forEach(v => {
+                            v.split(/[,،]/).forEach(t => {
+                                let trimmed = t.trim();
+                                if (trimmed) splitTokens.push(trimmed);
+                            });
+                        });
+                        const uniqueTokens = new Set(splitTokens);
+                        // If unique tokens is reasonable for a multiple choice question
+                        if (uniqueTokens.size <= 80) {
+                            isColMultiSelect = true;
+                        }
+                    }
+
+                    if (isColMultiSelect) {
+                        group.isMultiSelect = true;
+                        splitTokens.forEach(t => {
+                            group.options.add(t);
+                            group.frequencies.set(t, (group.frequencies.get(t) || 0) + 1);
+                        });
+                    } else {
+                        colVals.forEach(val => {
                             group.options.add(val);
                             group.frequencies.set(val, (group.frequencies.get(val) || 0) + 1);
-                        }
+                        });
                     }
                 }
 
@@ -1011,9 +1076,11 @@
                     // Sort options based on frequency descending
                     group.options.sort((a, b) => (group.frequencies.get(b) || 0) - (group.frequencies.get(a) || 0));
                     
-                    if (group.options.length > 12 || (group.cols.length === 1 && group.options.length > 6)) {
-                        group.isSuggestion = true;
-                        group.options = [];
+                    if (!group.isMultiSelect) {
+                        if (group.options.length > 12 || (group.cols.length === 1 && group.options.length > 6)) {
+                            group.isSuggestion = true;
+                            group.options = [];
+                        }
                     }
                 }
                 
@@ -1076,17 +1143,31 @@
                             const rps = rows.map(r => r[col]);
                             const freqs = {}; finalOpts.forEach(o => freqs[o] = 0);
                             let posCount = 0;
-                            rps.forEach(r => { 
-                                const tr = String(r || "").trim(); 
-                                if (freqs[tr] !== undefined) freqs[tr]++; 
-                                if (groupData.positives.has(tr)) posCount++; 
+                            let validRespondents = 0;
+
+                            rps.forEach(r => {
+                                const tr = String(r || "").trim();
+                                if (!tr) return;
+                                validRespondents++;
+
+                                if (groupData.isMultiSelect) {
+                                    const parts = tr.split(/[,،]/).map(p => p.trim()).filter(p => p !== "");
+                                    parts.forEach(p => {
+                                        if (freqs[p] !== undefined) freqs[p]++;
+                                        if (groupData.positives.has(p)) posCount++;
+                                    });
+                                } else {
+                                    if (freqs[tr] !== undefined) freqs[tr]++;
+                                    if (groupData.positives.has(tr)) posCount++;
+                                }
                             });
-                            const res = { 
-                                item: groupData.items[idx], 
-                                freqs, 
-                                total: rps.length, 
-                                posPerc: rps.length ? (posCount/rps.length)*100 : 0, 
-                                originalIdx: col - startColIdx + 1 
+
+                            const res = {
+                                item: groupData.items[idx],
+                                freqs,
+                                total: validRespondents,
+                                posPerc: validRespondents ? (posCount/validRespondents)*100 : 0,
+                                originalIdx: col - startColIdx + 1
                             };
                             allItemsList.push(res); 
                             return res;
@@ -1113,23 +1194,23 @@
                         
                         chartInstances.push(new Chart(ctx, { 
                             type: 'bar', 
-                            data: { 
-                                labels: finalOpts, 
-                                datasets: [{ 
-                                    data: dataVals, 
-                                    backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], 
-                                    borderRadius: 4, 
-                                    maxBarThickness: 50, 
-                                    barPercentage: 0.8 
-                                }] 
-                            }, 
-                            options: { 
-                                animation: false, 
-                                maintainAspectRatio: false, 
+                            data: {
+                                labels: finalOpts,
+                                datasets: [{
+                                    data: dataVals,
+                                    backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'],
+                                    borderRadius: 4,
+                                    maxBarThickness: 50,
+                                    barPercentage: 0.8
+                                }]
+                            },
+                            options: {
+                                animation: false,
+                                maintainAspectRatio: false,
                                 responsive: true,
-                                devicePixelRatio: 2, 
-                                locale: 'en-US', 
-                                rtl: true, 
+                                devicePixelRatio: 2,
+                                locale: 'en-US',
+                                rtl: true,
                                 layout: {
                                     padding: { top: 30, bottom: 10, left: 10, right: 10 }
                                 },
@@ -1151,11 +1232,11 @@
                                 },
                                 plugins: { 
                                     legend: { display: false }, 
-                                    datalabels: { 
-                                        anchor: 'end', 
-                                        align: 'top', 
-                                        font: { weight: '900', size: 11, family: 'Cairo' }, 
-                                        formatter: v => v+'%' 
+                                    datalabels: {
+                                        anchor: 'end',
+                                        align: 'top',
+                                        font: { weight: '900', size: 11, family: 'Cairo' },
+                                        formatter: v => v+'%'
                                     } 
                                 } 
                             } 
