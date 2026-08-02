@@ -118,6 +118,7 @@
                 align-items: center !important;
                 white-space: nowrap !important;
             }
+            /* يسمح لخانة البرنامج بالانكماش ووضع نقاط نهاية الجملة إذا ضاق المكان */
             #metaInfoDisplay > div.min-w-0 {
                 flex-shrink: 1 !important;
                 overflow: hidden !important;
@@ -484,19 +485,30 @@
 
         /* --- AI --- */
         async function summarizeWithAI(text) {
-            const apiKey = "AIzaSyBt0DtjhTpAZRQMYeMv_GFGogVYf1hLRNs";
-            const modelName = "gemini-2.5-flash-preview-09-2025";
+            const apiKey = "AQ.Ab8RN6JplE3DZVQudKfYkN13PedZrPJ3FsIsvEaVZeGapMBjGA"; 
+            const modelName = "gemini-1.5-flash"; 
+            
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
             const systemPrompt = "أنت خبير في تحليل البيانات التعليمية. لديك مجموعة من الملاحظات والاستجابات المفتوحة. يرجى قراءتها بعناية واستخلاص الأفكار الرئيسية والاتجاهات العامة، وتقديم ملخص شامل وموجز يعبر عن جوهر الملاحظات بدلاً من سردها أو تكرارها. اكتب الملخص في نقاط واضحة ومهنية باللغة العربية، وابدأ مباشرة بالنقاط دون مقدمات.";
             const payload = { contents: [{ parts: [{ text: text }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+            
             try {
                 const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 const result = await response.json();
+                
+                if(result.error) {
+                    console.error("خطأ من جوجل API:", result.error);
+                    return text; 
+                }
+
                 if (result && result.candidates && result.candidates[0] && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts[0]) {
                     return result.candidates[0].content.parts[0].text || text;
                 }
                 return text;
-            } catch (err) { return text; }
+            } catch (err) { 
+                console.error("مشكلة في الاتصال بالـ API:", err);
+                return text; 
+            }
         }
 
         /* --- Helpers --- */
