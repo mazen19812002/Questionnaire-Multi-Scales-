@@ -53,7 +53,7 @@
         /* ------------------------------------------------------------- */
         @media print {
             @page { size: A4 portrait; margin: 5mm; } 
-            body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 8pt !important; line-height: 1.1 !important; } 
+            body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 8pt !important; line-height: 1.1 !important; }
             
             /* Hide UI elements and their invisible margins entirely */
             .max-w-4xl, #dataConfigSection, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .copy-btn-wrapper, #messageBoxModal { display: none !important; }
@@ -118,7 +118,6 @@
                 align-items: center !important;
                 white-space: nowrap !important;
             }
-            /* يسمح لخانة البرنامج بالانكماش ووضع نقاط نهاية الجملة إذا ضاق المكان */
             #metaInfoDisplay > div.min-w-0 {
                 flex-shrink: 1 !important;
                 overflow: hidden !important;
@@ -287,7 +286,6 @@
 
     <div class="flex justify-between items-start mb-8 relative">
         <img src="00.png" alt="Logo1" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo1'">
-        
         <img src="02.jpg" alt="Logo2" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo2'">
     </div>
 
@@ -327,10 +325,14 @@
                 <div class="text-center border-b border-blue-100 pb-4 mb-6">
                     <p id="step2Title" class="text-slate-900 font-black thin-title text-2xl uppercase">الخطوة 2: تعيين البيانات</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-6">
                     <div class="flex flex-col">
                         <label id="labelFilterCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
                         <select id="filterColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
+                    </div>
+                    <div class="flex flex-col">
+                        <label id="labelCategoryCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
+                        <select id="categoryColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
                     </div>
                     <div class="flex flex-col">
                         <label id="labelStartCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
@@ -347,17 +349,32 @@
             </div>
         </div>
 
-        <div id="filterSection" class="hidden max-w-2xl mx-auto mb-10">
+        <div id="filterSection" class="hidden max-w-4xl mx-auto mb-10">
             <div class="input-card border-indigo-200 bg-indigo-50/30">
-                <div class="flex flex-col">
-                    <label id="labelDeptFilter" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
-                    <div class="multi-select-container mt-2">
-                        <div class="multi-select-trigger hover-zoom" id="deptMultiTrigger">
-                            <span id="deptSelectedText">...</span>
-                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col">
+                        <label id="labelDeptFilter" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
+                        <div class="multi-select-container mt-2">
+                            <div class="multi-select-trigger hover-zoom" id="deptMultiTrigger">
+                                <span id="deptSelectedText">...</span>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                            <div class="multi-select-dropdown" id="deptMultiDropdown">
+                                <!-- Items populated via JS -->
+                            </div>
                         </div>
-                        <div class="multi-select-dropdown" id="deptMultiDropdown">
-                            <!-- Items populated via JS -->
+                    </div>
+                    
+                    <div class="flex flex-col hidden" id="catFilterContainer">
+                        <label id="labelCatFilter" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
+                        <div class="multi-select-container mt-2">
+                            <div class="multi-select-trigger hover-zoom" id="catMultiTrigger">
+                                <span id="catSelectedText">...</span>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                            <div class="multi-select-dropdown" id="catMultiDropdown">
+                                <!-- Items populated via JS -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -435,6 +452,7 @@
         let itemToScaleGroup = new Map();
         let chartInstances = [];
         let selectedDepts = new Set();
+        let selectedCats = new Set();
 
         const languageData = {
             ar: {
@@ -464,6 +482,9 @@
                 confirm: 'تأكيد الإعدادات',
                 filterLabel: 'تصفية حسب القسم (اختيار متعدد)',
                 deptLabel: 'اختر عمود القسم',
+                catLabel: 'اختر عمود الفئة (اختياري)',
+                catFilterLabel: 'تصفية حسب الفئة (اختيار متعدد)',
+                noFilter: 'بدون تصفية',
                 startColLabel: 'ابدأ التحليل من عمود',
                 endColLabel: 'إلى عمود (اختياري)',
                 endColDefault: '-- حتى نهاية الملف --',
@@ -772,10 +793,10 @@
                     },
                     scales: {
                         y: { 
-                            beginAtZero: true, 
-                            grace: '15%', 
-                            position: 'right', 
-                            ticks: { font: { weight: '900', family: 'Cairo', size: 11 } }
+                             beginAtZero: true, 
+                             grace: '15%', 
+                             position: 'right', 
+                             ticks: { font: { weight: '900', family: 'Cairo', size: 11 } }
                         },
                         x: {
                             grid: { display: false }, 
@@ -794,7 +815,7 @@
                             align: 'top',
                             font: { weight: '900', size: 11, family: 'Cairo' },
                             formatter: v => v+'%'
-                        } 
+                        }
                     } 
                 } 
             }));
@@ -944,10 +965,15 @@
                 document.getElementById('googleLink').placeholder = d.googleHint;
                 document.getElementById('step2Title').textContent = d.step2;
                 document.getElementById('confirmMappingBtn').textContent = d.confirm;
+                
                 document.getElementById('labelFilterCol').textContent = d.deptLabel;
+                document.getElementById('labelCategoryCol').textContent = d.catLabel;
                 document.getElementById('labelStartCol').textContent = d.startColLabel;
                 document.getElementById('labelEndCol').textContent = d.endColLabel;
+                
                 document.getElementById('labelDeptFilter').textContent = d.filterLabel;
+                document.getElementById('labelCatFilter').textContent = d.catFilterLabel;
+                
                 document.getElementById('scaleOrderTitle').textContent = d.step3;
                 document.getElementById('scaleOrderSubtitle').textContent = d.step3Hint;
                 document.getElementById('labelThreshold').textContent = d.threshold;
@@ -966,6 +992,7 @@
                 document.getElementById('tip-final').textContent = d.nav.final;
                 
                 updateDeptSelectedText();
+                updateCatSelectedText();
             }
 
             const xlsxFile = document.getElementById('xlsxFile');
@@ -988,21 +1015,29 @@
                 }
 
                 const fs = document.getElementById('filterColSelect');
+                const cs = document.getElementById('categoryColSelect');
                 const as = document.getElementById('analysisStartColSelect');
                 const es = document.getElementById('analysisEndColSelect');
-                fs.innerHTML = ''; as.innerHTML = ''; es.innerHTML = '';
+                
+                fs.innerHTML = ''; cs.innerHTML = ''; as.innerHTML = ''; es.innerHTML = '';
                 
                 es.add(new Option(languageData[currentLang].endColDefault, ""));
+                cs.add(new Option(languageData[currentLang].noFilter, ""));
 
                 (rawExcelData[0] || []).forEach((h, i) => {
                     const colLetter = getColLetter(i);
-                    fs.add(new Option(`${colLetter}: ${h || '---'}`, i));
-                    as.add(new Option(`${colLetter}: ${h || '---'}`, i));
-                    es.add(new Option(`${colLetter}: ${h || '---'}`, i));
+                    const optText = `${colLetter}: ${h || '---'}`;
+                    fs.add(new Option(optText, i));
+                    cs.add(new Option(optText, i));
+                    as.add(new Option(optText, i));
+                    es.add(new Option(optText, i));
                 });
+                
                 fs.value = Math.min(1, rawExcelData[0].length - 1); 
+                cs.value = "";
                 as.value = Math.min(2, rawExcelData[0].length - 1); 
                 es.value = "";
+                
                 loadingMessage.classList.add('hidden');
             }
 
@@ -1064,15 +1099,27 @@
                 }
             };
 
-            /* Multi-select Dropdown toggle */
-            const trigger = document.getElementById('deptMultiTrigger');
-            const dropdown = document.getElementById('deptMultiDropdown');
-            trigger.onclick = (e) => {
+            /* Multi-select Dropdown toggles */
+            const deptTrigger = document.getElementById('deptMultiTrigger');
+            const deptDropdown = document.getElementById('deptMultiDropdown');
+            deptTrigger.onclick = (e) => {
                 e.stopPropagation();
-                dropdown.classList.toggle('active');
+                deptDropdown.classList.toggle('active');
             };
-            document.addEventListener('click', () => dropdown.classList.remove('active'));
-            dropdown.onclick = (e) => e.stopPropagation();
+            
+            const catTrigger = document.getElementById('catMultiTrigger');
+            const catDropdown = document.getElementById('catMultiDropdown');
+            catTrigger.onclick = (e) => {
+                e.stopPropagation();
+                catDropdown.classList.toggle('active');
+            };
+
+            document.addEventListener('click', () => {
+                deptDropdown.classList.remove('active');
+                catDropdown.classList.remove('active');
+            });
+            deptDropdown.onclick = (e) => e.stopPropagation();
+            catDropdown.onclick = (e) => e.stopPropagation();
 
             function updateDeptSelectedText() {
                 const d = languageData[currentLang];
@@ -1083,12 +1130,23 @@
                     textEl.textContent = Array.from(selectedDepts).join('، ');
                 }
             }
+            
+            function updateCatSelectedText() {
+                const d = languageData[currentLang];
+                const textEl = document.getElementById('catSelectedText');
+                if (selectedCats.size === 0) {
+                    textEl.textContent = d.allInstitute;
+                } else {
+                    textEl.textContent = Array.from(selectedCats).join('، ');
+                }
+            }
 
             document.getElementById('confirmMappingBtn').onclick = () => {
                 if (!rawExcelData) return;
                 identifiedScaleGroups.clear();
                 
                 const filterColIdx = parseInt(document.getElementById('filterColSelect').value);
+                const catColVal = document.getElementById('categoryColSelect').value;
                 const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
                 const endColVal = document.getElementById('analysisEndColSelect').value;
                 
@@ -1098,17 +1156,17 @@
                     if (val !== "") departments.add(val);
                 }
 
-                /* Populate Multi-select */
-                dropdown.innerHTML = '';
+                /* Populate Dept Multi-select */
+                deptDropdown.innerHTML = '';
                 selectedDepts.clear();
 
-                /* "Select All" Option */
-                const allItem = document.createElement('div');
-                allItem.className = 'multi-select-item border-b border-gray-100 font-black';
-                allItem.innerHTML = `<input type="checkbox" id="selectAllDepts"><span>${languageData[currentLang].selectAll}</span>`;
-                allItem.querySelector('input').onchange = (e) => {
+                /* "Select All" Option Dept */
+                const allDeptItem = document.createElement('div');
+                allDeptItem.className = 'multi-select-item border-b border-gray-100 font-black';
+                allDeptItem.innerHTML = `<input type="checkbox" id="selectAllDepts"><span>${languageData[currentLang].selectAll}</span>`;
+                allDeptItem.querySelector('input').onchange = (e) => {
                     const checked = e.target.checked;
-                    const checkboxes = dropdown.querySelectorAll('.dept-checkbox');
+                    const checkboxes = deptDropdown.querySelectorAll('.dept-checkbox');
                     checkboxes.forEach(cb => {
                         cb.checked = checked;
                         if (checked) selectedDepts.add(cb.value);
@@ -1116,7 +1174,7 @@
                     });
                     updateDeptSelectedText();
                 };
-                dropdown.appendChild(allItem);
+                deptDropdown.appendChild(allDeptItem);
 
                 Array.from(departments).forEach(dept => {
                     const item = document.createElement('div');
@@ -1130,8 +1188,57 @@
                         }
                         updateDeptSelectedText();
                     };
-                    dropdown.appendChild(item);
+                    deptDropdown.appendChild(item);
                 });
+                
+                /* Populate Category Multi-select (if selected) */
+                const categories = new Set();
+                catDropdown.innerHTML = '';
+                selectedCats.clear();
+                
+                if (catColVal !== "") {
+                    const catColIdx = parseInt(catColVal);
+                    for (let r = 1; r < rawExcelData.length; r++) {
+                        const val = String(rawExcelData[r][catColIdx] || "").trim();
+                        if (val !== "") categories.add(val);
+                    }
+                    document.getElementById('catFilterContainer').classList.remove('hidden');
+                    
+                    if (categories.size > 0) {
+                        const allCatItem = document.createElement('div');
+                        allCatItem.className = 'multi-select-item border-b border-gray-100 font-black';
+                        allCatItem.innerHTML = `<input type="checkbox" id="selectAllCats"><span>${languageData[currentLang].selectAll}</span>`;
+                        allCatItem.querySelector('input').onchange = (e) => {
+                            const checked = e.target.checked;
+                            const checkboxes = catDropdown.querySelectorAll('.cat-checkbox');
+                            checkboxes.forEach(cb => {
+                                cb.checked = checked;
+                                if (checked) selectedCats.add(cb.value);
+                                else selectedCats.delete(cb.value);
+                            });
+                            updateCatSelectedText();
+                        };
+                        catDropdown.appendChild(allCatItem);
+                        
+                        Array.from(categories).forEach(cat => {
+                            const item = document.createElement('div');
+                            item.className = 'multi-select-item font-bold';
+                            item.innerHTML = `<input type="checkbox" class="cat-checkbox" value="${cat}"><span>${cat}</span>`;
+                            item.querySelector('input').onchange = (e) => {
+                                if (e.target.checked) selectedCats.add(cat);
+                                else {
+                                    selectedCats.delete(cat);
+                                    document.getElementById('selectAllCats').checked = false;
+                                }
+                                updateCatSelectedText();
+                            };
+                            catDropdown.appendChild(item);
+                        });
+                    }
+                } else {
+                    document.getElementById('catFilterContainer').classList.add('hidden');
+                }
+                updateCatSelectedText();
 
                 /* --- DOMAIN-BASED ISOLATED SCALE LOGIC --- */
                 const headers = rawExcelData[0];
@@ -1235,6 +1342,7 @@
                 const allItemsList = []; const summaryDataList = []; 
                 const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
                 const filterColIdx = parseInt(document.getElementById('filterColSelect').value);
+                const catColVal = document.getElementById('categoryColSelect').value;
                 
                 const resultsContainer = document.getElementById('resultsContainer');
                 resultsContainer.innerHTML = ''; 
@@ -1248,6 +1356,11 @@
                     rows = rows.filter(r => r && selectedDepts.has(String(r[filterColIdx] || "").trim()));
                 }
                 
+                if (catColVal !== "" && selectedCats.size > 0) {
+                    const catColIdx = parseInt(catColVal);
+                    rows = rows.filter(r => r && selectedCats.has(String(r[catColIdx] || "").trim()));
+                }
+                
                 document.getElementById('participantCountDisplay').textContent = `${rows.length} ${languageData[currentLang].participants}`;
                 
                 let programText = '';
@@ -1256,6 +1369,11 @@
                 } else {
                     programText = Array.from(selectedDepts).join('، ');
                 }
+                
+                if (selectedCats.size > 0) {
+                    programText += ` | الفئة: ${Array.from(selectedCats).join('، ')}`;
+                }
+                
                 document.getElementById('programNameText').textContent = programText;
                 
                 document.getElementById('metaInfoDisplay').classList.remove('hidden');
@@ -1342,14 +1460,14 @@
                         
                         const ctx = document.getElementById(canvasId).getContext('2d');
                         const dataVals = finalOpts.map(o => { 
-                            const sum = rowsData.reduce((s, r) => s + r.freqs[o], 0); 
-                            const total = rowsData.reduce((s, r) => s + r.total, 0); 
-                            return total ? (sum/total*100).toFixed(1) : 0; 
-                        });
+                             const sum = rowsData.reduce((s, r) => s + r.freqs[o], 0); 
+                             const total = rowsData.reduce((s, r) => s + r.total, 0); 
+                             return total ? (sum/total*100).toFixed(1) : 0; 
+                         });
                         
                         chartInstances.push(new Chart(ctx, { 
-                            type: 'bar', 
-                            data: {
+                             type: 'bar', 
+                             data: {
                                 labels: finalOpts,
                                 datasets: [{
                                     data: dataVals,
@@ -1371,40 +1489,40 @@
                                 },
                                 scales: {
                                     y: { 
-                                        beginAtZero: true, 
-                                        grace: '15%', 
-                                        position: 'right', 
-                                        ticks: { font: { weight: '900', family: 'Cairo', size: 11 } }
+                                         beginAtZero: true, 
+                                         grace: '15%', 
+                                         position: 'right', 
+                                         ticks: { font: { weight: '900', family: 'Cairo', size: 11 } }
                                     },
                                     x: {
                                         grid: { display: false }, 
-                                        ticks: {
+                                         ticks: {
                                             font: { weight: '900', family: 'Cairo', size: 10 },
                                             autoSkip: false, 
-                                            maxRotation: 0 
-                                        }
+                                             maxRotation: 0 
+                                         }
                                     }
                                 },
                                 plugins: { 
-                                    legend: { display: false }, 
-                                    datalabels: {
+                                     legend: { display: false }, 
+                                     datalabels: {
                                         anchor: 'end',
                                         align: 'top',
                                         font: { weight: '900', size: 11, family: 'Cairo' },
                                         formatter: v => v+'%'
-                                    } 
-                                } 
-                            } 
-                        }));
+                                    }
+                                 } 
+                             } 
+                         }));
                         
                         const dFreqs = {}; 
-                        finalOpts.forEach(o => dFreqs[o] = rowsData.reduce((s, r) => s + r.freqs[o], 0));
+                         finalOpts.forEach(o => dFreqs[o] = rowsData.reduce((s, r) => s + r.freqs[o], 0));
                         summaryDataList.push({ 
-                            name: domainName, 
-                            freqs: dFreqs, 
-                            total: rowsData.reduce((s, r) => s + r.total, 0), 
-                            positives: groupData.positives 
-                        });
+                             name: domainName, 
+                             freqs: dFreqs, 
+                             total: rowsData.reduce((s, r) => s + r.total, 0), 
+                             positives: groupData.positives 
+                         });
                     }
                 }
 
@@ -1437,25 +1555,25 @@
                     if (table) table.querySelectorAll('tr').forEach(tr => {
                         let rD = []; 
                         tr.querySelectorAll('th, td').forEach(c => { 
-                            const cs = parseInt(c.getAttribute('colspan') || 1); 
-                            let val = c.innerText.trim();
+                             const cs = parseInt(c.getAttribute('colspan') || 1); 
+                             let val = c.innerText.trim();
                             if (['=', '-', '+', '@'].includes(val.charAt(0))) val = "'" + val;
                             rD.push(val); 
-                            for(let k=1; k < cs; k++) rD.push(""); 
-                        });
+                             for(let k=1; k < cs; k++) rD.push(""); 
+                         });
                         copyContent += rD.join('\t') + '\n';
                     });
                     const sb = block.querySelector('.suggestion-box'); if (sb) copyContent += sb.innerText + '\n';
                 });
                 document.querySelectorAll('#positiveNegativeItemsContainer > div').forEach(box => {
                     const h4 = box.querySelector('h4'); if (h4) { 
-                        copyContent += `\n${h4.innerText}\n`; 
-                        box.querySelectorAll('li').forEach(li => {
+                         copyContent += `\n${h4.innerText}\n`; 
+                         box.querySelectorAll('li').forEach(li => {
                             let text = li.innerText.trim();
                             if (['=', '-', '+', '@'].includes(text.charAt(0))) text = "'" + text;
                             copyContent += `• ${text}\n`; 
-                        }); 
-                    }
+                         }); 
+                     }
                 });
                 const rec = document.querySelector('#finalRecommendationContainer div');
                 if (rec) {
