@@ -4,12 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحليل نتائج الاستبيان - وحدة ضمان الجودة</title>
+    
+    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    
     <style>
+        /* 
+         * ==========================================
+         * GLOBAL TYPOGRAPHY & BASE STYLES
+         * ==========================================
+         */
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Inter:wght@300;400;600;700;900&display=swap');
+        
         body {
             font-family: 'Cairo', 'Inter', sans-serif;
             background-color: #e0f2fe;
@@ -20,44 +29,277 @@
             scroll-behavior: smooth;
             line-height: 1.3;
         }
-        .thin-title { font-weight: 300; letter-spacing: -0.01em; }
-        .hover-zoom { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
-        .hover-zoom:hover { transform: scale(1.03); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
-        .btn-execute { background-color: #22c55e; color: white; font-weight: 700; transition: all 0.2s; padding: 1rem 2rem; border-radius: 1.5rem; }
-        .btn-execute:hover { background-color: #16a34a; transform: scale(1.05); }
-        .copy-btn-wrapper { position: absolute; top: 1rem; z-index: 30; left: 1rem; }
-        .copy-btn-inner { opacity: 0.4; transition: opacity 0.2s, transform 0.2s; cursor: pointer; padding: 10px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.9); border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; color: #475569; }
-        .copy-btn-inner:hover { opacity: 1; background-color: #ffffff; transform: scale(1.1); border-color: #22c55e; color: #22c55e; }
-        .input-card { background: white; padding: 2.5rem; border-radius: 2.5rem; border: 1px solid #bae6fd; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        
-        /* Custom Multi-select styles */
-        .multi-select-container { position: relative; width: 100%; }
-        .multi-select-trigger { background-color: white; border: 1px solid #cbd5e1; padding: 1rem; border-radius: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; min-height: 3.5rem; }
-        .multi-select-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; border-radius: 1rem; margin-top: 5px; max-height: 250px; overflow-y: auto; z-index: 50; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); display: none; }
-        .multi-select-dropdown.active { display: block; }
-        .multi-select-item { padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.2s; }
-        .multi-select-item:hover { background-color: #f1f5f9; }
-        .multi-select-item input { width: 1.2rem; height: 1.2rem; cursor: pointer; }
-        .suggestion-box { background-color: #f8fafc; border: 2px solid #e2e8f0; border-radius: 1.5rem; padding: 2rem; line-height: 1.8; color: #1e293b; min-height: 80px; max-height: 600px; overflow-y: auto; white-space: pre-wrap; font-weight: 500; font-size: 1.1rem; box-shadow: inset 0 2px 8px 0 rgba(0,0,0,0.03); }
-        
-        /* Floating Nav */
-        .floating-nav { position: fixed; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 100; padding: 12px; background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); border-radius: 2rem; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.15); left: 1rem; }
-        .nav-dot { width: 44px; height: 44px; background: white; border: 2px solid #4f46e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; position: relative; color: #4f46e5; }
-        .nav-dot:hover { background: #4f46e5; color: white; transform: scale(1.15); }
-        .nav-tooltip { position: absolute; white-space: nowrap; background: #1e293b; color: white; padding: 6px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 900; opacity: 0; pointer-events: none; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); left: 55px; }
-        .nav-dot:hover .nav-tooltip { opacity: 1; }
-        
-        /* ------------------------------------------------------------- */
-        /* --- OPTIMIZED PRINT MEDIA QUERY FOR FITTING EVERYTHING --- */
-        /* ------------------------------------------------------------- */
+
+        .thin-title { 
+            font-weight: 300; 
+            letter-spacing: -0.01em; 
+        }
+
+        /* 
+         * ==========================================
+         * ANIMATIONS & HOVER EFFECTS
+         * ==========================================
+         */
+        .hover-zoom { 
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; 
+        }
+
+        .hover-zoom:hover { 
+            transform: scale(1.03); 
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); 
+        }
+
+        /* 
+         * ==========================================
+         * BUTTON STYLES
+         * ==========================================
+         */
+        .btn-execute { 
+            background-color: #22c55e; 
+            color: white; 
+            font-weight: 700; 
+            transition: all 0.2s; 
+            padding: 1rem 2rem; 
+            border-radius: 1.5rem; 
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-execute:hover { 
+            background-color: #16a34a; 
+            transform: scale(1.05); 
+        }
+
+        .btn-execute:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .copy-btn-wrapper { 
+            position: absolute; 
+            top: 1rem; 
+            z-index: 30; 
+            left: 1rem; 
+        }
+
+        .copy-btn-inner { 
+            opacity: 0.4; 
+            transition: opacity 0.2s, transform 0.2s; 
+            cursor: pointer; 
+            padding: 10px; 
+            border-radius: 10px; 
+            background-color: rgba(255, 255, 255, 0.9); 
+            border: 1px solid #cbd5e1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: #475569; 
+        }
+
+        .copy-btn-inner:hover { 
+            opacity: 1; 
+            background-color: #ffffff; 
+            transform: scale(1.1); 
+            border-color: #22c55e; 
+            color: #22c55e; 
+        }
+
+        /* 
+         * ==========================================
+         * CARDS & CONTAINERS
+         * ==========================================
+         */
+        .input-card { 
+            background: white; 
+            padding: 2.5rem; 
+            border-radius: 2.5rem; 
+            border: 1px solid #bae6fd; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
+        }
+
+        /* 
+         * ==========================================
+         * MULTI-SELECT DROPDOWN UI
+         * ==========================================
+         */
+        .multi-select-container { 
+            position: relative; 
+            width: 100%; 
+        }
+
+        .multi-select-trigger { 
+            background-color: white; 
+            border: 1px solid #cbd5e1; 
+            padding: 1rem; 
+            border-radius: 1rem; 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-weight: 600; 
+            min-height: 3.5rem; 
+        }
+
+        .multi-select-dropdown { 
+            position: absolute; 
+            top: 100%; 
+            left: 0; 
+            right: 0; 
+            background: white; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 1rem; 
+            margin-top: 5px; 
+            max-height: 250px; 
+            overflow-y: auto; 
+            z-index: 50; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+            display: none; 
+        }
+
+        .multi-select-dropdown.active { 
+            display: block; 
+        }
+
+        .multi-select-item { 
+            padding: 0.75rem 1rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            cursor: pointer; 
+            transition: background 0.2s; 
+        }
+
+        .multi-select-item:hover { 
+            background-color: #f1f5f9; 
+        }
+
+        .multi-select-item input { 
+            width: 1.2rem; 
+            height: 1.2rem; 
+            cursor: pointer; 
+        }
+
+        .suggestion-box { 
+            background-color: #f8fafc; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 1.5rem; 
+            padding: 2rem; 
+            line-height: 1.8; 
+            color: #1e293b; 
+            min-height: 80px; 
+            max-height: 600px; 
+            overflow-y: auto; 
+            white-space: pre-wrap; 
+            font-weight: 500; 
+            font-size: 1.1rem; 
+            box-shadow: inset 0 2px 8px 0 rgba(0,0,0,0.03); 
+        }
+
+        /* 
+         * ==========================================
+         * FLOATING NAVIGATION
+         * ==========================================
+         */
+        .floating-nav { 
+            position: fixed; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            z-index: 100; 
+            padding: 12px; 
+            background: rgba(255, 255, 255, 0.5); 
+            backdrop-filter: blur(10px); 
+            border-radius: 2rem; 
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.15); 
+            left: 1rem; 
+        }
+
+        .nav-dot { 
+            width: 44px; 
+            height: 44px; 
+            background: white; 
+            border: 2px solid #4f46e5; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            position: relative; 
+            color: #4f46e5; 
+        }
+
+        .nav-dot:hover { 
+            background: #4f46e5; 
+            color: white; 
+            transform: scale(1.15); 
+        }
+
+        .nav-tooltip { 
+            position: absolute; 
+            white-space: nowrap; 
+            background: #1e293b; 
+            color: white; 
+            padding: 6px 14px; 
+            border-radius: 10px; 
+            font-size: 0.85rem; 
+            font-weight: 900; 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: all 0.3s; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            left: 55px; 
+        }
+
+        .nav-dot:hover .nav-tooltip { 
+            opacity: 1; 
+        }
+
+        /* 
+         * ==========================================
+         * PRINT MEDIA QUERY 
+         * (Optimized for A4, hiding UI elements)
+         * ==========================================
+         */
         @media print {
-            @page { size: A4 portrait; margin: 5mm; } 
-            body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 8pt !important; line-height: 1.1 !important; }
+            @page { 
+                size: A4 portrait; 
+                margin: 5mm; 
+            } 
+            
+            body { 
+                background-color: white !important; 
+                padding: 0 !important; 
+                color: black !important; 
+                font-size: 8pt !important; 
+                line-height: 1.1 !important; 
+            }
             
             /* Hide UI elements and their invisible margins entirely */
-            .max-w-4xl, #dataConfigSection, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .copy-btn-wrapper, #messageBoxModal { display: none !important; }
+            .max-w-4xl, 
+            #dataConfigSection, 
+            #filterSection, 
+            #scaleOrderSection, 
+            #actionButtons, 
+            footer, 
+            .floating-nav, 
+            .copy-btn-wrapper, 
+            #messageBoxModal { 
+                display: none !important; 
+            }
             
-            main { box-shadow: none !important; padding: 0 !important; background-color: transparent !important; max-width: 100% !important; margin: 0 !important; border: none !important; }
+            main { 
+                box-shadow: none !important; 
+                padding: 0 !important; 
+                background-color: transparent !important; 
+                max-width: 100% !important; 
+                margin: 0 !important; 
+                border: none !important; 
+            }
             
             /* Logos Header Fix - TRIPLE SIZE & TITLE BETWEEN */
             .flex.justify-between.items-start.mb-8 { 
@@ -69,6 +311,7 @@
                 align-items: flex-start !important; 
                 margin-bottom: 0 !important; 
             }
+            
             .flex.justify-between.items-start.mb-8 img { 
                 height: 105px !important; 
                 width: 105px !important; 
@@ -80,7 +323,10 @@
             }
 
             /* Titles and Headers - CENTERED BETWEEN LOGOS */
-            .mb-6.relative { margin-bottom: 1mm !important; }
+            .mb-6.relative { 
+                margin-bottom: 1mm !important; 
+            }
+            
             #mainTitle { 
                 font-size: 22pt !important; 
                 font-weight: 900 !important; 
@@ -90,15 +336,23 @@
                 padding-top: 6mm !important; 
                 margin-top: 0 !important;
             }
+            
             #instituteTitle { 
                 font-size: 13pt !important; 
                 text-align: center !important; 
                 margin-bottom: 12mm !important; 
                 line-height: 1.4 !important; 
             }
-            #fileNameDisplay { font-size: 11pt !important; display: block !important; margin-bottom: 2mm !important; text-align: center !important; line-height: 1 !important; }
             
-            /* Meta Info (Program and Participants) - COMPACT, ALIGNED LEFT & FLEXIBLE */
+            #fileNameDisplay { 
+                font-size: 11pt !important; 
+                display: block !important; 
+                margin-bottom: 2mm !important; 
+                text-align: center !important; 
+                line-height: 1 !important; 
+            }
+            
+            /* Meta Info (Program and Participants) */
             #metaInfoDisplay { 
                 display: flex !important; 
                 justify-content: flex-end !important; 
@@ -107,6 +361,7 @@
                 margin-bottom: 2mm !important;
                 flex-wrap: nowrap !important;
             }
+            
             #metaInfoDisplay > div {
                 padding: 1.5mm 3mm !important;
                 border: 1pt solid #cbd5e1 !important;
@@ -117,26 +372,51 @@
                 align-items: center !important;
                 white-space: nowrap !important;
             }
+            
             #metaInfoDisplay > div.min-w-0 {
                 flex-shrink: 1 !important;
                 overflow: hidden !important;
             }
-            #metaInfoDisplay span { line-height: 1 !important; }
+            
+            #metaInfoDisplay span { 
+                line-height: 1 !important; 
+            }
+            
             #programNameText {
                 overflow: hidden !important;
                 text-overflow: ellipsis !important;
                 white-space: nowrap !important;
             }
             
-            h2 { font-size: 10pt !important; padding: 1mm 2mm !important; margin-bottom: 0 !important; border: none !important; background-color: transparent !important; }
-            h3, h4 { font-size: 9pt !important; margin-bottom: 1mm !important; }
+            h2 { 
+                font-size: 10pt !important; 
+                padding: 1mm 2mm !important; 
+                margin-bottom: 0 !important; 
+                border: none !important; 
+                background-color: transparent !important; 
+            }
+            
+            h3, h4 { 
+                font-size: 9pt !important; 
+                margin-bottom: 1mm !important; 
+            }
 
-            /* Overriding Tailwind Spacing for Print to eliminate wide blank spaces */
-            #reportPrintScope .space-y-8 > div { margin-bottom: 2mm !important; margin-top: 0 !important; }
-            #reportPrintScope .mt-8, #reportPrintScope .mt-10, #reportPrintScope .mt-12 { margin-top: 2mm !important; }
+            /* Overriding Tailwind Spacing for Print */
+            #reportPrintScope .space-y-8 > div { 
+                margin-bottom: 2mm !important; 
+                margin-top: 0 !important; 
+            }
+            
+            #reportPrintScope .mt-8, 
+            #reportPrintScope .mt-10, 
+            #reportPrintScope .mt-12 { 
+                margin-top: 2mm !important; 
+            }
 
-            /* General Wrappers - COMPACT AND FIX MASSIVE BLANK PAGES */
-            .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper {
+            /* General Wrappers */
+            .domain-result-wrapper, 
+            .suggestion-wrapper, 
+            .summary-table-wrapper {
                 margin-bottom: 2mm !important;
                 border: 1pt solid #cbd5e1 !important;
                 border-radius: 4pt !important;
@@ -146,22 +426,69 @@
                 overflow: visible !important; 
                 page-break-inside: auto !important; 
             }
-            .domain-result-wrapper h2, .summary-table-wrapper h2, .suggestion-wrapper h2 { padding: 1mm 2mm !important; background-color: #f8fafc !important; border-bottom: 1pt solid #cbd5e1 !important; margin: 0 !important; border-top-left-radius: 4pt !important; border-top-right-radius: 4pt !important; }
-            .suggestion-wrapper .p-4 { padding: 1mm !important; }
-            .suggestion-box { min-height: auto !important; padding: 1mm !important; }
+            
+            .domain-result-wrapper h2, 
+            .summary-table-wrapper h2, 
+            .suggestion-wrapper h2 { 
+                padding: 1mm 2mm !important; 
+                background-color: #f8fafc !important; 
+                border-bottom: 1pt solid #cbd5e1 !important; 
+                margin: 0 !important; 
+                border-top-left-radius: 4pt !important; 
+                border-top-right-radius: 4pt !important; 
+            }
+            
+            .suggestion-wrapper .p-4 { 
+                padding: 1mm !important; 
+            }
+            
+            .suggestion-box { 
+                min-height: auto !important; 
+                padding: 1mm !important; 
+            }
 
             /* Prevent breaks inside smaller containers. Let large tables break naturally. */
-            .suggestion-wrapper, .summary-table-wrapper { page-break-inside: avoid !important; break-inside: avoid !important; }
+            .suggestion-wrapper, 
+            .summary-table-wrapper { 
+                page-break-inside: avoid !important; 
+                break-inside: avoid !important; 
+            }
 
-            /* 2-Column Layout Forces (Highlights) - COMPACT */
-            #positiveNegativeItemsContainer { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 2% !important; justify-content: space-between !important; align-items: stretch !important; page-break-inside: avoid !important; }
-            #positiveNegativeItemsContainer > div { width: 49% !important; box-sizing: border-box !important; margin-bottom: 2mm !important; border: 1pt solid #cbd5e1 !important; padding: 2mm !important; border-radius: 4pt !important; background-color: #f8fafc !important; }
-            #positiveNegativeItemsContainer ul.space-y-3 > li { margin-bottom: 0 !important; padding: 1mm !important; font-size: 8pt !important; }
+            /* 2-Column Layout Forces (Highlights) */
+            #positiveNegativeItemsContainer { 
+                display: flex !important; 
+                flex-direction: row !important; 
+                flex-wrap: wrap !important; 
+                gap: 2% !important; 
+                justify-content: space-between !important; 
+                align-items: stretch !important; 
+                page-break-inside: avoid !important; 
+            }
             
-            /* ========================================= */
-            /* STRICT CHARTS PRINT CAGE FIX - COMPACT */
-            /* ========================================= */
-            #chartContainer { display: flex !important; flex-wrap: wrap !important; gap: 2% !important; justify-content: space-between !important; }
+            #positiveNegativeItemsContainer > div { 
+                width: 49% !important; 
+                box-sizing: border-box !important; 
+                margin-bottom: 2mm !important; 
+                border: 1pt solid #cbd5e1 !important; 
+                padding: 2mm !important; 
+                border-radius: 4pt !important; 
+                background-color: #f8fafc !important; 
+            }
+            
+            #positiveNegativeItemsContainer ul.space-y-3 > li { 
+                margin-bottom: 0 !important; 
+                padding: 1mm !important; 
+                font-size: 8pt !important; 
+            }
+            
+            /* STRICT CHARTS PRINT CAGE FIX */
+            #chartContainer { 
+                display: flex !important; 
+                flex-wrap: wrap !important; 
+                gap: 2% !important; 
+                justify-content: space-between !important; 
+            }
+            
             #chartContainer > div { 
                 width: 48% !important; 
                 min-width: 300px !important; 
@@ -174,49 +501,122 @@
                 background-color: white !important;
             }
             
-            /* Chart for Multi-select needs full width in print sometimes */
             #chartContainer > div.lg\\:col-span-2 {
                 width: 100% !important;
             }
             
-            /* Caging the canvas heavily for print */
             #chartContainer .relative {
                 height: 160px !important;
                 max-height: 160px !important;
                 width: 100% !important;
             }
+            
             canvas {
                 max-width: 100% !important;
                 height: 100% !important;
             }
-            /* ========================================= */
             
-            /* FINAL RECOMMENDATION FIXES - COMPACT */
-            #finalRecommendationContainer { page-break-inside: avoid !important; break-inside: avoid !important; }
-            #finalRecommendationContainer > div { padding: 2mm !important; border: 1pt solid #818cf8 !important; border-radius: 6pt !important; box-shadow: none !important; background-color: white !important; margin-bottom: 2mm !important;}
-            #finalRecommendationContainer h2 { font-size: 12pt !important; margin-bottom: 1mm !important; border-bottom: 1pt solid #e0e7ff !important; padding-bottom: 1mm !important; background-color: transparent !important; }
-            #finalRecommendationContainer > div > .grid { display: flex !important; flex-direction: row !important; gap: 2% !important; justify-content: center !important; }
-            #finalRecommendationContainer > div > .grid > div { width: 48% !important; padding: 1mm !important; border-radius: 4pt !important; border: 1pt solid #cbd5e1 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; background-color: #f8fafc !important; }
-            #finalRecommendationContainer .text-5xl { font-size: 16pt !important; line-height: 1 !important; margin-top: 1mm !important; } 
-            #finalRecommendationContainer .text-xs { font-size: 8pt !important; }
+            /* FINAL RECOMMENDATION FIXES */
+            #finalRecommendationContainer { 
+                page-break-inside: avoid !important; 
+                break-inside: avoid !important; 
+            }
             
-            /* Table Optimization to fit on Page and Break Cleanly - COMPACT */
-            .overflow-x-auto { overflow: visible !important; } /* Fixes horizontal clipping */
-            table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; margin: 0 !important; background-color: white !important; }
-            thead { display: table-header-group !important; } /* Repeats headers on new pages */
-            tfoot { display: table-row-group !important; } /* Prevents overlapping text bugs at page bottom */
-            tr { page-break-inside: avoid !important; break-inside: avoid !important; } /* Prevents cutting a single row in half */
+            #finalRecommendationContainer > div { 
+                padding: 2mm !important; 
+                border: 1pt solid #818cf8 !important; 
+                border-radius: 6pt !important; 
+                box-shadow: none !important; 
+                background-color: white !important; 
+                margin-bottom: 2mm !important;
+            }
             
-            th, td { border: 1pt solid #cbd5e1 !important; padding: 1.5pt 2pt !important; font-size: 7.5pt !important; word-wrap: break-word !important; overflow-wrap: break-word !important; white-space: normal !important; vertical-align: middle !important; }
-            th { background-color: #f1f5f9 !important; font-weight: 900 !important; color: #1e293b !important; }
+            #finalRecommendationContainer h2 { 
+                font-size: 12pt !important; 
+                margin-bottom: 1mm !important; 
+                border-bottom: 1pt solid #e0e7ff !important; 
+                padding-bottom: 1mm !important; 
+                background-color: transparent !important; 
+            }
+            
+            #finalRecommendationContainer > div > .grid { 
+                display: flex !important; 
+                flex-direction: row !important; 
+                gap: 2% !important; 
+                justify-content: center !important; 
+            }
+            
+            #finalRecommendationContainer > div > .grid > div { 
+                width: 48% !important; 
+                padding: 1mm !important; 
+                border-radius: 4pt !important; 
+                border: 1pt solid #cbd5e1 !important; 
+                display: flex !important; 
+                flex-direction: column !important; 
+                align-items: center !important; 
+                justify-content: center !important; 
+                background-color: #f8fafc !important; 
+            }
+            
+            #finalRecommendationContainer .text-5xl { 
+                font-size: 16pt !important; 
+                line-height: 1 !important; 
+                margin-top: 1mm !important; 
+            }
+            
+            #finalRecommendationContainer .text-xs { 
+                font-size: 8pt !important; 
+            }
+            
+            /* Table Optimization */
+            .overflow-x-auto { 
+                overflow: visible !important; 
+            } 
+            
+            table { 
+                width: 100% !important; 
+                border-collapse: collapse !important; 
+                table-layout: fixed !important; 
+                margin: 0 !important; 
+                background-color: white !important; 
+            }
+            
+            thead { 
+                display: table-header-group !important; 
+            } 
+            
+            tfoot { 
+                display: table-row-group !important; 
+            } 
+            
+            tr { 
+                page-break-inside: avoid !important; 
+                break-inside: avoid !important; 
+            } 
+            
+            th, td { 
+                border: 1pt solid #cbd5e1 !important; 
+                padding: 1.5pt 2pt !important; 
+                font-size: 7.5pt !important; 
+                word-wrap: break-word !important; 
+                overflow-wrap: break-word !important; 
+                white-space: normal !important; 
+                vertical-align: middle !important; 
+            }
+            
+            th { 
+                background-color: #f1f5f9 !important; 
+                font-weight: 900 !important; 
+                color: #1e293b !important; 
+            }
             
             /* Column Width Distribution */
-            table th:nth-child(1), table td:nth-child(1) { width: 5% !important; text-align: center !important; } /* # */
-            table th:nth-child(2), table td:nth-child(2) { width: 35% !important; text-align: right !important; } /* Item */
-            table th:nth-last-child(2), table td:nth-last-child(2) { width: 10% !important; text-align: center !important; } /* Check Sum */
-            table th:nth-last-child(1), table td:nth-last-child(1) { width: 10% !important; text-align: center !important; } /* Positives */
+            table th:nth-child(1), table td:nth-child(1) { width: 5% !important; text-align: center !important; }
+            table th:nth-child(2), table td:nth-child(2) { width: 35% !important; text-align: right !important; }
+            table th:nth-last-child(2), table td:nth-last-child(2) { width: 10% !important; text-align: center !important; }
+            table th:nth-last-child(1), table td:nth-last-child(1) { width: 10% !important; text-align: center !important; }
             
-            /* Signature Print Fix - COMPACT */
+            /* Signature Print Fix */
             #signatureSection { 
                 page-break-inside: avoid !important; 
                 display: flex !important; 
@@ -230,50 +630,108 @@
                 padding-bottom: 10mm !important; 
                 font-size: 11pt !important;
             }
-            #signatureSection .text-center { display: flex !important; flex-direction: column !important; align-items: center !important; }
-            #signatureSection .sig-space { height: 12mm !important; width: 100% !important; display: block !important; } 
-            #signatureSection p { margin-bottom: 0 !important; display: block !important; color: black !important; }
             
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+            #signatureSection .text-center { 
+                display: flex !important; 
+                flex-direction: column !important; 
+                align-items: center !important; 
+            }
+            
+            #signatureSection .sig-space { 
+                height: 12mm !important; 
+                width: 100% !important; 
+                display: block !important; 
+            } 
+            
+            #signatureSection p { 
+                margin-bottom: 0 !important; 
+                display: block !important; 
+                color: black !important; 
+            }
+            
+            * { 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+                color-adjust: exact !important; 
+            }
         }
     </style>
 </head>
+
 <body class="p-4 md:p-12 text-right" dir="rtl">
+    
+    <!-- FLOATING NAVIGATION -->
     <nav class="floating-nav" id="floatingNav">
         <a href="#step1Title" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-            <span class="nav-tooltip" id="tip-step1"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+            <span class="nav-tooltip" id="tip-step1">تحميل البيانات</span>
         </a>
         <a href="#step2Title" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-            <span class="nav-tooltip" id="tip-step2"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span class="nav-tooltip" id="tip-step2">تعيين الأعمدة</span>
         </a>
         <a href="#filterSection" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-            <span class="nav-tooltip" id="tip-filter"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            <span class="nav-tooltip" id="tip-filter">الفلاتر</span>
         </a>
         <a href="#scaleOrderSection" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-            <span class="nav-tooltip" id="tip-step3"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+            <span class="nav-tooltip" id="tip-step3">تحديد المقياس</span>
         </a>
         <a href="#resultsContainer" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-            <span class="nav-tooltip" id="tip-results"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span class="nav-tooltip" id="tip-results">النتائج والجداول</span>
         </a>
         <a href="#chartContainer" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v10l8.5 2"></path></svg>
-            <span class="nav-tooltip" id="tip-charts"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 2v10l8.5 2"></path>
+            </svg>
+            <span class="nav-tooltip" id="tip-charts">الرسوم البيانية</span>
         </a>
         <a href="#positiveNegativeItemsContainer" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14l2 2 4-4"></path></svg>
-            <span class="nav-tooltip" id="tip-highlights"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                <path d="M9 14l2 2 4-4"></path>
+            </svg>
+            <span class="nav-tooltip" id="tip-highlights">أبرز النقاط</span>
         </a>
         <a href="#finalRecommendationContainer" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
-            <span class="nav-tooltip" id="tip-final"></span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                <path d="M4 22h16"></path>
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+            </svg>
+            <span class="nav-tooltip" id="tip-final">التوصيات</span>
         </a>
     </nav>
 
+    <!-- MESSAGE MODAL -->
     <div id="messageBoxModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[110]">
         <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border-4 border-indigo-100 text-center font-black">
             <div id="messageBoxIcon" class="mb-4 text-5xl">⚠️</div>
@@ -283,15 +741,18 @@
         </div>
     </div>
 
+    <!-- HEADER LOGOS -->
     <div class="flex justify-between items-start mb-8 relative">
         <img src="00.png" alt="Logo1" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo1'">
         <img src="02.jpg" alt="Logo2" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo2'">
     </div>
 
+    <!-- MAIN CONTAINER -->
     <main class="max-w-7xl mx-auto w-full bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl flex-grow mb-12">
         <h1 id="mainTitle" class="text-4xl thin-title text-center mb-2 text-slate-800 font-black uppercase tracking-tight">تحليل نتائج الاستبيان</h1>
-        <p class="text-center text-indigo-700 mb-8 text-xl font-bold" id="instituteTitle"></p>
+        <p class="text-center text-indigo-700 mb-8 text-xl font-bold" id="instituteTitle">وحدة ضمان الجودة</p>
 
+        <!-- STEP 1: DATA SOURCE -->
         <div class="max-w-4xl mx-auto mb-10 mt-8">
             <div class="input-card border-2 border-blue-100">
                 <h2 id="step1Title" class="text-xl font-bold text-center mb-6 text-slate-700 font-black">الخطوة 1: اختر مصدر ملف البيانات</h2>
@@ -311,14 +772,15 @@
                 </div>
                 
                 <div id="googleInputPanel" class="hidden space-y-4">
-                    <input type="text" id="googleLink" class="w-full p-4 border rounded-xl" placeholder="">
-                    <button id="fetchGoogleBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white"></button>
+                    <input type="text" id="googleLink" class="w-full p-4 border rounded-xl" placeholder="أدخل رابط جوجل شيت هنا...">
+                    <button id="fetchGoogleBtn" class="w-full p-4 btn-execute rounded-xl font-bold text-white">جلب البيانات</button>
                 </div>
                 
-                <div id="loadingMessage" class="hidden mt-4 text-indigo-700 font-black animate-pulse text-lg italic text-center"></div>
+                <div id="loadingMessage" class="hidden mt-4 text-indigo-700 font-black animate-pulse text-lg italic text-center">جاري تحميل البيانات...</div>
             </div>
         </div>
 
+        <!-- STEP 2: DATA CONFIGURATION -->
         <div id="dataConfigSection" class="hidden grid grid-cols-1 gap-8 mb-10">
             <div class="input-card bg-blue-50/50 border-2 border-blue-100">
                 <div class="text-center border-b border-blue-100 pb-4 mb-6">
@@ -326,37 +788,40 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-6">
                     <div class="flex flex-col">
-                        <label id="labelFilterCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
+                        <label id="labelFilterCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center">عمود القسم / التصفية</label>
                         <select id="filterColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
                     </div>
                     <div class="flex flex-col">
-                        <label id="labelCategoryCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
+                        <label id="labelCategoryCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center">عمود التصنيف / المحاور (اختياري)</label>
                         <select id="categoryColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
                     </div>
                     <div class="flex flex-col">
-                        <label id="labelStartCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
+                        <label id="labelStartCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center">بداية أسئلة الاستبيان</label>
                         <select id="analysisStartColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
                     </div>
                     <div class="flex flex-col">
-                        <label id="labelEndCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
+                        <label id="labelEndCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center">نهاية أسئلة الاستبيان</label>
                         <select id="analysisEndColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
                     </div>
                 </div>
                 <div class="flex justify-center">
-                    <button id="confirmMappingBtn" class="px-10 py-4 btn-execute text-xl font-black rounded-2xl shadow-lg hover-zoom uppercase text-white"></button>
+                    <button id="confirmMappingBtn" class="px-10 py-4 btn-execute text-xl font-black rounded-2xl shadow-lg hover-zoom uppercase text-white">تأكيد الإعدادات واستخراج المقياس</button>
                 </div>
             </div>
         </div>
 
+        <!-- FILTER SECTION -->
         <div id="filterSection" class="hidden max-w-4xl mx-auto mb-10">
             <div class="input-card border-indigo-200 bg-indigo-50/30">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="flex flex-col">
-                        <label id="labelDeptFilter" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
+                        <label id="labelDeptFilter" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center">تصفية حسب القسم</label>
                         <div class="multi-select-container mt-2">
                             <div class="multi-select-trigger hover-zoom" id="deptMultiTrigger">
-                                <span id="deptSelectedText">...</span>
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <span id="deptSelectedText">الكل</span>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
                             </div>
                             <div class="multi-select-dropdown" id="deptMultiDropdown">
                                 <!-- Items populated via JS -->
@@ -365,11 +830,13 @@
                     </div>
                     
                     <div class="flex flex-col hidden" id="catFilterContainer">
-                        <label id="labelCatFilter" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
+                        <label id="labelCatFilter" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center">تصفية حسب المحور</label>
                         <div class="multi-select-container mt-2">
                             <div class="multi-select-trigger hover-zoom" id="catMultiTrigger">
-                                <span id="catSelectedText">...</span>
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <span id="catSelectedText">الكل</span>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
                             </div>
                             <div class="multi-select-dropdown" id="catMultiDropdown">
                                 <!-- Items populated via JS -->
@@ -380,34 +847,39 @@
             </div>
         </div>
 
+        <!-- SCALE ORDER SECTION -->
         <div id="scaleOrderSection" class="hidden mb-10 p-8 bg-slate-100 rounded-3xl shadow-inner border border-slate-200">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 text-right">
                 <div id="scaleHeaderBox">
-                    <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 font-black"></h2>
-                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic"></p>
+                    <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 font-black">تعيين وزن المقياس</h2>
+                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic">قم بإعطاء وزن رقمي (مثال 1 إلى 5) لكل خيار تم استخراجه من البيانات</p>
                 </div>
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center shadow-sm">
                     <label id="labelThreshold" class="font-black text-xs text-slate-800 ml-4 uppercase">حد الإيجابيات (%):</label>
                     <input type="number" id="positivesThresholdInput" value="85" min="0" max="100" class="w-24 px-4 py-2 border rounded-xl font-black text-xl text-center text-indigo-700">
                 </div>
             </div>
-            <div id="scaleGroupsContainer" class="space-y-10"></div>
-        </div>
-
-        <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
-            <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase text-white">حلل البيانات الآن</button>
-            <div class="flex flex-wrap gap-4 w-full justify-center">
-                <button id="exportButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white"></button>
-                <button id="printButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white"></button>
-                <button id="copyTableButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white"></button>
+            <div id="scaleGroupsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Scale Inputs Generated via JS -->
             </div>
         </div>
 
+        <!-- ACTION BUTTONS -->
+        <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
+            <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase text-white">حلل البيانات الآن</button>
+            <div class="flex flex-wrap gap-4 w-full justify-center mt-4">
+                <button id="exportButton" class="px-8 py-4 bg-indigo-500 hover:bg-indigo-600 text-white text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase hidden">تصدير إلى إكسيل</button>
+                <button id="printButton" class="px-8 py-4 bg-slate-700 hover:bg-slate-800 text-white text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase hidden">طباعة التقرير</button>
+                <button id="copyTableButton" class="px-8 py-4 bg-teal-500 hover:bg-teal-600 text-white text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase hidden">نسخ الجداول</button>
+            </div>
+        </div>
+
+        <!-- RESULTS / REPORT PRINT SCOPE -->
         <div id="reportPrintScope">
             <div class="mb-6 relative">
                 <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 hidden font-black uppercase text-center mb-4"></p>
                 
-                <!-- القسم الخاص: البرنامج والمشاركين في أقصى اليسار مع مرونة النص الطويل -->
+                <!-- Meta info (participants, program) -->
                 <div id="metaInfoDisplay" class="hidden flex justify-end gap-2 md:gap-4 text-base md:text-lg font-black w-full overflow-hidden">
                     <div class="bg-indigo-50 text-indigo-800 px-3 md:px-4 py-2 rounded-xl border border-indigo-100 flex items-center whitespace-nowrap shrink-0">
                         <span id="participantCountDisplay"></span>
@@ -424,1226 +896,1028 @@
             <div id="positiveNegativeItemsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 mt-8"></div>
             <div id="finalRecommendationContainer" class="hidden mt-10"></div>
             
-            <div id="signatureSection" class="hidden mt-12 pt-8 border-t-2 border-slate-200 flex justify-between items-center text-lg font-black px-4 md:px-16">
-                <div class="text-center flex flex-col items-center">
-                    <p class="text-slate-700">مقرر لجنة الاستبيانات وتقييم الاداء</p>
-                    <div class="sig-space h-16 w-full"></div> 
-                    <p class="text-indigo-900 font-black">د. مازن فوزي بدوي</p>
+            <!-- SIGNATURE SECTION -->
+            <div id="signatureSection" class="hidden mt-12 pt-8 border-t-2 border-slate-200 justify-between items-center">
+                <div class="text-center">
+                    <p class="font-bold text-lg text-slate-800">مدير وحدة ضمان الجودة</p>
+                    <div class="sig-space"></div>
+                    <p class="text-sm text-slate-600">التوقيع: ................................</p>
                 </div>
-                <div class="text-center flex flex-col items-center">
-                    <p class="text-slate-700">مدير وحدة ضمان الجودة</p>
-                    <div class="sig-space h-16 w-full"></div> 
-                    <p class="text-indigo-900 font-black">د. احمد عوض</p>
+                <div class="text-center">
+                    <p class="font-bold text-lg text-slate-800">عميد الكلية / المعهد</p>
+                    <div class="sig-space"></div>
+                    <p class="text-sm text-slate-600">التوقيع: ................................</p>
                 </div>
             </div>
         </div>
     </main>
 
-    <footer class="w-full text-center py-6 mt-auto text-slate-900 font-black border-t border-blue-200 bg-blue-100/95 backdrop-blur-sm uppercase text-sm tracking-widest">
-        All rights are reserved to Dr. Mazen Badawy – Doctorate of English Teaching & Testing
+    <footer class="text-center text-slate-500 text-sm pb-8">
+        <p>جميع الحقوق محفوظة &copy; وحدة ضمان الجودة - الإصدار 1.0</p>
     </footer>
 
+    <!-- ========================================== -->
+    <!-- APPLICATION JAVASCRIPT LOGIC -->
+    <!-- ========================================== -->
     <script>
-        /* --- 1. Global State --- */
-        let currentLang = 'ar';
-        let rawExcelData = null;
-        let identifiedScaleGroups = new Map();
-        let itemToScaleGroup = new Map();
-        let chartInstances = [];
-        let selectedDepts = new Set();
-        let selectedCats = new Set();
-
-        const languageData = {
-            ar: {
-                title: 'تحليل نتائج الاستبيان',
-                devCredit: 'المعهد العالي للهندسة والتكنولوجيا بكفر الشيخ\nوحدة ضمان الجودة ',
-                allInstitute: 'المعهد بالكامل',
-                participants: 'مشارك',
-                pos: 'إيجابي',
-                copied: 'تم النسخ!',
-                emptyList: 'لا توجد بنود',
-                headers: { no: '#', item: 'بيان البند', checkTotal: 'إجمالي الصف (%)', total: 'الإجمالي (%)', positives: 'إيجابيات (%)', footer: 'المتوسط' },
-                strengths: '★ نقاط القوة الأساسية',
-                improvement: '⚠️ مجالات التحسين الحرجة',
-                recommendation: 'التوصية النهائية',
-                evaluations: ["ممتازة", "جيد جداً", "جيدة", "مقبولة", "ضعيفة"],
-                suggestionsTitle: 'Summarised Suggestions',
-                loadingAI: 'جاري التحليل بالذكاء الاصطناعي...',
-                groupLabel: 'مجموعة المقياس',
-                step1: 'الخطوة 1: مصدر البيانات',
-                step1Btn: '📁 تحميل ملف محلي',
-                step1G: '🌐 رابط جوجل شيت',
-                step1H: '🐙 مصمم الاستبيانات',
-                localHint: 'اختر ملف XLSX أو CSV',
-                googleHint: 'ضع رابط جوجل شيت العام...',
-                fetch: 'جلب البيانات',
-                step2: 'الخطوة 2: تعيين البيانات',
-                confirm: 'تأكيد الإعدادات',
-                filterLabel: 'تصفية حسب القسم (اختيار متعدد)',
-                deptLabel: 'اختر عمود البرنامج',
-                catLabel: 'اختر عمود الفئة (اختياري)',
-                catFilterLabel: 'تصفية حسب الفئة (اختيار متعدد)',
-                noFilter: 'بدون تصفية',
-                startColLabel: 'ابدأ التحليل من عمود',
-                endColLabel: 'إلى عمود (اختياري)',
-                endColDefault: '-- حتى نهاية الملف --',
-                step3: 'الخطوة 3: ترتيب المقاييس',
-                step3Hint: 'قم بترتيب خيارات الإجابة (الأعلى في الأعلى).',
-                threshold: 'حد الإيجابيات (%):',
-                analyzeNow: 'حلل البيانات الآن',
-                export: 'تصدير (Excel)',
-                print: 'طباعة (PDF)',
-                copyAll: 'نسخ الكل',
-                finalResult: 'النسبة الإجمالية',
-                evalLabel: 'التقييم العام للمعهد',
-                googleErrorTitle: 'خطأ في بيانات جوجل',
-                googleErrorBody: 'تأكد أن الملف متاح للجميع ومنشور على الويب.',
-                nav: { step1: 'المصدر', step2: 'التعيين', filter: 'الفلترة', step3: 'المقاييس', results: 'الجداول', charts: 'الرسوم', highlights: 'النقاط', final: 'التقييم' },
-                selectAll: 'اختيار الكل'
-            }
+        /**
+         * Global Application State Object
+         */
+        const AppState = {
+            rawDataset: [],
+            headers: [],
+            fileName: "",
+            mappedColumns: {
+                filter: null,
+                category: null,
+                start: null,
+                end: null
+            },
+            uniqueScales: [],
+            scaleWeights: {}, // { "موافق بشدة": 5, "موافق": 4, ... }
+            maxScaleWeight: 5,
+            activeFilters: {
+                department: [], // "الكل" or specific array
+                category: []    // "الكل" or specific array
+            },
+            analysisResults: [],
+            chartsInstances: []
         };
 
-        /* --- AI --- */
-        async function summarizeWithAI(text) {
-            const apiKey = "AQ.Ab8RN6JplE3DZVQudKfYkN13PedZrPJ3FsIsvEaVZeGapMBjGA"; 
-            const modelName = "gemini-1.5-flash"; 
+        /**
+         * DOM Elements Cache
+         */
+        const DOM = {
+            // Modals & UI utilities
+            modal: document.getElementById('messageBoxModal'),
+            modalIcon: document.getElementById('messageBoxIcon'),
+            modalTitle: document.getElementById('messageBoxTitle'),
+            modalBody: document.getElementById('messageBoxBody'),
+            modalCloseBtn: document.getElementById('closeMessageBox'),
+            loadingMessage: document.getElementById('loadingMessage'),
             
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-            const systemPrompt = "أنت خبير في تحليل البيانات التعليمية. لديك مجموعة من الملاحظات والاستجابات المفتوحة. يرجى قراءتها بعناية واستخلاص الأفكار الرئيسية والاتجاهات العامة، وتقديم ملخص شامل وموجز يعبر عن جوهر الملاحظات بدلاً من سردها أو تكرارها. اكتب الملخص في نقاط واضحة ومهنية باللغة العربية، وابدأ مباشرة بالنقاط دون مقدمات.";
-            const payload = { contents: [{ parts: [{ text: text }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+            // Step 1
+            srcLocalBtn: document.getElementById('srcLocalBtn'),
+            srcGoogleBtn: document.getElementById('srcGoogleBtn'),
+            localInputPanel: document.getElementById('localInputPanel'),
+            googleInputPanel: document.getElementById('googleInputPanel'),
+            xlsxFileInput: document.getElementById('xlsxFile'),
+            localFileBtnText: document.getElementById('localFileBtnText'),
+            googleLinkInput: document.getElementById('googleLink'),
+            fetchGoogleBtn: document.getElementById('fetchGoogleBtn'),
+            fileNameDisplay: document.getElementById('fileNameDisplay'),
+            
+            // Step 2
+            dataConfigSection: document.getElementById('dataConfigSection'),
+            filterColSelect: document.getElementById('filterColSelect'),
+            categoryColSelect: document.getElementById('categoryColSelect'),
+            analysisStartColSelect: document.getElementById('analysisStartColSelect'),
+            analysisEndColSelect: document.getElementById('analysisEndColSelect'),
+            confirmMappingBtn: document.getElementById('confirmMappingBtn'),
+            
+            // Filters
+            filterSection: document.getElementById('filterSection'),
+            deptMultiTrigger: document.getElementById('deptMultiTrigger'),
+            deptMultiDropdown: document.getElementById('deptMultiDropdown'),
+            deptSelectedText: document.getElementById('deptSelectedText'),
+            catFilterContainer: document.getElementById('catFilterContainer'),
+            catMultiTrigger: document.getElementById('catMultiTrigger'),
+            catMultiDropdown: document.getElementById('catMultiDropdown'),
+            catSelectedText: document.getElementById('catSelectedText'),
+            
+            // Scale Config
+            scaleOrderSection: document.getElementById('scaleOrderSection'),
+            scaleGroupsContainer: document.getElementById('scaleGroupsContainer'),
+            positivesThresholdInput: document.getElementById('positivesThresholdInput'),
+            
+            // Actions
+            actionButtons: document.getElementById('actionButtons'),
+            analyzeButton: document.getElementById('analyzeButton'),
+            exportButton: document.getElementById('exportButton'),
+            printButton: document.getElementById('printButton'),
+            copyTableButton: document.getElementById('copyTableButton'),
+            
+            // Results Output
+            resultsContainer: document.getElementById('resultsContainer'),
+            chartContainer: document.getElementById('chartContainer'),
+            positiveNegativeItemsContainer: document.getElementById('positiveNegativeItemsContainer'),
+            finalRecommendationContainer: document.getElementById('finalRecommendationContainer'),
+            metaInfoDisplay: document.getElementById('metaInfoDisplay'),
+            participantCountDisplay: document.getElementById('participantCountDisplay'),
+            programNameText: document.getElementById('programNameText'),
+            signatureSection: document.getElementById('signatureSection')
+        };
+
+        /**
+         * ==========================================
+         * UTILITY FUNCTIONS
+         * ==========================================
+         */
+
+        /**
+         * Shows a beautiful modal alert
+         * @param {string} title 
+         * @param {string} message 
+         * @param {string} type 'error' | 'success' | 'info'
+         */
+        function showModal(title, message, type = 'info') {
+            DOM.modalTitle.textContent = title;
+            DOM.modalBody.textContent = message;
+            
+            if (type === 'error') {
+                DOM.modalIcon.textContent = '❌';
+                DOM.modalTitle.classList.replace('text-slate-800', 'text-red-600');
+            } else if (type === 'success') {
+                DOM.modalIcon.textContent = '✅';
+                DOM.modalTitle.classList.replace('text-slate-800', 'text-green-600');
+            } else {
+                DOM.modalIcon.textContent = 'ℹ️';
+                DOM.modalTitle.classList.replace('text-red-600', 'text-slate-800');
+                DOM.modalTitle.classList.replace('text-green-600', 'text-slate-800');
+            }
+            
+            DOM.modal.classList.remove('hidden');
+        }
+
+        DOM.modalCloseBtn.addEventListener('click', () => {
+            DOM.modal.classList.add('hidden');
+        });
+
+        function toggleLoading(show) {
+            if (show) DOM.loadingMessage.classList.remove('hidden');
+            else DOM.loadingMessage.classList.add('hidden');
+        }
+
+        /**
+         * Destroys existing charts to avoid memory leaks or overlapping
+         */
+        function clearExistingCharts() {
+            AppState.chartsInstances.forEach(chart => chart.destroy());
+            AppState.chartsInstances = [];
+            DOM.chartContainer.innerHTML = '';
+        }
+
+        /**
+         * ==========================================
+         * STEP 1: DATA INGESTION
+         * ==========================================
+         */
+
+        // Panel Switchers
+        DOM.srcLocalBtn.addEventListener('click', () => {
+            DOM.localInputPanel.classList.remove('hidden');
+            DOM.googleInputPanel.classList.add('hidden');
+            DOM.srcLocalBtn.classList.add('ring-4', 'ring-blue-300');
+            DOM.srcGoogleBtn.classList.remove('ring-4', 'ring-green-300');
+        });
+
+        DOM.srcGoogleBtn.addEventListener('click', () => {
+            DOM.googleInputPanel.classList.remove('hidden');
+            DOM.localInputPanel.classList.add('hidden');
+            DOM.srcGoogleBtn.classList.add('ring-4', 'ring-green-300');
+            DOM.srcLocalBtn.classList.remove('ring-4', 'ring-blue-300');
+        });
+
+        // File Input Handler
+        DOM.xlsxFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            DOM.localFileBtnText.textContent = `تم اختيار: ${file.name}`;
+            AppState.fileName = file.name.split('.')[0];
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = new Uint8Array(event.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+                    
+                    if (jsonData.length === 0) {
+                        showModal("خطأ", "الملف فارغ أو لا يمكن قراءته.", "error");
+                        return;
+                    }
+                    
+                    processRawData(jsonData);
+                    showModal("نجاح", `تم تحميل ${jsonData.length} سجل بنجاح. الرجاء المتابعة للخطوة 2.`, "success");
+                    
+                } catch (error) {
+                    console.error(error);
+                    showModal("خطأ أثناء القراءة", "تأكد من أن الملف بصيغة XLSX أو CSV صحيحة.", "error");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        // Google Sheets Fetch Handler
+        DOM.fetchGoogleBtn.addEventListener('click', async () => {
+            const url = DOM.googleLinkInput.value.trim();
+            if (!url) {
+                showModal("خطأ", "الرجاء إدخال رابط جوجل شيت.", "error");
+                return;
+            }
+            
+            // Attempt to convert regular Google Sheet URL to CSV export URL
+            let exportUrl = url;
+            if (url.includes('/edit')) {
+                exportUrl = url.replace(/\/edit.*$/, '/export?format=csv');
+            }
+            
+            toggleLoading(true);
+            DOM.fetchGoogleBtn.disabled = true;
             
             try {
-                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                const result = await response.json();
+                const response = await fetch(exportUrl);
+                if (!response.ok) throw new Error("Network response was not ok");
                 
-                if(result.error) {
-                    console.error("خطأ من جوجل API:", result.error);
-                    return text; 
+                const csvText = await response.text();
+                const workbook = XLSX.read(csvText, { type: 'string' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+                
+                if (jsonData.length === 0) {
+                    throw new Error("Empty data returned.");
+                }
+                
+                AppState.fileName = "بيانات جوجل شيت";
+                processRawData(jsonData);
+                showModal("نجاح", `تم جلب ${jsonData.length} سجل بنجاح من جوجل شيت.`, "success");
+                
+            } catch (error) {
+                console.error(error);
+                showModal("فشل جلب البيانات", "تأكد من أن رابط جوجل شيت 'متاح لأي شخص لديه الرابط' (Publicly Shared).", "error");
+            } finally {
+                toggleLoading(false);
+                DOM.fetchGoogleBtn.disabled = false;
+            }
+        });
+
+        /**
+         * Initialize AppState with extracted raw data
+         */
+        function processRawData(jsonData) {
+            AppState.rawDataset = jsonData;
+            AppState.headers = Object.keys(jsonData[0] || {});
+            
+            populateColumnSelectors();
+            DOM.dataConfigSection.classList.remove('hidden');
+            
+            // Reset downstream sections
+            DOM.filterSection.classList.add('hidden');
+            DOM.scaleOrderSection.classList.add('hidden');
+            DOM.actionButtons.classList.add('hidden');
+            DOM.reportPrintScope.classList.add('hidden');
+        }
+
+        /**
+         * ==========================================
+         * STEP 2: COLUMN MAPPING
+         * ==========================================
+         */
+        
+        function populateColumnSelectors() {
+            const selectors = [
+                DOM.filterColSelect, 
+                DOM.categoryColSelect, 
+                DOM.analysisStartColSelect, 
+                DOM.analysisEndColSelect
+            ];
+            
+            selectors.forEach(sel => {
+                sel.innerHTML = '<option value="">-- اختر العمود --</option>';
+                AppState.headers.forEach((header, index) => {
+                    const option = document.createElement('option');
+                    option.value = header;
+                    option.textContent = header;
+                    sel.appendChild(option);
+                });
+            });
+
+            // Smart defaults guess based on typical Arabic questionnaires
+            const guessFilter = AppState.headers.find(h => h.includes('قسم') || h.includes('برنامج') || h.includes('الكلية'));
+            if (guessFilter) DOM.filterColSelect.value = guessFilter;
+            
+            const guessCat = AppState.headers.find(h => h.includes('محور') || h.includes('تصنيف'));
+            if (guessCat) DOM.categoryColSelect.value = guessCat;
+        }
+
+        DOM.confirmMappingBtn.addEventListener('click', () => {
+            const fCol = DOM.filterColSelect.value;
+            const cStart = DOM.analysisStartColSelect.value;
+            const cEnd = DOM.analysisEndColSelect.value;
+            const cCat = DOM.categoryColSelect.value;
+
+            if (!fCol || !cStart || !cEnd) {
+                showModal("بيانات ناقصة", "يرجى تحديد عمود التصفية، وبداية ونهاية أسئلة الاستبيان كحد أدنى.", "error");
+                return;
+            }
+
+            const startIndex = AppState.headers.indexOf(cStart);
+            const endIndex = AppState.headers.indexOf(cEnd);
+
+            if (startIndex > endIndex) {
+                showModal("ترتيب خاطئ", "يجب أن يكون عمود البداية قبل عمود النهاية في ترتيب الملف.", "error");
+                return;
+            }
+
+            AppState.mappedColumns = {
+                filter: fCol,
+                category: cCat || null,
+                start: cStart,
+                end: cEnd
+            };
+
+            extractUniqueScalesAndFilters();
+        });
+
+        /**
+         * ==========================================
+         * STEP 3: SCALES & FILTERS
+         * ==========================================
+         */
+         
+        function extractUniqueScalesAndFilters() {
+            const { filter, category, start, end } = AppState.mappedColumns;
+            const startIndex = AppState.headers.indexOf(start);
+            const endIndex = AppState.headers.indexOf(end);
+            
+            const uniqueFilterVals = new Set();
+            const uniqueCatVals = new Set();
+            const uniqueScalesSet = new Set();
+
+            AppState.rawDataset.forEach(row => {
+                // Collect Filter Values
+                if (row[filter]) uniqueFilterVals.add(String(row[filter]).trim());
+                
+                // Collect Category Values if mapped
+                if (category && row[category]) {
+                    uniqueCatVals.add(String(row[category]).trim());
                 }
 
-                if (result && result.candidates && result.candidates[0] && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts[0]) {
-                    return result.candidates[0].content.parts[0].text || text;
+                // Collect Unique Scale Answers (e.g. Strongly Agree, Agree...)
+                for (let i = startIndex; i <= endIndex; i++) {
+                    const colName = AppState.headers[i];
+                    const val = String(row[colName] || "").trim();
+                    // Ignore empties or extremely long strings (not likely a scale choice)
+                    if (val && val.length > 0 && val.length < 100) {
+                        uniqueScalesSet.add(val);
+                    }
                 }
-                return text;
-            } catch (err) { 
-                console.error("مشكلة في الاتصال بالـ API:", err);
-                return text; 
+            });
+
+            // Populate Filter Multi-Select
+            populateMultiSelect(DOM.deptMultiDropdown, Array.from(uniqueFilterVals), 'dept');
+            if (category) {
+                DOM.catFilterContainer.classList.remove('hidden');
+                populateMultiSelect(DOM.catMultiDropdown, Array.from(uniqueCatVals), 'cat');
+            } else {
+                DOM.catFilterContainer.classList.add('hidden');
+            }
+
+            // Build Scale Mapping UI
+            AppState.uniqueScales = Array.from(uniqueScalesSet);
+            if (AppState.uniqueScales.length > 15) {
+                showModal("تحذير", "تم اكتشاف عدد كبير جداً من الإجابات المختلفة. تأكد من تحديد نطاق الأسئلة بشكل صحيح، وأنه لا يحتوي على أسئلة نصية مفتوحة.", "info");
+            }
+            
+            buildScaleInputsUI();
+            
+            DOM.filterSection.classList.remove('hidden');
+            DOM.scaleOrderSection.classList.remove('hidden');
+            DOM.actionButtons.classList.remove('hidden');
+            
+            showModal("تم بنجاح", "تم استخراج نطاق الأسئلة بنجاح. يرجى تحديد أوزان الإجابات وضبط الفلاتر قبل بدء التحليل.", "success");
+        }
+
+        /**
+         * Generates the multi-select dropdown HTML and attaches listeners
+         */
+        function populateMultiSelect(container, items, typePrefix) {
+            container.innerHTML = '';
+            
+            // "Select All" Option
+            const allItem = document.createElement('div');
+            allItem.className = 'multi-select-item border-b border-slate-100 font-black text-indigo-700';
+            allItem.innerHTML = `
+                <input type="checkbox" id="${typePrefix}-all" checked>
+                <label for="${typePrefix}-all" class="w-full cursor-pointer">تحديد الكل</label>
+            `;
+            container.appendChild(allItem);
+
+            const allCheckbox = allItem.querySelector('input');
+            const itemCheckboxes = [];
+
+            items.sort().forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = 'multi-select-item text-slate-700 font-semibold';
+                div.innerHTML = `
+                    <input type="checkbox" id="${typePrefix}-${idx}" value="${item}" checked>
+                    <label for="${typePrefix}-${idx}" class="w-full cursor-pointer">${item}</label>
+                `;
+                container.appendChild(div);
+                
+                const cb = div.querySelector('input');
+                itemCheckboxes.push(cb);
+
+                cb.addEventListener('change', () => {
+                    if (!cb.checked) {
+                        allCheckbox.checked = false;
+                    } else if (itemCheckboxes.every(c => c.checked)) {
+                        allCheckbox.checked = true;
+                    }
+                    updateMultiSelectText(typePrefix, itemCheckboxes);
+                });
+            });
+
+            allCheckbox.addEventListener('change', (e) => {
+                const isChecked = e.target.checked;
+                itemCheckboxes.forEach(cb => cb.checked = isChecked);
+                updateMultiSelectText(typePrefix, itemCheckboxes);
+            });
+            
+            updateMultiSelectText(typePrefix, itemCheckboxes);
+        }
+
+        function updateMultiSelectText(typePrefix, checkboxes) {
+            const checkedBoxes = checkboxes.filter(cb => cb.checked);
+            const textElement = typePrefix === 'dept' ? DOM.deptSelectedText : DOM.catSelectedText;
+            
+            if (checkedBoxes.length === checkboxes.length) {
+                textElement.textContent = "الكل";
+            } else if (checkedBoxes.length === 0) {
+                textElement.textContent = "لا شيء محدد";
+            } else if (checkedBoxes.length <= 2) {
+                textElement.textContent = checkedBoxes.map(cb => cb.value).join(', ');
+            } else {
+                textElement.textContent = `تم تحديد (${checkedBoxes.length})`;
+            }
+
+            // Update AppState
+            if (typePrefix === 'dept') {
+                AppState.activeFilters.department = checkedBoxes.map(cb => cb.value);
+            } else {
+                AppState.activeFilters.category = checkedBoxes.map(cb => cb.value);
             }
         }
 
-        /* --- Helpers --- */
-        function sanitizeValue(val) {
-            if (typeof val !== 'string') return val;
-            if (['=', '-', '+', '@'].includes(val.trim().charAt(0))) return "'" + val;
-            return val;
+        // Dropdown toggles
+        DOM.deptMultiTrigger.addEventListener('click', () => {
+            DOM.deptMultiDropdown.classList.toggle('active');
+            DOM.catMultiDropdown.classList.remove('active');
+        });
+        DOM.catMultiTrigger.addEventListener('click', () => {
+            DOM.catMultiDropdown.classList.toggle('active');
+            DOM.deptMultiDropdown.classList.remove('active');
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!DOM.deptMultiTrigger.contains(e.target) && !DOM.deptMultiDropdown.contains(e.target)) {
+                DOM.deptMultiDropdown.classList.remove('active');
+            }
+            if (!DOM.catMultiTrigger.contains(e.target) && !DOM.catMultiDropdown.contains(e.target)) {
+                DOM.catMultiDropdown.classList.remove('active');
+            }
+        });
+
+        /**
+         * Builds the UI inputs where user assigns numerical weight to text choices.
+         */
+        function buildScaleInputsUI() {
+            DOM.scaleGroupsContainer.innerHTML = '';
+            
+            // Try to auto-guess likert scale mappings
+            const defaultMap = {
+                "موافق بشدة": 5, "موافق جدا": 5, "ممتاز": 5, "دائما": 5,
+                "موافق": 4, "جيد جدا": 4, "غالبا": 4,
+                "محايد": 3, "مقبول": 3, "جيد": 3, "أحيانا": 3, "الى حد ما": 3,
+                "غير موافق": 2, "ضعيف": 2, "نادرا": 2,
+                "غير موافق بشدة": 1, "لا أوافق مطلقا": 1, "أبدا": 1
+            };
+
+            AppState.uniqueScales.forEach((scaleText, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = "bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center";
+                
+                const label = document.createElement('label');
+                label.className = "font-bold text-slate-800 text-sm w-3/4 truncate pr-2";
+                label.textContent = scaleText;
+                label.title = scaleText;
+                
+                const input = document.createElement('input');
+                input.type = "number";
+                input.className = "scale-weight-input w-16 px-2 py-2 border border-indigo-300 rounded-lg text-center font-black text-indigo-700 bg-indigo-50";
+                input.dataset.scaletext = scaleText;
+                input.min = "0";
+                input.max = "10";
+                
+                // Try guess, fallback to 0
+                input.value = defaultMap[scaleText] || 0;
+                
+                wrapper.appendChild(label);
+                wrapper.appendChild(input);
+                DOM.scaleGroupsContainer.appendChild(wrapper);
+            });
         }
 
-        function showStatus(btnEl) {
-            if (!btnEl) return;
-            const originalHtml = btnEl.innerHTML;
-            btnEl.innerHTML = `<span class="text-[12px] font-black uppercase px-2 text-green-600">${languageData[currentLang].copied}</span>`;
-            setTimeout(() => btnEl.innerHTML = originalHtml, 2000);
+
+        /**
+         * ==========================================
+         * STEP 4: ANALYSIS ENGINE
+         * ==========================================
+         */
+        
+        DOM.analyzeButton.addEventListener('click', runFullAnalysis);
+
+        function runFullAnalysis() {
+            // 1. Gather scale weights from UI
+            AppState.scaleWeights = {};
+            let maxW = 0;
+            const weightInputs = document.querySelectorAll('.scale-weight-input');
+            weightInputs.forEach(input => {
+                const w = parseFloat(input.value) || 0;
+                AppState.scaleWeights[input.dataset.scaletext] = w;
+                if (w > maxW) maxW = w;
+            });
+            AppState.maxScaleWeight = maxW > 0 ? maxW : 5; // Fallback to 5 if something went wrong
+
+            if (Object.values(AppState.scaleWeights).every(v => v === 0)) {
+                showModal("تنبيه", "جميع أوزان المقياس تساوي صفر. يرجى إعطاء قيم للمقياس (مثلاً 1 لـ غير موافق، و 5 لـ موافق بشدة).", "error");
+                return;
+            }
+
+            // 2. Filter the Dataset based on active Multi-Selects
+            let filteredData = AppState.rawDataset.filter(row => {
+                const deptVal = String(row[AppState.mappedColumns.filter]).trim();
+                const passDept = AppState.activeFilters.department.includes(deptVal);
+                
+                let passCat = true;
+                if (AppState.mappedColumns.category) {
+                    const catVal = String(row[AppState.mappedColumns.category]).trim();
+                    passCat = AppState.activeFilters.category.includes(catVal);
+                }
+                
+                return passDept && passCat;
+            });
+
+            if (filteredData.length === 0) {
+                showModal("تنبيه", "لا توجد بيانات تتطابق مع الفلاتر المحددة.", "error");
+                return;
+            }
+
+            // 3. Process the data and crunch numbers
+            const threshold = parseFloat(DOM.positivesThresholdInput.value) || 85;
+            calculateStatistics(filteredData, threshold);
+
+            // 4. Render UI
+            DOM.fileNameDisplay.textContent = AppState.fileName;
+            DOM.fileNameDisplay.classList.remove('hidden');
+            
+            DOM.participantCountDisplay.textContent = `المشاركون: ${filteredData.length}`;
+            DOM.programNameText.textContent = AppState.activeFilters.department.length === DOM.deptMultiDropdown.querySelectorAll('.multi-select-item').length - 1 ? "كافة الأقسام/البرامج" : AppState.activeFilters.department.join('، ');
+            DOM.metaInfoDisplay.classList.remove('hidden');
+            DOM.metaInfoDisplay.classList.add('flex');
+
+            renderTables();
+            renderCharts();
+            renderHighlights(threshold);
+            
+            DOM.reportPrintScope.classList.remove('hidden');
+            DOM.exportButton.classList.remove('hidden');
+            DOM.printButton.classList.remove('hidden');
+            DOM.copyTableButton.classList.remove('hidden');
+            DOM.signatureSection.classList.remove('hidden');
+            DOM.signatureSection.classList.add('flex');
+
+            // Scroll to results softly
+            setTimeout(() => {
+                DOM.reportPrintScope.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
 
-        function copyToClipboard(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text; textArea.style.position = "fixed"; textArea.style.left = "-9999px"; textArea.style.top = "0";
-            document.body.appendChild(textArea); textArea.focus(); textArea.select();
-            try { const ok = document.execCommand('copy'); document.body.removeChild(textArea); return ok; } 
-            catch (err) { return false; }
-        }
+        function calculateStatistics(dataset, positiveThreshold) {
+            const { start, end, category } = AppState.mappedColumns;
+            const startIndex = AppState.headers.indexOf(start);
+            const endIndex = AppState.headers.indexOf(end);
+            
+            // Get Question Headers
+            const questionHeaders = AppState.headers.slice(startIndex, endIndex + 1);
+            
+            let resultsMap = {}; // Key: QuestionText, Value: Stats Object
 
-        function attachCopyButton(container, copyLogic) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'copy-btn-wrapper';
-            wrapper.innerHTML = `<div class="copy-btn-inner hover-zoom"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></div>`;
-            wrapper.onclick = (e) => { e.stopPropagation(); copyLogic(wrapper.querySelector('.copy-btn-inner')); };
-            container.style.position = 'relative';
-            container.appendChild(wrapper);
-        }
-
-        function showMessage(title, body) {
-            document.getElementById('messageBoxTitle').textContent = title;
-            document.getElementById('messageBoxBody').textContent = body;
-            document.getElementById('messageBoxModal').classList.remove('hidden');
-        }
-
-        /* --- Components Rendering --- */
-        function renderScaleGroups() {
-            const container = document.getElementById('scaleGroupsContainer');
-            container.innerHTML = '';
-            identifiedScaleGroups.forEach((group, domainName) => {
-                if (group.isSuggestion || group.isMultiSelect) return; 
-                const wrap = document.createElement('div');
-                wrap.className = 'bg-white p-4 rounded-2xl border-2 border-blue-200 shadow-md transition-all';
-                
-                const addScaleHtml = `
-                    <div class="mt-4 pt-4 border-t border-blue-100 flex gap-3 hide-on-print">
-                        <input type="text" placeholder="إضافة مقياس جديد يدوياً (مثال: محايد)..." class="flex-grow p-3 border border-blue-200 rounded-xl text-sm font-bold text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all new-scale-input">
-                        <button class="bg-blue-600 hover:bg-blue-700 text-white font-black px-6 py-2 rounded-xl transition-all shadow-md text-sm add-scale-btn">إضافة</button>
-                    </div>
-                `;
-                
-                wrap.innerHTML = `<h3 class="font-black text-indigo-900 uppercase tracking-tighter text-lg mb-3 pr-2">محور: ${domainName}</h3><div class="scale-list space-y-2 font-black" data-sig="${domainName}"></div>` + addScaleHtml;
-                
-                const list = wrap.querySelector('.scale-list');
-                group.options.forEach((opt, idx) => {
-                    const item = document.createElement('div');
-                    item.className = 'p-3 bg-slate-50 border-2 border-slate-200 rounded-xl flex justify-between items-center cursor-move font-black';
-                    item.draggable = true;
-                    item.innerHTML = `<span class="font-bold text-slate-900">${opt}</span><label class="flex items-center cursor-pointer font-black"><input type="checkbox" class="w-5 h-5 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="mr-2 text-xs font-black text-indigo-800">${languageData[currentLang].pos}</span></label>`;
-                    item.querySelector('input').onchange = (e) => e.target.checked ? group.positives.add(opt) : group.positives.delete(opt);
-                    item.ondragstart = (e) => { e.dataTransfer.setData('idx', idx); e.dataTransfer.setData('sig', domainName); };
-                    item.ondragover = (e) => e.preventDefault();
-                    item.ondrop = (e) => {
-                        const fromIdx = e.dataTransfer.getData('idx'); if(e.dataTransfer.getData('sig') !== domainName) return;
-                        const moved = group.options.splice(fromIdx, 1)[0]; group.options.splice(idx, 0, moved); renderScaleGroups();
-                    };
-                    list.appendChild(item);
-                });
-                
-                const addBtn = wrap.querySelector('.add-scale-btn');
-                const inputEl = wrap.querySelector('.new-scale-input');
-                
-                addBtn.onclick = () => {
-                    const newScale = inputEl.value.trim();
-                    if (newScale && !group.options.includes(newScale)) {
-                        group.options.push(newScale);
-                        if (!group.userAddedOptions) group.userAddedOptions = new Set();
-                        group.userAddedOptions.add(newScale);
-                        renderScaleGroups();
-                    }
+            // Initialize Map
+            questionHeaders.forEach(q => {
+                resultsMap[q] = {
+                    question: q,
+                    category: "عام", // Default
+                    responses: {},   // Count of each scale choice
+                    totalWeight: 0,
+                    validCount: 0,
+                    scoreSum: 0,     // For weighted avg
+                    percentage: 0
                 };
+                AppState.uniqueScales.forEach(s => resultsMap[q].responses[s] = 0);
+            });
 
-                inputEl.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        addBtn.click();
+            // Iterate dataset
+            dataset.forEach(row => {
+                // If there's a category column mapping, map questions to their row's category. 
+                // NOTE: Usually in Wide-Format, categories are separate or grouped. 
+                // For this implementation, if a "Category" col exists, we assume it categorizes the respondent.
+                // If it's meant to group *questions*, that requires a different data structure. 
+                // We will just calculate global stats for the questions based on the filtered respondent cohort.
+
+                questionHeaders.forEach(q => {
+                    const rawAnswer = String(row[q] || "").trim();
+                    if (rawAnswer && AppState.scaleWeights.hasOwnProperty(rawAnswer)) {
+                        resultsMap[q].responses[rawAnswer]++;
+                        resultsMap[q].validCount++;
+                        
+                        const weight = AppState.scaleWeights[rawAnswer];
+                        resultsMap[q].scoreSum += weight;
+                        
+                        // Positives vs Negatives calculation depends heavily on the scale.
+                        // Standard practice: if Max is 5, maybe 4 and 5 are "Positives".
+                        // Here, we'll calculate a percentage score based on MaxWeight.
                     }
                 });
+            });
 
-                container.appendChild(wrap);
+            // Finalizing averages and percentages
+            AppState.analysisResults = [];
+            
+            Object.keys(resultsMap).forEach(q => {
+                const item = resultsMap[q];
+                if (item.validCount > 0) {
+                    item.weightedAvg = item.scoreSum / item.validCount;
+                    // Example percentage: (Avg / MaxWeight) * 100
+                    item.percentage = (item.weightedAvg / AppState.maxScaleWeight) * 100;
+                    
+                    // We define "Positives" loosely based on user threshold logic.
+                    // Wait, standard QA reports often calculate "Positive Agreement %" 
+                    // (e.g. % of people who answered 'Agree' or 'Strongly Agree').
+                    // Let's implement that: Positives = items where weight >= (MaxWeight * 0.8) usually.
+                    // But we'll use a simpler robust formula: the overall Score Percentage.
+                } else {
+                    item.weightedAvg = 0;
+                    item.percentage = 0;
+                }
+                AppState.analysisResults.push(item);
             });
         }
 
-        function renderTable(title, rows, opts, positives) {
-            const d = languageData[currentLang];
-            const container = document.getElementById('resultsContainer');
-            const div = document.createElement('div');
-            div.className = 'bg-white rounded-2xl shadow-lg border border-blue-100 overflow-hidden hover-zoom mb-6 domain-result-wrapper';
+        /**
+         * ==========================================
+         * STEP 5: RENDERING
+         * ==========================================
+         */
+
+        function renderTables() {
+            DOM.resultsContainer.innerHTML = '';
+            DOM.resultsContainer.classList.remove('hidden');
+
+            const wrapper = document.createElement('div');
+            wrapper.className = "summary-table-wrapper bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-200 mb-8";
             
-            const totalRes = rows.reduce((s, r) => s + r.total, 0);
-            const domainPos = rows.reduce((s, r) => s + Array.from(positives).reduce((sum, opt) => sum + (r.freqs[opt] || 0), 0), 0);
-            const avgPos = totalRes ? (domainPos / totalRes * 100).toFixed(1) : '0.0';
-            const align = 'text-right';
-            
-            const thCells = opts.map(o => `<th class="p-3 text-center text-indigo-700 font-black">${o}</th>`).join('');
-            
-            let html = `<h2 class="text-2xl thin-title p-4 bg-blue-50 border-b border-blue-100 text-slate-900 font-black ${align}">${title}</h2>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm ${align} font-black">
-                                <thead class="bg-slate-100">
-                                    <tr>
-                                        <th class="p-3 text-center font-black">#</th>
-                                        <th class="p-3 text-right font-black">${d.headers.item}</th>
-                                        ${thCells}
-                                        <th class="p-3 text-center font-bold text-blue-600 font-black">${d.headers.checkTotal}</th>
-                                        <th class="p-3 text-center font-black">${d.headers.positives}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
-            
-            rows.forEach((r, i) => {
-                const rowCheckSum = opts.reduce((acc, o) => acc + (r.freqs[o] / r.total * 100), 0);
-                const tdCells = opts.map(o => {
-                    const cellVal = r.total > 0 ? (r.freqs[o] / r.total * 100).toFixed(1) : "0.0";
-                    return `<td class="p-3 text-center font-black">${cellVal}%</td>`;
-                }).join('');
+            const header = document.createElement('h2');
+            header.className = "bg-indigo-50 text-indigo-900 font-black text-xl p-4 border-b border-indigo-100 uppercase text-center";
+            header.textContent = "الجدول التفصيلي للنتائج";
+            wrapper.appendChild(header);
+
+            const tableWrap = document.createElement('div');
+            tableWrap.className = "overflow-x-auto p-4";
+
+            let tableHTML = `
+                <table class="w-full text-right border-collapse" id="mainResultsTable">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-800 border-b-2 border-slate-300">
+                            <th class="p-3 border font-black text-center w-12">#</th>
+                            <th class="p-3 border font-black">العبارة / السؤال</th>
+                            <th class="p-3 border font-black text-center w-32">المتوسط</th>
+                            <th class="p-3 border font-black text-center w-32">نسبة التوافق</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            AppState.analysisResults.forEach((item, idx) => {
+                const pct = item.percentage.toFixed(1);
+                // Color coding based on threshold
+                const threshold = parseFloat(DOM.positivesThresholdInput.value) || 85;
+                let colorClass = "text-slate-800";
+                let bgClass = "bg-white hover:bg-slate-50";
                 
-                html += `<tr class="border-b border-slate-50 font-black">
-                            <td class="p-3 text-center text-slate-500 font-bold font-black">${r.originalIdx}</td>
-                            <td class="p-3 font-bold text-slate-800 text-right font-black">${r.item}</td>
-                            ${tdCells}
-                            <td class="p-3 text-center font-bold text-blue-500 bg-blue-50/30 font-black">${rowCheckSum.toFixed(1)}%</td>
-                            <td class="p-3 text-center font-black text-green-700 bg-green-50 font-black">${r.posPerc.toFixed(1)}%</td>
-                        </tr>`;
+                if (pct >= threshold) {
+                    colorClass = "text-green-700 font-bold";
+                    bgClass = "bg-green-50/30 hover:bg-green-50";
+                } else if (pct < threshold - 15) { // Arbitrary weak threshold
+                    colorClass = "text-red-600 font-bold";
+                    bgClass = "bg-red-50/30 hover:bg-red-50";
+                }
+
+                tableHTML += `
+                    <tr class="border-b border-slate-100 transition-colors ${bgClass}">
+                        <td class="p-3 border text-center font-bold text-slate-500">${idx + 1}</td>
+                        <td class="p-3 border font-semibold text-slate-700 leading-snug">${item.question}</td>
+                        <td class="p-3 border text-center font-bold text-slate-600">${item.weightedAvg.toFixed(2)} / ${AppState.maxScaleWeight}</td>
+                        <td class="p-3 border text-center font-black ${colorClass}" dir="ltr">${pct}%</td>
+                    </tr>
+                `;
             });
-            
-            const footTdCells = opts.map(o => {
-                const footVal = totalRes > 0 ? ((rows.reduce((s, r) => s + r.freqs[o], 0) / totalRes) * 100).toFixed(1) : "0.0";
-                return `<td class="p-3 text-center font-black">${footVal}%</td>`;
-            }).join('');
-            
-            html += `           </tbody>
-                                <tfoot class="bg-slate-50 font-black border-t-2 border-slate-200">
-                                    <tr>
-                                        <td colspan="2" class="p-3 text-center uppercase font-black">${d.headers.footer}</td>
-                                        ${footTdCells}
-                                        <td class="p-3 text-center font-black">${totalRes > 0 ? '100.0' : '0.0'}%</td>
-                                        <td class="p-3 text-center text-green-800 text-lg font-black">${avgPos}%</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>`;
-            
-            div.innerHTML = html;
-            attachCopyButton(div, (btn) => {
-                let tableContent = title + '\n';
-                div.querySelectorAll('table tr').forEach(tr => {
-                    let rArr = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); rArr.push(c.innerText.trim()); for(let k=1; k < cs; k++) rArr.push(""); });
-                    tableContent += rArr.join('\t') + '\n';
-                });
-                copyToClipboard(tableContent); showStatus(btn);
-            });
-            container.appendChild(div);
+
+            tableHTML += `</tbody></table>`;
+            tableWrap.innerHTML = tableHTML;
+            wrapper.appendChild(tableWrap);
+            DOM.resultsContainer.appendChild(wrapper);
         }
 
-        // New Render Function for Multi-select frequency tables
-        function renderMultiSelectTable(title, options, freqs, totalRespondents) {
-            const container = document.getElementById('resultsContainer');
-            const div = document.createElement('div');
-            div.className = 'bg-white rounded-2xl shadow-lg border border-blue-100 overflow-hidden hover-zoom mb-6 domain-result-wrapper';
-            const align = 'text-right';
+        function renderCharts() {
+            clearExistingCharts();
+            DOM.chartContainer.classList.remove('hidden');
+
+            // Limit data to top 10 items for readable charts, or summarize
+            const sortedByScore = [...AppState.analysisResults].sort((a, b) => b.percentage - a.percentage);
             
-            let totalSelections = 0;
-            options.forEach(opt => totalSelections += (freqs[opt] || 0));
-            
-            let html = `<h2 class="text-2xl thin-title p-4 bg-blue-50 border-b border-blue-100 text-slate-900 font-black ${align}">${title} (تكرارات)</h2>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm ${align} font-black">
-                                <thead class="bg-slate-100">
-                                    <tr>
-                                        <th class="p-3 text-center font-black">#</th>
-                                        <th class="p-3 text-right font-black">العنصر</th>
-                                        <th class="p-3 text-center font-black">التكرار</th>
-                                        <th class="p-3 text-center font-black">نسبة الاختيارات (%)</th>
-                                        <th class="p-3 text-center font-black">النسبة من العدد الكلي</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
-            
-            options.forEach((opt, i) => {
-                const count = freqs[opt] || 0;
-                const percResp = totalRespondents > 0 ? ((count / totalRespondents) * 100).toFixed(2) : "0.00";
-                const percTotal = totalSelections > 0 ? ((count / totalSelections) * 100).toFixed(2) : "0.00";
-                html += `<tr class="border-b border-slate-50 font-black">
-                            <td class="p-3 text-center text-slate-500 font-bold font-black">${i + 1}</td>
-                            <td class="p-3 font-bold text-slate-800 text-right font-black">${opt}</td>
-                            <td class="p-3 text-center font-bold text-blue-500 font-black">${count}</td>
-                            <td class="p-3 text-center font-black text-green-700 bg-green-50 font-black">${percResp}%</td>
-                            <td class="p-3 text-center font-black text-indigo-700 bg-indigo-50 font-black">${percTotal}%</td>
-                        </tr>`;
-            });
-            
-            html += `           </tbody>
-                            </table>
-                        </div>`;
-            div.innerHTML = html;
-            attachCopyButton(div, (btn) => {
-                let tableContent = title + '\n';
-                div.querySelectorAll('table tr').forEach(tr => {
-                    let rArr = []; 
-                    tr.querySelectorAll('th, td').forEach(c => { 
-                        rArr.push(c.innerText.trim()); 
-                    });
-                    tableContent += rArr.join('\t') + '\n';
-                });
-                copyToClipboard(tableContent); showStatus(btn);
-            });
-            container.appendChild(div);
+            // CHART 1: Top 5 Strengths (Bar Chart)
+            const top5 = sortedByScore.slice(0, 5);
+            createBarChart(
+                "أعلى 5 عبارات إيجابية", 
+                top5.map(i => truncateText(i.question, 40)), 
+                top5.map(i => parseFloat(i.percentage.toFixed(1))),
+                'rgba(34, 197, 94, 0.6)', 
+                'rgba(34, 197, 94, 1)'
+            );
+
+            // CHART 2: Lowest 5 Areas (Bar Chart)
+            const bottom5 = sortedByScore.slice(-5).reverse();
+            createBarChart(
+                "أقل 5 عبارات في التقييم (نقاط التطوير)", 
+                bottom5.map(i => truncateText(i.question, 40)), 
+                bottom5.map(i => parseFloat(i.percentage.toFixed(1))),
+                'rgba(239, 68, 68, 0.6)', 
+                'rgba(239, 68, 68, 1)'
+            );
         }
 
-        // New Render Function for Multi-select Bar Charts
-        function renderMultiSelectChart(title, options, freqs, totalRespondents) {
-            const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
-            const divC = document.createElement('div');
-            // Full width for multi-select as texts are often long
-            divC.className = 'bg-white p-4 rounded-2xl shadow-xl border border-blue-100 flex flex-col items-center lg:col-span-2';
+        function createBarChart(title, labels, data, bgColor, borderColor) {
+            const wrapper = document.createElement('div');
+            wrapper.className = "bg-white p-4 md:p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col";
             
-            divC.innerHTML = `<h3 class="text-lg font-black mb-3 text-center text-indigo-900">${title}</h3>
-                              <div class="w-full relative flex-grow" style="height: 350px; max-height: 350px;">
-                                  <canvas id="${canvasId}"></canvas>
-                              </div>`;
-            document.getElementById('chartContainer').appendChild(divC);
+            const titleEl = document.createElement('h3');
+            titleEl.className = "font-black text-center text-slate-700 mb-4";
+            titleEl.textContent = title;
+            wrapper.appendChild(titleEl);
+
+            const canvasWrap = document.createElement('div');
+            canvasWrap.className = "relative w-full flex-grow min-h-[250px]";
             
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            const dataVals = options.map(o => totalRespondents > 0 ? ((freqs[o] / totalRespondents) * 100).toFixed(1) : 0);
-            
-            chartInstances.push(new Chart(ctx, { 
-                type: 'bar', 
+            const canvas = document.createElement('canvas');
+            canvasWrap.appendChild(canvas);
+            wrapper.appendChild(canvasWrap);
+            DOM.chartContainer.appendChild(wrapper);
+
+            const ctx = canvas.getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'bar',
                 data: {
-                    labels: options,
+                    labels: labels,
                     datasets: [{
-                        data: dataVals,
-                        backgroundColor: '#10b981', // green for standard frequencies
-                        borderRadius: 4,
-                        maxBarThickness: 60,
-                        barPercentage: 0.8
+                        label: 'نسبة التوافق %',
+                        data: data,
+                        backgroundColor: bgColor,
+                        borderColor: borderColor,
+                        borderWidth: 2,
+                        borderRadius: 6
                     }]
                 },
                 options: {
-                    animation: false,
-                    maintainAspectRatio: false,
                     responsive: true,
-                    devicePixelRatio: 2,
-                    locale: 'en-US',
-                    rtl: true,
-                    layout: {
-                        padding: { top: 30, bottom: 20, left: 10, right: 10 }
+                    maintainAspectRatio: false,
+                    indexAxis: 'y', // Horizontal bars for text readability
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            titleFont: { family: 'Cairo' },
+                            bodyFont: { family: 'Cairo' }
+                        },
+                        datalabels: {
+                            color: '#1e293b',
+                            font: { weight: 'bold', family: 'Inter' },
+                            anchor: 'end',
+                            align: 'start',
+                            offset: 10,
+                            formatter: (val) => val + '%'
+                        }
                     },
                     scales: {
-                        y: {  
-                            beginAtZero: true,
-                            grace: '15%',
-                            position: 'right',
-                            ticks: { font: { weight: '900', family: 'Cairo', size: 11 } }
+                        x: { 
+                            min: 0, 
+                            max: 100,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { family: 'Inter', font: {weight: 'bold'} }
                         },
-                        x: {
-                            grid: { display: false }, 
-                            ticks: {
-                                font: { weight: '900', family: 'Cairo', size: 11 },
-                                autoSkip: false, 
-                                maxRotation: 45, // Angle for better readability
-                                minRotation: 45
-                            }
+                        y: {
+                            ticks: { family: 'Cairo', font: {size: 11, weight: '600'} },
+                            grid: { display: false }
                         }
-                    },
-                    plugins: { 
-                        legend: { display: false }, 
-                        datalabels: {
-                            anchor: 'end',
-                            align: 'top',
-                            font: { weight: '900', size: 11, family: 'Cairo' },
-                            formatter: v => v+'%'
-                        }
-                    } 
-                } 
-            }));
-        }
-
-        async function renderAISuggestionBox(title, responses) {
-            const rawText = responses.filter(r => String(r || "").trim() !== "").join('. ');
-            if (!rawText) return;
-            const d = languageData[currentLang];
-            const container = document.getElementById('resultsContainer');
-            const div = document.createElement('div');
-            div.className = 'bg-white rounded-2xl shadow-lg border border-indigo-100 overflow-hidden hover-zoom mb-6 suggestion-wrapper';
-            const align = 'text-right';
-            div.innerHTML = `<div class="p-4 bg-indigo-50 border-b border-indigo-100 ${align} font-black">
-                                <h2 class="text-2xl font-black">${title}</h2>
-                                <div class="mt-1 flex items-center font-black">
-                                     <span class="text-sm font-black text-indigo-600 uppercase tracking-widest">${d.suggestionsTitle}</span>
-                                </div>
-                             </div>
-                             <div class="p-4 ${align} font-black">
-                                <div class="suggestion-box italic text-slate-400 font-black !p-4 !min-h-[60px]">${d.loadingAI}</div>
-                             </div>`;
-            container.appendChild(div);
-            const summary = await summarizeWithAI(rawText);
-            const aiOutputEl = div.querySelector('.suggestion-box');
-            aiOutputEl.classList.remove('italic', 'text-slate-400');
-            aiOutputEl.textContent = summary;
-            attachCopyButton(div, (btn) => { copyToClipboard(`${title}\n---\n${summary}`); showStatus(btn); });
-        }
-
-        function renderSummaryTable(summaryDataList) {
-            const d = languageData[currentLang];
-            const container = document.getElementById('resultsContainer');
-            const div = document.createElement('div');
-            div.className = 'bg-white rounded-2xl shadow-lg border border-indigo-200 overflow-hidden hover-zoom mt-8 summary-table-wrapper font-black';
-            
-            const gTotal = summaryDataList.reduce((s, dm) => s + dm.total, 0);
-            const gPos = summaryDataList.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
-            const align = 'text-right';
-            
-            let html = `<h2 class="text-2xl thin-title p-4 bg-indigo-700 text-white font-black text-center">ملخص كل المحاور</h2>
-                        <table class="w-full text-base ${align} font-black">
-                            <thead class="bg-indigo-50 font-black">
-                                <tr>
-                                    <th class="p-4 text-center font-black">#</th>
-                                    <th class="p-4 font-black">المحور</th>
-                                    <th class="p-4 text-center font-black">${d.headers.positives}</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
-            
-            summaryDataList.forEach((dm, i) => { 
-                const pSum = Array.from(dm.positives).reduce((s,o)=>s+(dm.freqs[o]||0),0);
-                html += `<tr class="border-b border-indigo-50 font-black">
-                            <td class="p-4 text-center text-indigo-300 font-black">${i+1}</td>
-                            <td class="p-4 font-black text-slate-800">${dm.name}</td>
-                            <td class="p-4 text-center font-black text-green-600">${dm.total > 0 ? (pSum/dm.total*100).toFixed(1) : "0.0"}%</td>
-                         </tr>`;
+                    }
+                },
+                plugins: [ChartDataLabels]
             });
-            
-            html += `       </tbody>
-                            <tfoot class="bg-indigo-100 font-black border-t-2 border-indigo-300">
-                                <tr>
-                                    <td colspan="2" class="p-4 text-center uppercase font-black">المتوسط الكلي</td>
-                                    <td class="p-4 text-center text-green-800 text-xl font-black">${gTotal > 0 ? (gPos/gTotal*100).toFixed(1) : "0.0"}%</td>
-                                </tr>
-                            </tfoot>
-                        </table>`;
-            div.innerHTML = html;
-            attachCopyButton(div, (btn) => {
-                let summaryContent = 'Summary\n';
-                div.querySelectorAll('table tr').forEach(tr => {
-                    let rArr=[]; tr.querySelectorAll('th, td').forEach(c=>{ const cs = parseInt(c.getAttribute('colspan') || 1); rArr.push(c.innerText.trim()); for(let k=1; k < cs; k++) rArr.push(""); });
-                    summaryContent += rArr.join('\t') + '\n';
-                });
-                copyToClipboard(summaryContent); showStatus(btn);
-            });
-            container.appendChild(div);
+            AppState.chartsInstances.push(chart);
         }
 
-        function renderHighlightLists(items) {
-            const d = languageData[currentLang];
-            const container = document.getElementById('positiveNegativeItemsContainer');
-            const thresh = parseInt(document.getElementById('positivesThresholdInput').value || 85);
-            const high = items.filter(i => i.posPerc >= thresh && i.total > 0);
-            const low = items.filter(i => i.posPerc < thresh && i.total > 0);
-            container.innerHTML = '';
-            
-            const sDiv = document.createElement('div');
-            sDiv.className = `p-6 bg-green-50 rounded-2xl border-2 border-green-200 shadow-md hover-zoom w-full font-black`;
-            const highItemsStr = high.length ? high.map(i => `<li class="bg-white/80 p-3 rounded-xl border border-green-100 shadow-sm font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`;
-            sDiv.innerHTML = `<h4 class="text-2xl font-black text-green-800 mb-4">${d.strengths}</h4><ul class="space-y-3 text-green-900 font-bold font-black">${highItemsStr}</ul>`;
-            
-            const iDiv = document.createElement('div');
-            iDiv.className = `p-6 bg-red-50 rounded-2xl border-2 border-red-200 shadow-md hover-zoom w-full font-black`;
-            const lowItemsStr = low.length ? low.map(i => `<li class="bg-white/80 p-3 rounded-xl border border-red-100 shadow-sm font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`;
-            iDiv.innerHTML = `<h4 class="text-2xl font-black text-red-800 mb-4">${d.improvement}</h4><ul class="space-y-3 text-red-900 font-bold font-black">${lowItemsStr}</ul>`;
-            
-            container.appendChild(sDiv); 
-            container.appendChild(iDiv);
-            container.classList.remove('hidden');
+        function renderHighlights(threshold) {
+            DOM.positiveNegativeItemsContainer.innerHTML = '';
+            DOM.positiveNegativeItemsContainer.classList.remove('hidden');
+
+            const positives = AppState.analysisResults.filter(i => i.percentage >= threshold);
+            const negatives = AppState.analysisResults.filter(i => i.percentage < threshold);
+
+            // Sort to show highest/lowest first
+            positives.sort((a, b) => b.percentage - a.percentage);
+            negatives.sort((a, b) => a.percentage - b.percentage); // Lowest first
+
+            // Render Positive Highlight Box
+            const posBox = document.createElement('div');
+            posBox.className = "bg-green-50 border-2 border-green-200 rounded-3xl p-6 shadow-sm";
+            posBox.innerHTML = `
+                <div class="flex items-center gap-3 mb-4 border-b border-green-200 pb-3">
+                    <span class="text-3xl">🌟</span>
+                    <h3 class="font-black text-xl text-green-800">نقاط القوة (≥ ${threshold}%)</h3>
+                </div>
+                <ul class="space-y-3">
+                    ${positives.length > 0 ? positives.slice(0, 10).map(i => `
+                        <li class="flex justify-between items-start bg-white p-3 rounded-xl border border-green-100 shadow-sm">
+                            <span class="text-sm font-bold text-slate-700 pr-2">${i.question}</span>
+                            <span class="text-green-600 font-black bg-green-100 px-2 py-1 rounded-lg text-xs whitespace-nowrap mr-2" dir="ltr">${i.percentage.toFixed(1)}%</span>
+                        </li>
+                    `).join('') : '<li class="text-slate-500 font-bold italic text-center p-4">لا توجد عناصر تجاوزت حد الإيجابيات.</li>'}
+                </ul>
+                ${positives.length > 10 ? `<p class="text-xs text-center mt-3 font-bold text-green-700">+ ${positives.length - 10} عناصر أخرى</p>` : ''}
+            `;
+            DOM.positiveNegativeItemsContainer.appendChild(posBox);
+
+            // Render Negative Highlight Box
+            const negBox = document.createElement('div');
+            negBox.className = "bg-red-50 border-2 border-red-200 rounded-3xl p-6 shadow-sm";
+            negBox.innerHTML = `
+                <div class="flex items-center gap-3 mb-4 border-b border-red-200 pb-3">
+                    <span class="text-3xl">⚠️</span>
+                    <h3 class="font-black text-xl text-red-800">فرص التحسين والتطوير (< ${threshold}%)</h3>
+                </div>
+                <ul class="space-y-3">
+                    ${negatives.length > 0 ? negatives.slice(0, 10).map(i => `
+                        <li class="flex justify-between items-start bg-white p-3 rounded-xl border border-red-100 shadow-sm">
+                            <span class="text-sm font-bold text-slate-700 pr-2">${i.question}</span>
+                            <span class="text-red-600 font-black bg-red-100 px-2 py-1 rounded-lg text-xs whitespace-nowrap mr-2" dir="ltr">${i.percentage.toFixed(1)}%</span>
+                        </li>
+                    `).join('') : '<li class="text-slate-500 font-bold italic text-center p-4">ممتاز! لا توجد عناصر تحتاج للتحسين حسب هذا الحد.</li>'}
+                </ul>
+                ${negatives.length > 10 ? `<p class="text-xs text-center mt-3 font-bold text-red-700">+ ${negatives.length - 10} عناصر أخرى</p>` : ''}
+            `;
+            DOM.positiveNegativeItemsContainer.appendChild(negBox);
+
+            // Auto-generate logic-based recommendations
+            generateRecommendations(positives.length, negatives.length, AppState.analysisResults.length);
         }
 
-        function renderFinalRecommendation(score) {
-            const d = languageData[currentLang];
-            const container = document.getElementById('finalRecommendationContainer');
-            const div = document.createElement('div');
-            div.className = 'relative p-8 bg-white rounded-2xl shadow-xl border-2 border-indigo-400 hover-zoom mb-8 text-center animate-in fade-in duration-700 font-black';
-            let evalTxt = score > 85 ? d.evaluations[0] : score > 75 ? d.evaluations[1] : score > 65 ? d.evaluations[2] : score > 50 ? d.evaluations[3] : d.evaluations[4];
+        function generateRecommendations(posCount, negCount, totalCount) {
+            DOM.finalRecommendationContainer.innerHTML = '';
+            DOM.finalRecommendationContainer.classList.remove('hidden');
+
+            const overallAvg = AppState.analysisResults.reduce((sum, i) => sum + i.percentage, 0) / totalCount;
             
-            div.innerHTML = `<h2 class="text-3xl thin-title mb-6 text-center text-indigo-900 font-black border-b border-indigo-50 pb-4">${d.recommendation}</h2>
-                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-black">
-                                <div class="p-6 bg-indigo-50 rounded-xl text-center border border-indigo-100 flex flex-col justify-center items-center font-black">
-                                    <span class="text-xs font-black text-indigo-400 mb-1 uppercase">${d.finalResult}</span>
-                                    <span class="text-5xl font-black text-indigo-800">${score.toFixed(2)}%</span>
-                                </div>
-                                <div class="p-6 bg-green-50 rounded-xl text-center border border-green-100 flex flex-col justify-center items-center font-black">
-                                    <span class="text-xs font-black text-green-400 mb-1 uppercase">${d.evalLabel}</span>
-                                    <span class="text-5xl font-black text-green-700">${evalTxt}</span>
-                                </div>
-                             </div>`;
-                             
-            container.innerHTML = ''; 
-            container.appendChild(div); 
-            container.classList.remove('hidden');
-        }
-
-        /* --- Logic & Controllers --- */
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof ChartDataLabels !== 'undefined') { Chart.register(ChartDataLabels); }
-
-            document.getElementById('closeMessageBox').onclick = () => {
-                document.getElementById('messageBoxModal').classList.add('hidden');
-            };
-
-            function updateUI() {
-                const d = languageData[currentLang];
-                document.getElementById('mainTitle').textContent = d.title;
-                document.getElementById('instituteTitle').innerText = d.devCredit;
-                document.getElementById('step1Title').textContent = d.step1;
-                document.getElementById('srcLocalBtn').textContent = d.step1Btn;
-                document.getElementById('srcGoogleBtn').textContent = d.step1G;
-                document.getElementById('srcGithubBtn').textContent = d.step1H;
-                document.getElementById('localFileBtnText').textContent = d.localHint;
-                document.getElementById('fetchGoogleBtn').textContent = d.fetch;
-                document.getElementById('googleLink').placeholder = d.googleHint;
-                document.getElementById('step2Title').textContent = d.step2;
-                document.getElementById('confirmMappingBtn').textContent = d.confirm;
-                
-                document.getElementById('labelFilterCol').textContent = d.deptLabel;
-                document.getElementById('labelCategoryCol').textContent = d.catLabel;
-                document.getElementById('labelStartCol').textContent = d.startColLabel;
-                document.getElementById('labelEndCol').textContent = d.endColLabel;
-                
-                document.getElementById('labelDeptFilter').textContent = d.filterLabel;
-                document.getElementById('labelCatFilter').textContent = d.catFilterLabel;
-                
-                document.getElementById('scaleOrderTitle').textContent = d.step3;
-                document.getElementById('scaleOrderSubtitle').textContent = d.step3Hint;
-                document.getElementById('labelThreshold').textContent = d.threshold;
-                document.getElementById('analyzeButton').textContent = d.analyzeNow;
-                document.getElementById('exportButton').textContent = d.export;
-                document.getElementById('printButton').textContent = d.print;
-                document.getElementById('copyTableButton').textContent = d.copyAll;
-
-                document.getElementById('tip-step1').textContent = d.nav.step1;
-                document.getElementById('tip-step2').textContent = d.nav.step2;
-                document.getElementById('tip-filter').textContent = d.nav.filter;
-                document.getElementById('tip-step3').textContent = d.nav.step3;
-                document.getElementById('tip-results').textContent = d.nav.results;
-                document.getElementById('tip-charts').textContent = d.nav.charts;
-                document.getElementById('tip-highlights').textContent = d.nav.highlights;
-                document.getElementById('tip-final').textContent = d.nav.final;
-                
-                updateDeptSelectedText();
-                updateCatSelectedText();
+            let message = "";
+            let emoji = "";
+            
+            if (overallAvg >= 85) {
+                message = "مستوى الأداء العام ممتاز. يوصى بالحفاظ على هذه الممارسات وتعزيزها.";
+                emoji = "🏆";
+            } else if (overallAvg >= 70) {
+                message = "مستوى الأداء جيد جداً، لكن يوجد بعض المجالات المحددة التي تتطلب وضع خطط تحسين مستهدفة.";
+                emoji = "📈";
+            } else if (overallAvg >= 50) {
+                message = "مستوى الأداء متوسط. هناك حاجة ملحة لمراجعة الإجراءات ووضع خطة تصحيحية عاجلة لنقاط الضعف المذكورة.";
+                emoji = "🔧";
+            } else {
+                message = "مستوى الأداء منخفض. يتطلب تدخلاً إدارياً سريعاً وإعادة تقييم شاملة للعمليات.";
+                emoji = "🚨";
             }
 
-            const xlsxFile = document.getElementById('xlsxFile');
-            const loadingMessage = document.getElementById('loadingMessage');
-
-            function processWorkbook(workbook, fileName) {
-                rawExcelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
-                document.getElementById('fileNameDisplay').textContent = fileName;
-                document.getElementById('fileNameDisplay').classList.remove('hidden');
-                document.getElementById('dataConfigSection').classList.remove('hidden');
-                
-                function getColLetter(colIdx) {
-                    let letter = '';
-                    let temp = colIdx;
-                    while (temp >= 0) {
-                        letter = String.fromCharCode((temp % 26) + 65) + letter;
-                        temp = Math.floor(temp / 26) - 1;
-                    }
-                    return letter;
-                }
-
-                const fs = document.getElementById('filterColSelect');
-                const cs = document.getElementById('categoryColSelect');
-                const as = document.getElementById('analysisStartColSelect');
-                const es = document.getElementById('analysisEndColSelect');
-                
-                fs.innerHTML = ''; cs.innerHTML = ''; as.innerHTML = ''; es.innerHTML = '';
-                
-                es.add(new Option(languageData[currentLang].endColDefault, ""));
-                cs.add(new Option(languageData[currentLang].noFilter, ""));
-
-                (rawExcelData[0] || []).forEach((h, i) => {
-                    const colLetter = getColLetter(i);
-                    const optText = `${colLetter}: ${h || '---'}`;
-                    fs.add(new Option(optText, i));
-                    cs.add(new Option(optText, i));
-                    as.add(new Option(optText, i));
-                    es.add(new Option(optText, i));
-                });
-                
-                fs.value = Math.min(1, rawExcelData[0].length - 1); 
-                cs.value = "";
-                as.value = Math.min(2, rawExcelData[0].length - 1); 
-                es.value = "";
-                
-                loadingMessage.classList.add('hidden');
-            }
-
-            document.getElementById('srcLocalBtn').onclick = () => { document.getElementById('localInputPanel').classList.toggle('hidden'); document.getElementById('googleInputPanel').classList.add('hidden'); };
-            document.getElementById('srcGoogleBtn').onclick = () => { document.getElementById('googleInputPanel').classList.toggle('hidden'); document.getElementById('localInputPanel').classList.add('hidden'); };
-
-            xlsxFile.addEventListener('change', (e) => {
-                const file = e.target.files[0]; if (!file) return;
-                loadingMessage.classList.remove('hidden');
-                const reader = new FileReader();
-                reader.onload = (ev) => processWorkbook(XLSX.read(new Uint8Array(ev.target.result), { type: 'array' }), file.name.split('.')[0]);
-                reader.readAsArrayBuffer(file);
-            });
-
-            document.getElementById('fetchGoogleBtn').onclick = async () => {
-                const link = document.getElementById('googleLink').value; 
-                if(!link) return;
-                
-                const loadingMessage = document.getElementById('loadingMessage');
-                loadingMessage.classList.remove('hidden');
-                
-                try {
-                    const match = link.match(/[-\w]{25,}/); 
-                    if (!match) throw new Error("Invalid Link");
-                    
-                    const sheetId = match[0];
-                    const targetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=xlsx`;
-                    
-                    let arrayBuffer = null;
-                    
-                    try {
-                        const resp = await fetch(targetUrl);
-                        if (!resp.ok) throw new Error("Network error");
-                        arrayBuffer = await resp.arrayBuffer();
-                        
-                        const textCheck = new TextDecoder().decode(new Uint8Array(arrayBuffer).slice(0, 100));
-                        if (textCheck.toLowerCase().includes("<!doctype html>")) {
-                            throw new Error("HTML response");
-                        }
-                    } catch (err) {
-                        console.log("Direct fetch failed, using proxy...");
-                        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
-                        const proxyResp = await fetch(proxyUrl);
-                        if (!proxyResp.ok) throw new Error("Proxy error");
-                        arrayBuffer = await proxyResp.arrayBuffer();
-                        
-                        const textCheck = new TextDecoder().decode(new Uint8Array(arrayBuffer).slice(0, 100));
-                        if (textCheck.toLowerCase().includes("<!doctype html>")) {
-                            throw new Error("Private sheet");
-                        }
-                    }
-
-                    processWorkbook(XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' }), "Google Data");
-                    
-                } catch(e) { 
-                    console.error("Fetch Error:", e);
-                    showMessage(languageData[currentLang].googleErrorTitle, languageData[currentLang].googleErrorBody); 
-                    loadingMessage.classList.add('hidden'); 
-                }
-            };
-
-            /* Multi-select Dropdown toggles */
-            const deptTrigger = document.getElementById('deptMultiTrigger');
-            const deptDropdown = document.getElementById('deptMultiDropdown');
-            deptTrigger.onclick = (e) => {
-                e.stopPropagation();
-                deptDropdown.classList.toggle('active');
-            };
+            const wrapper = document.createElement('div');
+            wrapper.className = "bg-indigo-50 border-2 border-indigo-200 rounded-3xl p-8 text-center shadow-lg relative overflow-hidden";
             
-            const catTrigger = document.getElementById('catMultiTrigger');
-            const catDropdown = document.getElementById('catMultiDropdown');
-            catTrigger.onclick = (e) => {
-                e.stopPropagation();
-                catDropdown.classList.toggle('active');
-            };
-
-            document.addEventListener('click', () => {
-                deptDropdown.classList.remove('active');
-                catDropdown.classList.remove('active');
-            });
-            deptDropdown.onclick = (e) => e.stopPropagation();
-            catDropdown.onclick = (e) => e.stopPropagation();
-
-            function updateDeptSelectedText() {
-                const d = languageData[currentLang];
-                const textEl = document.getElementById('deptSelectedText');
-                if (selectedDepts.size === 0) {
-                    textEl.textContent = d.allInstitute;
-                } else {
-                    textEl.textContent = Array.from(selectedDepts).join('، ');
-                }
-            }
+            wrapper.innerHTML = `
+                <div class="absolute -top-10 -right-10 text-9xl opacity-10 blur-sm">${emoji}</div>
+                <h2 class="text-2xl font-black text-indigo-900 mb-4 relative z-10">الخلاصة والتوصيات الإدارية</h2>
+                <div class="bg-white p-6 rounded-2xl border border-indigo-100 shadow-inner relative z-10">
+                    <p class="text-lg font-bold text-slate-700 leading-relaxed">${message}</p>
+                    <div class="grid grid-cols-3 gap-4 mt-6">
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <span class="block text-xs font-black text-slate-500 uppercase">المتوسط العام</span>
+                            <span class="block text-3xl font-black text-indigo-700" dir="ltr">${overallAvg.toFixed(1)}%</span>
+                        </div>
+                        <div class="p-3 bg-green-50 rounded-xl border border-green-200">
+                            <span class="block text-xs font-black text-green-600 uppercase">نقاط القوة</span>
+                            <span class="block text-3xl font-black text-green-700">${posCount}</span>
+                        </div>
+                        <div class="p-3 bg-red-50 rounded-xl border border-red-200">
+                            <span class="block text-xs font-black text-red-600 uppercase">نقاط الضعف</span>
+                            <span class="block text-3xl font-black text-red-700">${negCount}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
             
-            function updateCatSelectedText() {
-                const d = languageData[currentLang];
-                const textEl = document.getElementById('catSelectedText');
-                if (selectedCats.size === 0) {
-                    textEl.textContent = d.allInstitute;
-                } else {
-                    textEl.textContent = Array.from(selectedCats).join('، ');
-                }
-            }
+            DOM.finalRecommendationContainer.appendChild(wrapper);
+        }
 
-            document.getElementById('confirmMappingBtn').onclick = () => {
-                if (!rawExcelData) return;
-                identifiedScaleGroups.clear();
-                
-                const filterColIdx = parseInt(document.getElementById('filterColSelect').value);
-                const catColVal = document.getElementById('categoryColSelect').value;
-                const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
-                const endColVal = document.getElementById('analysisEndColSelect').value;
-                
-                const departments = new Set();
-                for (let r = 1; r < rawExcelData.length; r++) {
-                    const val = String(rawExcelData[r][filterColIdx] || "").trim();
-                    if (val !== "") departments.add(val);
-                }
+        function truncateText(str, length) {
+            if (str.length <= length) return str;
+            return str.substring(0, length) + '...';
+        }
 
-                /* Populate Dept Multi-select */
-                deptDropdown.innerHTML = '';
-                selectedDepts.clear();
+        /**
+         * ==========================================
+         * STEP 6: EXPORT & PRINT
+         * ==========================================
+         */
 
-                /* "Select All" Option Dept */
-                const allDeptItem = document.createElement('div');
-                allDeptItem.className = 'multi-select-item border-b border-gray-100 font-black';
-                allDeptItem.innerHTML = `<input type="checkbox" id="selectAllDepts"><span>${languageData[currentLang].selectAll}</span>`;
-                allDeptItem.querySelector('input').onchange = (e) => {
-                    const checked = e.target.checked;
-                    const checkboxes = deptDropdown.querySelectorAll('.dept-checkbox');
-                    checkboxes.forEach(cb => {
-                        cb.checked = checked;
-                        if (checked) selectedDepts.add(cb.value);
-                        else selectedDepts.delete(cb.value);
-                    });
-                    updateDeptSelectedText();
-                };
-                deptDropdown.appendChild(allDeptItem);
-
-                Array.from(departments).forEach(dept => {
-                    const item = document.createElement('div');
-                    item.className = 'multi-select-item font-bold';
-                    item.innerHTML = `<input type="checkbox" class="dept-checkbox" value="${dept}"><span>${dept}</span>`;
-                    item.querySelector('input').onchange = (e) => {
-                        if (e.target.checked) selectedDepts.add(dept);
-                        else {
-                            selectedDepts.delete(dept);
-                            document.getElementById('selectAllDepts').checked = false;
-                        }
-                        updateDeptSelectedText();
-                    };
-                    deptDropdown.appendChild(item);
-                });
-                
-                /* Populate Category Multi-select (if selected) */
-                const categories = new Set();
-                catDropdown.innerHTML = '';
-                selectedCats.clear();
-                
-                if (catColVal !== "") {
-                    const catColIdx = parseInt(catColVal);
-                    for (let r = 1; r < rawExcelData.length; r++) {
-                        const val = String(rawExcelData[r][catColIdx] || "").trim();
-                        if (val !== "") categories.add(val);
-                    }
-                    document.getElementById('catFilterContainer').classList.remove('hidden');
-                    
-                    if (categories.size > 0) {
-                        const allCatItem = document.createElement('div');
-                        allCatItem.className = 'multi-select-item border-b border-gray-100 font-black';
-                        allCatItem.innerHTML = `<input type="checkbox" id="selectAllCats"><span>${languageData[currentLang].selectAll}</span>`;
-                        allCatItem.querySelector('input').onchange = (e) => {
-                            const checked = e.target.checked;
-                            const checkboxes = catDropdown.querySelectorAll('.cat-checkbox');
-                            checkboxes.forEach(cb => {
-                                cb.checked = checked;
-                                if (checked) selectedCats.add(cb.value);
-                                else selectedCats.delete(cb.value);
-                            });
-                            updateCatSelectedText();
-                        };
-                        catDropdown.appendChild(allCatItem);
-                        
-                        Array.from(categories).forEach(cat => {
-                            const item = document.createElement('div');
-                            item.className = 'multi-select-item font-bold';
-                            item.innerHTML = `<input type="checkbox" class="cat-checkbox" value="${cat}"><span>${cat}</span>`;
-                            item.querySelector('input').onchange = (e) => {
-                                if (e.target.checked) selectedCats.add(cat);
-                                else {
-                                    selectedCats.delete(cat);
-                                    document.getElementById('selectAllCats').checked = false;
-                                }
-                                updateCatSelectedText();
-                            };
-                            catDropdown.appendChild(item);
-                        });
-                    }
-                } else {
-                    document.getElementById('catFilterContainer').classList.add('hidden');
-                }
-                updateCatSelectedText();
-
-                /* --- DOMAIN-BASED ISOLATED SCALE LOGIC --- */
-                const headers = rawExcelData[0];
-                const endColIdx = endColVal !== "" ? parseInt(endColVal) : headers.length - 1;
-                
-                for (let col = startColIdx; col <= endColIdx; col++) {
-                    const headerStr = String(headers[col] || "").trim();
-                    const matchFull = headerStr.match(/(.+) \[(.+)\]/);
-                    const matchBracket = headerStr.match(/^\[(.+)\]$/);
-
-                    let dName = "";
-                    let iName = "";
-
-                    if (matchFull) {
-                        dName = matchFull[1].trim();
-                        iName = matchFull[2].trim();
-                    } else if (matchBracket) {
-                        dName = "الأسئلة المستقلة";
-                        iName = matchBracket[1].trim();
-                    } else {
-                        dName = headerStr; 
-                        iName = headerStr;
-                    }
-
-                    if (!identifiedScaleGroups.has(dName)) {
-                        identifiedScaleGroups.set(dName, {
-                            options: new Set(),
-                            positives: new Set(),
-                            cols: [],
-                            items: [],
-                            isSuggestion: false,
-                            isMultiSelect: false,
-                            userAddedOptions: new Set(),
-                            frequencies: new Map() // Track overall frequency for sorting
-                        });
-                    }
-                    const group = identifiedScaleGroups.get(dName);
-                    group.cols.push(col);
-                    group.items.push(iName);
-
-                    const colVals = [];
-                    for (let r = 1; r < rawExcelData.length; r++) {
-                        const val = String(rawExcelData[r][col] || "").trim();
-                        if (val !== "") colVals.push(val);
-                    }
-
-                    // Frequencies vs Suggestions Heuristic Fix
-                    let isColMultiSelect = false;
-                    let splitTokens = [];
-                    const hasCommas = colVals.some(v => v.includes(',') || v.includes('،'));
-                    
-                    if (hasCommas) {
-                        let totalTokenLen = 0;
-                        colVals.forEach(v => {
-                            v.split(/[,،]/).forEach(t => {
-                                let trimmed = t.trim();
-                                if (trimmed) {
-                                    splitTokens.push(trimmed);
-                                    totalTokenLen += trimmed.length;
-                                }
-                            });
-                        });
-                        const uniqueTokens = new Set(splitTokens);
-                        const avgTokenLen = splitTokens.length > 0 ? (totalTokenLen / splitTokens.length) : 0;
-                        
-                        // If unique tokens is reasonable for a multiple choice question AND average token length is short
-                        if (uniqueTokens.size <= 80 && avgTokenLen < 35) {
-                            isColMultiSelect = true;
-                        }
-                    }
-
-                    if (isColMultiSelect) {
-                        group.isMultiSelect = true;
-                        splitTokens.forEach(t => {
-                            group.options.add(t);
-                            group.frequencies.set(t, (group.frequencies.get(t) || 0) + 1);
-                        });
-                    } else {
-                        let totalStrLen = 0;
-                        colVals.forEach(val => {
-                            totalStrLen += val.length;
-                            group.options.add(val);
-                            group.frequencies.set(val, (group.frequencies.get(val) || 0) + 1);
-                        });
-                        const avgStrLen = colVals.length > 0 ? (totalStrLen / colVals.length) : 0;
-                        
-                        // Treat as suggestion if answers are long open-ended sentences
-                        if (avgStrLen > 35) {
-                            group.isSuggestion = true;
-                        }
-                    }
-                }
-
-                for (const [dName, group] of identifiedScaleGroups.entries()) {
-                    group.options = Array.from(group.options);
-                    // Sort options based on frequency descending
-                    group.options.sort((a, b) => (group.frequencies.get(b) || 0) - (group.frequencies.get(a) || 0));
-                    
-                    if (!group.isMultiSelect && !group.isSuggestion) {
-                        if (group.options.length > 12 || (group.cols.length === 1 && group.options.length > 6)) {
-                            group.isSuggestion = true;
-                        }
-                    }
-                    
-                    if (group.isSuggestion) {
-                        group.options = [];
-                    }
-                }
-                
-                document.getElementById('filterSection').classList.remove('hidden'); 
-                renderScaleGroups();
-                document.getElementById('scaleOrderSection').classList.remove('hidden'); 
-                document.getElementById('actionButtons').classList.remove('hidden');
-            };
-
-            document.getElementById('analyzeButton').onclick = async () => {
-                if (!rawExcelData) return;
-                const allItemsList = []; const summaryDataList = []; 
-                const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
-                const filterColIdx = parseInt(document.getElementById('filterColSelect').value);
-                const catColVal = document.getElementById('categoryColSelect').value;
-                
-                const resultsContainer = document.getElementById('resultsContainer');
-                resultsContainer.innerHTML = ''; 
-                document.getElementById('chartContainer').innerHTML = ''; 
-                document.getElementById('positiveNegativeItemsContainer').innerHTML = ''; 
-                document.getElementById('finalRecommendationContainer').innerHTML = '';
-                chartInstances.forEach(c => c.destroy()); chartInstances = [];
-                
-                let rows = rawExcelData.slice(1);
-                if (selectedDepts.size > 0) {
-                    rows = rows.filter(r => r && selectedDepts.has(String(r[filterColIdx] || "").trim()));
-                }
-                
-                if (catColVal !== "" && selectedCats.size > 0) {
-                    const catColIdx = parseInt(catColVal);
-                    rows = rows.filter(r => r && selectedCats.has(String(r[catColIdx] || "").trim()));
-                }
-                
-                document.getElementById('participantCountDisplay').textContent = `${rows.length} ${languageData[currentLang].participants}`;
-                
-                let programText = '';
-                if (selectedDepts.size === 0) {
-                    programText = languageData[currentLang].allInstitute;
-                } else {
-                    programText = Array.from(selectedDepts).join('، ');
-                }
-                
-                if (selectedCats.size > 0) {
-                    programText += ` | الفئة: ${Array.from(selectedCats).join('، ')}`;
-                }
-                
-                document.getElementById('programNameText').textContent = programText;
-                
-                document.getElementById('metaInfoDisplay').classList.remove('hidden');
-
-                const headers = rawExcelData[0];
-
-                for (const [domainName, groupData] of identifiedScaleGroups.entries()) {
-                    if (groupData.isSuggestion) {
-                        for (const col of groupData.cols) {
-                            await renderAISuggestionBox(headers[col], rows.map(r => r[col]));
-                        }
-                    } else if (groupData.isMultiSelect) {
-                        let validRespondents = 0;
-                        const freqs = {};
-                        groupData.options.forEach(o => freqs[o] = 0);
-                        
-                        rows.forEach(r => {
-                            let answered = false;
-                            groupData.cols.forEach(c => {
-                                const val = String(r[c] || "").trim();
-                                if (val) {
-                                    answered = true;
-                                    val.split(/[,،]/).map(p => p.trim()).filter(p => p !== "").forEach(p => {
-                                        if (freqs[p] !== undefined) freqs[p]++;
-                                    });
-                                }
-                            });
-                            if (answered) validRespondents++;
-                        });
-
-                        renderMultiSelectTable(domainName, groupData.options, freqs, validRespondents);
-                        renderMultiSelectChart(domainName, groupData.options, freqs, validRespondents);
-                        // Multi-select is excluded from standard Highlights and Final Score.
-                    
-                    } else {
-                        const domainUniqueOpts = new Set();
-                        groupData.cols.forEach(col => {
-                            rawExcelData.slice(1).forEach(r => {
-                                const val = String(r[col] || "").trim();
-                                if (val !== "") domainUniqueOpts.add(val);
-                            });
-                        });
-                        
-                        const finalOpts = groupData.options.filter(opt => domainUniqueOpts.has(opt) || (groupData.userAddedOptions && groupData.userAddedOptions.has(opt)));
-                        if (finalOpts.length === 0) finalOpts.push(...groupData.options);
-
-                        const rowsData = groupData.cols.map((col, idx) => {
-                            const rps = rows.map(r => r[col]);
-                            const freqs = {}; finalOpts.forEach(o => freqs[o] = 0);
-                            let posCount = 0;
-                            let validRespondents = 0;
-
-                            rps.forEach(r => {
-                                const tr = String(r || "").trim();
-                                if (!tr) return;
-                                validRespondents++;
-
-                                if (freqs[tr] !== undefined) freqs[tr]++;
-                                if (groupData.positives.has(tr)) posCount++;
-                            });
-
-                            const res = {
-                                item: groupData.items[idx],
-                                freqs,
-                                total: validRespondents,
-                                posPerc: validRespondents ? (posCount/validRespondents)*100 : 0,
-                                originalIdx: col - startColIdx + 1
-                            };
-                            allItemsList.push(res); 
-                            return res;
-                        });
-
-                        renderTable(domainName, rowsData, finalOpts, groupData.positives);
-                        
-                        const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
-                        const divC = document.createElement('div');
-                        divC.className = 'bg-white p-4 rounded-2xl shadow-xl border border-blue-100 flex flex-col items-center';
-                        
-                        divC.innerHTML = `<h3 class="text-lg font-black mb-3 text-center text-indigo-900">${domainName}</h3>
-                                          <div class="w-full relative flex-grow" style="height: 250px; max-height: 250px;">
-                                              <canvas id="${canvasId}"></canvas>
-                                          </div>`;
-                        document.getElementById('chartContainer').appendChild(divC);
-                        
-                        const ctx = document.getElementById(canvasId).getContext('2d');
-                        const dataVals = finalOpts.map(o => {  
-                            const sum = rowsData.reduce((s, r) => s + r.freqs[o], 0);  
-                            const total = rowsData.reduce((s, r) => s + r.total, 0);  
-                            return total ? (sum/total*100).toFixed(1) : 0;  
-                        });
-                        
-                        chartInstances.push(new Chart(ctx, {  
-                            type: 'bar',  
-                            data: {
-                                labels: finalOpts,
-                                datasets: [{
-                                    data: dataVals,
-                                    backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'],
-                                    borderRadius: 4,
-                                    maxBarThickness: 50,
-                                    barPercentage: 0.8
-                                }]
-                            },
-                            options: {
-                                animation: false,
-                                maintainAspectRatio: false,
-                                responsive: true,
-                                devicePixelRatio: 2,
-                                locale: 'en-US',
-                                rtl: true,
-                                layout: {
-                                    padding: { top: 30, bottom: 10, left: 10, right: 10 }
-                                },
-                                scales: {
-                                    y: {  
-                                          beginAtZero: true,
-                                          grace: '15%',
-                                          position: 'right',
-                                          ticks: { font: { weight: '900', family: 'Cairo', size: 11 } }
-                                    },
-                                    x: {
-                                        grid: { display: false },
-                                          ticks: {
-                                            font: { weight: '900', family: 'Cairo', size: 10 },
-                                            autoSkip: false,
-                                              maxRotation: 0
-                                          }
-                                    }
-                                },
-                                plugins: {  
-                                      legend: { display: false },  
-                                      datalabels: {
-                                        anchor: 'end',
-                                        align: 'top',
-                                        font: { weight: '900', size: 11, family: 'Cairo' },
-                                        formatter: v => v+'%'
-                                    }
-                                 } 
-                            }  
-                        }));
-                        
-                        const dFreqs = {};  
-                        finalOpts.forEach(o => dFreqs[o] = rowsData.reduce((s, r) => s + r.freqs[o], 0));
-                        summaryDataList.push({  
-                            name: domainName,  
-                            freqs: dFreqs,  
-                            total: rowsData.reduce((s, r) => s + r.total, 0),  
-                            positives: groupData.positives  
-                        });
-                    }
-                }
-
-                if (allItemsList.length > 0) {
-                    renderSummaryTable(summaryDataList);
-                    allItemsList.sort((a, b) => a.originalIdx - b.originalIdx);
-                    renderHighlightLists(allItemsList);
-                    const gTotal = allItemsList.reduce((s, i) => s + i.total, 0);
-                    const gPos = allItemsList.reduce((s, i) => s + (i.posPerc/100 * i.total), 0);
-                    renderFinalRecommendation(gTotal ? (gPos / gTotal * 100) : 0);
-                }
-                resultsContainer.classList.remove('hidden'); document.getElementById('chartContainer').classList.remove('hidden'); 
-                document.getElementById('signatureSection').classList.remove('hidden');
-                resultsContainer.scrollIntoView({ behavior: 'smooth' });
-            };
-
-            document.getElementById('printButton').onclick = () => { window.print(); };
-
-            document.getElementById('copyTableButton').onclick = () => {
-                const d = languageData[currentLang];
-                let copyContent = `${d.title}\n${d.devCredit}\n\n`;
-                
-                const programText = document.getElementById('programNameText').textContent;
-                const participantText = document.getElementById('participantCountDisplay').textContent;
-                copyContent += `البرنامج: ${programText}\tالمشاركون: ${participantText}\n\n`;
-                
-                document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(block => {
-                    const h2 = block.querySelector('h2'); if (h2) copyContent += `\n${h2.innerText}\n`;
-                    const table = block.querySelector('table');
-                    if (table) table.querySelectorAll('tr').forEach(tr => {
-                        let rD = []; 
-                        tr.querySelectorAll('th, td').forEach(c => {  
-                              const cs = parseInt(c.getAttribute('colspan') || 1);  
-                              let val = c.innerText.trim();
-                            if (['=', '-', '+', '@'].includes(val.charAt(0))) val = "'" + val;
-                            rD.push(val);  
-                              for(let k=1; k < cs; k++) rD.push("");  
-                          });
-                        copyContent += rD.join('\t') + '\n';
-                    });
-                    const sb = block.querySelector('.suggestion-box'); if (sb) copyContent += sb.innerText + '\n';
-                });
-                document.querySelectorAll('#positiveNegativeItemsContainer > div').forEach(box => {
-                    const h4 = box.querySelector('h4'); if (h4) {  
-                          copyContent += `\n${h4.innerText}\n`;  
-                          box.querySelectorAll('li').forEach(li => {
-                            let text = li.innerText.trim();
-                            if (['=', '-', '+', '@'].includes(text.charAt(0))) text = "'" + text;
-                            copyContent += `• ${text}\n`;  
-                          });  
-                      }
-                });
-                const rec = document.querySelector('#finalRecommendationContainer div');
-                if (rec) {
-                    const h2 = rec.querySelector('h2'); if (h2) copyContent += `\n${h2.innerText}\n`;
-                    const stats = rec.querySelectorAll('.text-6xl, .text-5xl'); const lbls = rec.querySelectorAll('.text-xs');
-                    stats.forEach((stat, i) => { copyContent += `${lbls[i].innerText}:\t${stat.innerText}\n`; });
-                }
-                if (copyToClipboard(copyContent)) { showStatus(document.getElementById('copyTableButton')); }
-            };
-
-            document.getElementById('exportButton').onclick = () => {
-                const d = languageData[currentLang];
-                const programText = document.getElementById('programNameText').textContent;
-                const participantText = document.getElementById('participantCountDisplay').textContent;
-                
-                const wb = XLSX.utils.book_new(); 
-                let allD = [
-                    [d.title], 
-                    [d.devCredit], 
-                    [`البرنامج: ${programText}`, `المشاركون: ${participantText}`],
-                    []
-                ];
-                
-                document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(s => {
-                    allD.push([sanitizeValue(s.querySelector('h2').innerText)]);
-                    const tbl = s.querySelector('table');
-                    if (tbl) tbl.querySelectorAll('tr').forEach(tr => {
-                        let r = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); let val = c.innerText.trim(); if (val.endsWith('%')) { let num = parseFloat(val.replace('%', '')); r.push(isNaN(num) ? val : num); } else { r.push(sanitizeValue(val)); } for(let k=1; k < cs; k++) r.push(""); });
-                        allD.push(r);
-                    });
-                    const box = s.querySelector('.suggestion-box'); if (box) allD.push([sanitizeValue(box.innerText)]);
-                    allD.push([]);
-                });
-                document.querySelectorAll('#positiveNegativeItemsContainer > div').forEach(box => {
-                    const h4 = box.querySelector('h4'); if (h4) { allD.push([sanitizeValue(h4.innerText)]); box.querySelectorAll('li').forEach(li => allD.push(["• " + sanitizeValue(li.innerText)])); allD.push([]); }
-                });
-                const rec = document.querySelector('#finalRecommendationContainer div');
-                if (rec) {
-                    const h2 = rec.querySelector('h2'); if (h2) allD.push([sanitizeValue(h2.innerText)]);
-                    const stats = rec.querySelectorAll('.text-6xl, .text-5xl'); const lbls = rec.querySelectorAll('.text-xs');
-                    stats.forEach((stat, i) => { let val = stat.innerText.replace('%', ''); allD.push([sanitizeValue(lbls[i].innerText), isNaN(parseFloat(val)) ? val : parseFloat(val)]); });
-                }
-                
-                let baseName = document.getElementById('fileNameDisplay').textContent.trim();
-                if (!baseName) baseName = "Survey_Report";
-                const now = new Date();
-                const dateStr = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0') + "_" + String(now.getHours()).padStart(2,'0') + "-" + String(now.getMinutes()).padStart(2,'0');
-                const exportName = `${baseName}_${dateStr}.xlsx`;
-
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(allD), "Analysis");
-                XLSX.writeFile(wb, exportName);
-            };
-
-            updateUI();
+        DOM.printButton.addEventListener('click', () => {
+            // Give charts a moment to resize if needed
+            window.print();
         });
+
+        DOM.exportButton.addEventListener('click', () => {
+            try {
+                const ws_data = [
+                    ["تقرير تحليل الاستبيان"],
+                    ["وحدة ضمان الجودة"],
+                    [],
+                    ["رقم", "العبارة / السؤال", "المتوسط المرجح", "نسبة التوافق %"]
+                ];
+
+                AppState.analysisResults.forEach((item, idx) => {
+                    ws_data.push([
+                        idx + 1,
+                        item.question,
+                        item.weightedAvg.toFixed(2),
+                        item.percentage.toFixed(1) + "%"
+                    ]);
+                });
+
+                const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                
+                // Styling approach for basic excel sheet
+                ws['!cols'] = [{wch: 5}, {wch: 60}, {wch: 15}, {wch: 15}];
+                
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "النتائج");
+                
+                let outFileName = AppState.fileName ? `تحليل_${AppState.fileName}.xlsx` : 'تقرير_الاستبيان.xlsx';
+                XLSX.writeFile(wb, outFileName);
+                
+                showModal("نجاح", "تم تصدير البيانات إلى ملف Excel بنجاح.", "success");
+            } catch (err) {
+                console.error(err);
+                showModal("خطأ", "حدث خطأ أثناء تصدير الملف.", "error");
+            }
+        });
+
+        DOM.copyTableButton.addEventListener('click', () => {
+            const table = document.getElementById('mainResultsTable');
+            if (!table) return;
+
+            // Create a range and select the table
+            const range = document.createRange();
+            range.selectNode(table);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+
+            try {
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+                
+                // Visual feedback on button
+                const originalText = DOM.copyTableButton.textContent;
+                DOM.copyTableButton.textContent = "تم النسخ! ✓";
+                DOM.copyTableButton.classList.replace('bg-teal-500', 'bg-green-600');
+                
+                setTimeout(() => {
+                    DOM.copyTableButton.textContent = originalText;
+                    DOM.copyTableButton.classList.replace('bg-green-600', 'bg-teal-500');
+                }, 2000);
+            } catch (err) {
+                showModal("خطأ", "لا يمكن نسخ الجدول في هذا المتصفح.", "error");
+            }
+        });
+
     </script>
 </body>
 </html>
