@@ -788,9 +788,9 @@
         <div id="manualGroupSection" class="hidden mb-10 input-card bg-purple-50/40 border-2 border-purple-200">
             <h2 class="text-3xl font-black text-purple-900 mb-2 text-center thin-title">التجميع والتصنيف اليدوي</h2>
             <p class="text-center text-slate-500 font-bold mb-8 text-sm leading-relaxed">
-                أضف مجموعات وحدد نوعها (مقياس، تكرارات، أو نصوص مفتوحة)، ثم اختر الأسئلة التي تنتمي لكل مجموعة (سيتم حجب الأسئلة المختارة من باقي المجموعات لمنع التكرار). 
+                أضف مجموعات وحدد الأسئلة التي تنتمي لكل مجموعة (سيتم حجب الأسئلة المختارة من باقي المجموعات لمنع التكرار). 
                 <br>
-                <span class="text-purple-700 font-black">ملاحظة:</span> أي أسئلة تتركها بدون تحديد، سيقوم النظام تلقائياً باكتشافها وتصنيفها بالطريقة العادية، لتوفير وقتك.
+                <span class="text-purple-700 font-black">ملاحظة:</span> سيقوم النظام تلقائياً باكتشاف نوع البيانات (مقياس، تكرارات، نصوص مفتوحة) لكل مجموعة يدوية تصنعها، وكذلك لأي أسئلة تتركها بدون تحديد!
             </p>
             
             <div id="manualGroupsContainer" class="space-y-6 mb-8"></div>
@@ -2024,7 +2024,22 @@
                 
                 document.getElementById('filterSection').classList.remove('hidden'); 
                 renderScaleGroups();
-                document.getElementById('scaleOrderSection').classList.remove('hidden'); 
+                
+                // Hide Step 3 if there are no scale groups to configure
+                let hasScaleGroups = false;
+                identifiedScaleGroups.forEach((group) => {
+                    if (!group.isSuggestion && !group.isMultiSelect) {
+                        hasScaleGroups = true;
+                    }
+                });
+                
+                if (hasScaleGroups) {
+                    document.getElementById('scaleOrderSection').classList.remove('hidden'); 
+                    document.getElementById('scaleOrderSection').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    document.getElementById('scaleOrderSection').classList.add('hidden'); 
+                }
+                
                 document.getElementById('actionButtons').classList.remove('hidden');
             };
 
@@ -2090,6 +2105,7 @@
                 groupDiv.className = 'manual-group-item bg-white p-6 rounded-2xl border-2 border-purple-100 shadow-lg flex flex-col gap-4 relative animate-in zoom-in duration-300';
                 const allCols = getAllAvailableColumns();
                 
+                // Restored the exact manual assignment options: scale, multi, and open
                 groupDiv.innerHTML = `
                     <button class="absolute top-4 left-4 w-8 h-8 flex items-center justify-center rounded-full btn-delete shadow-md font-black text-sm z-10 delete-group-btn" title="حذف المجموعة">✖</button>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2294,8 +2310,9 @@
                     group.options = Array.from(group.options);
                     group.options.sort((a, b) => (group.frequencies.get(b) || 0) - (group.frequencies.get(a) || 0));
                     
-                    // Apply heuristic to automatic groups only
-                    if (!group.isManual && !group.isMultiSelect && !group.isSuggestion) {
+                    // Apply heuristic to automatic groups, and ALSO to manual groups
+                    // that were explicitly set to scale but look like suggestions.
+                    if (!group.isMultiSelect && !group.isSuggestion) {
                         if (group.options.length > 12 || (group.cols.length === 1 && group.options.length > 6)) {
                             group.isSuggestion = true;
                         }
@@ -2311,9 +2328,22 @@
                 
                 renderScaleGroups();
                 
-                document.getElementById('scaleOrderSection').classList.remove('hidden'); 
+                // FIX: Hide Step 3 if there are no scale groups to configure
+                let hasScaleGroups = false;
+                identifiedScaleGroups.forEach((group) => {
+                    if (!group.isSuggestion && !group.isMultiSelect) {
+                        hasScaleGroups = true;
+                    }
+                });
+                
+                if (hasScaleGroups) {
+                    document.getElementById('scaleOrderSection').classList.remove('hidden'); 
+                    document.getElementById('scaleOrderSection').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    document.getElementById('scaleOrderSection').classList.add('hidden'); 
+                }
+                
                 document.getElementById('actionButtons').classList.remove('hidden');
-                document.getElementById('scaleOrderSection').scrollIntoView({ behavior: 'smooth' });
             };
             /* ========================================================= */
 
