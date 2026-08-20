@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تحليل نتائج الاستبيان - وحدة ضمان الجودة</title>
+    
+    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Inter:wght@300;400;600;700;900&display=swap');
+        
         body {
             font-family: 'Cairo', 'Inter', sans-serif;
             background-color: #e0f2fe;
@@ -20,54 +24,265 @@
             scroll-behavior: smooth;
             line-height: 1.3;
         }
-        .thin-title { font-weight: 300; letter-spacing: -0.01em; }
-        .hover-zoom { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
-        .hover-zoom:hover { transform: scale(1.03); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
-        .btn-execute { background-color: #22c55e; color: white; font-weight: 700; transition: all 0.2s; padding: 1rem 2rem; border-radius: 1.5rem; }
-        .btn-execute:hover { background-color: #16a34a; transform: scale(1.05); }
-        .copy-btn-wrapper { position: absolute; top: 1rem; z-index: 30; left: 1rem; }
-        .copy-btn-inner { opacity: 0.4; transition: opacity 0.2s, transform 0.2s; cursor: pointer; padding: 10px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.9); border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; color: #475569; }
-        .copy-btn-inner:hover { opacity: 1; background-color: #ffffff; transform: scale(1.1); border-color: #22c55e; color: #22c55e; }
-        .input-card { background: white; padding: 2.5rem; border-radius: 2.5rem; border: 1px solid #bae6fd; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+
+        .thin-title { 
+            font-weight: 300; 
+            letter-spacing: -0.01em; 
+        }
+
+        .hover-zoom { 
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; 
+        }
+
+        .hover-zoom:hover { 
+            transform: scale(1.03); 
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); 
+        }
+
+        .btn-execute { 
+            background-color: #22c55e; 
+            color: white; 
+            font-weight: 700; 
+            transition: all 0.2s; 
+            padding: 1rem 2rem; 
+            border-radius: 1.5rem; 
+        }
+
+        .btn-execute:hover { 
+            background-color: #16a34a; 
+            transform: scale(1.05); 
+        }
+
+        .copy-btn-wrapper { 
+            position: absolute; 
+            top: 1rem; 
+            z-index: 30; 
+            left: 1rem; 
+        }
+
+        .copy-btn-inner { 
+            opacity: 0.4; 
+            transition: opacity 0.2s, transform 0.2s; 
+            cursor: pointer; 
+            padding: 10px; 
+            border-radius: 10px; 
+            background-color: rgba(255, 255, 255, 0.9); 
+            border: 1px solid #cbd5e1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: #475569; 
+        }
+
+        .copy-btn-inner:hover { 
+            opacity: 1; 
+            background-color: #ffffff; 
+            transform: scale(1.1); 
+            border-color: #22c55e; 
+            color: #22c55e; 
+        }
+
+        .input-card { 
+            background: white; 
+            padding: 2.5rem; 
+            border-radius: 2.5rem; 
+            border: 1px solid #bae6fd; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
+        }
         
         /* Custom Multi-select styles */
-        .multi-select-container { position: relative; width: 100%; }
-        .multi-select-trigger { background-color: white; border: 1px solid #cbd5e1; padding: 1rem; border-radius: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; min-height: 3.5rem; }
-        .multi-select-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; border-radius: 1rem; margin-top: 5px; max-height: 250px; overflow-y: auto; z-index: 50; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); display: none; }
-        .multi-select-dropdown.active { display: block; }
-        .multi-select-item { padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.2s; }
-        .multi-select-item:hover { background-color: #f1f5f9; }
-        .multi-select-item input { width: 1.2rem; height: 1.2rem; cursor: pointer; }
-        .suggestion-box { background-color: #f8fafc; border: 2px solid #e2e8f0; border-radius: 1.5rem; padding: 2rem; line-height: 1.8; color: #1e293b; min-height: 80px; max-height: 600px; overflow-y: auto; white-space: pre-wrap; font-weight: 500; font-size: 1.1rem; box-shadow: inset 0 2px 8px 0 rgba(0,0,0,0.03); }
+        .multi-select-container { 
+            position: relative; 
+            width: 100%; 
+        }
+
+        .multi-select-trigger { 
+            background-color: white; 
+            border: 1px solid #cbd5e1; 
+            padding: 1rem; 
+            border-radius: 1rem; 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-weight: 600; 
+            min-height: 3.5rem; 
+        }
+
+        .multi-select-dropdown { 
+            position: absolute; 
+            top: 100%; 
+            left: 0; 
+            right: 0; 
+            background: white; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 1rem; 
+            margin-top: 5px; 
+            max-height: 250px; 
+            overflow-y: auto; 
+            z-index: 50; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+            display: none; 
+        }
+
+        .multi-select-dropdown.active { 
+            display: block; 
+        }
+
+        .multi-select-item { 
+            padding: 0.75rem 1rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            cursor: pointer; 
+            transition: background 0.2s; 
+        }
+
+        .multi-select-item:hover { 
+            background-color: #f1f5f9; 
+        }
+
+        .multi-select-item input { 
+            width: 1.2rem; 
+            height: 1.2rem; 
+            cursor: pointer; 
+        }
+
+        .suggestion-box { 
+            background-color: #f8fafc; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 1.5rem; 
+            padding: 2rem; 
+            line-height: 1.8; 
+            color: #1e293b; 
+            min-height: 80px; 
+            max-height: 600px; 
+            overflow-y: auto; 
+            white-space: pre-wrap; 
+            font-weight: 500; 
+            font-size: 1.1rem; 
+            box-shadow: inset 0 2px 8px 0 rgba(0,0,0,0.03); 
+        }
         
         /* Floating Nav */
-        .floating-nav { position: fixed; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 100; padding: 12px; background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); border-radius: 2rem; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.15); left: 1rem; }
-        .nav-dot { width: 44px; height: 44px; background: white; border: 2px solid #4f46e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; position: relative; color: #4f46e5; }
-        .nav-dot:hover { background: #4f46e5; color: white; transform: scale(1.15); }
-        .nav-tooltip { position: absolute; white-space: nowrap; background: #1e293b; color: white; padding: 6px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 900; opacity: 0; pointer-events: none; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); left: 55px; }
-        .nav-dot:hover .nav-tooltip { opacity: 1; }
+        .floating-nav { 
+            position: fixed; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            z-index: 100; 
+            padding: 12px; 
+            background: rgba(255, 255, 255, 0.5); 
+            backdrop-filter: blur(10px); 
+            border-radius: 2rem; 
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.15); 
+            left: 1rem; 
+        }
+
+        .nav-dot { 
+            width: 44px; 
+            height: 44px; 
+            background: white; 
+            border: 2px solid #4f46e5; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            position: relative; 
+            color: #4f46e5; 
+        }
+
+        .nav-dot:hover { 
+            background: #4f46e5; 
+            color: white; 
+            transform: scale(1.15); 
+        }
+
+        .nav-tooltip { 
+            position: absolute; 
+            white-space: nowrap; 
+            background: #1e293b; 
+            color: white; 
+            padding: 6px 14px; 
+            border-radius: 10px; 
+            font-size: 0.85rem; 
+            font-weight: 900; 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: all 0.3s; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            left: 55px; 
+        }
+
+        .nav-dot:hover .nav-tooltip { 
+            opacity: 1; 
+        }
         
         /* Styles for Manual Grouping */
-        .btn-delete { background-color: #ef4444; color: white; transition: all 0.2s; }
-        .btn-delete:hover { background-color: #dc2626; transform: scale(1.1); }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .btn-delete { 
+            background-color: #ef4444; 
+            color: white; 
+            transition: all 0.2s; 
+        }
+
+        .btn-delete:hover { 
+            background-color: #dc2626; 
+            transform: scale(1.1); 
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { 
+            width: 6px; 
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track { 
+            background: #f1f5f9; 
+            border-radius: 4px; 
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb { 
+            background: #cbd5e1; 
+            border-radius: 4px; 
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { 
+            background: #94a3b8; 
+        }
 
         /* ------------------------------------------------------------- */
         /* --- OPTIMIZED PRINT MEDIA QUERY FOR FITTING EVERYTHING --- */
         /* ------------------------------------------------------------- */
         @media print {
-            @page { size: A4 portrait; margin: 5mm; } 
-            body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 8pt !important; line-height: 1.1 !important; }
+            @page { 
+                size: A4 portrait; 
+                margin: 5mm; 
+            } 
             
-            /* Hide UI elements and their invisible margins entirely */
-            .max-w-4xl, #dataConfigSection, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .copy-btn-wrapper, #messageBoxModal, #manualGroupSection { display: none !important; }
+            body { 
+                background-color: white !important; 
+                padding: 0 !important; 
+                color: black !important; 
+                font-size: 8pt !important; 
+                line-height: 1.1 !important; 
+            }
             
-            main { box-shadow: none !important; padding: 0 !important; background-color: transparent !important; max-width: 100% !important; margin: 0 !important; border: none !important; }
+            .max-w-4xl, #dataConfigSection, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .copy-btn-wrapper, #messageBoxModal, #manualGroupSection { 
+                display: none !important; 
+            }
             
-            /* Logos Header Fix - TRIPLE SIZE & TITLE BETWEEN */
+            main { 
+                box-shadow: none !important; 
+                padding: 0 !important; 
+                background-color: transparent !important; 
+                max-width: 100% !important; 
+                margin: 0 !important; 
+                border: none !important; 
+            }
+            
             .flex.justify-between.items-start.mb-8 { 
                 display: flex !important; 
                 position: absolute !important; 
@@ -77,6 +292,7 @@
                 align-items: flex-start !important; 
                 margin-bottom: 0 !important; 
             }
+
             .flex.justify-between.items-start.mb-8 img { 
                 height: 105px !important; 
                 width: 105px !important; 
@@ -87,8 +303,10 @@
                 background: transparent !important;
             }
 
-            /* Titles and Headers - CENTERED BETWEEN LOGOS */
-            .mb-6.relative { margin-bottom: 1mm !important; }
+            .mb-6.relative { 
+                margin-bottom: 1mm !important; 
+            }
+
             #mainTitle { 
                 font-size: 22pt !important; 
                 font-weight: 900 !important; 
@@ -98,15 +316,22 @@
                 padding-top: 6mm !important; 
                 margin-top: 0 !important;
             }
+
             #instituteTitle { 
                 font-size: 13pt !important; 
                 text-align: center !important; 
                 margin-bottom: 12mm !important; 
                 line-height: 1.4 !important; 
             }
-            #fileNameDisplay { font-size: 11pt !important; display: block !important; margin-bottom: 2mm !important; text-align: center !important; line-height: 1 !important; }
+
+            #fileNameDisplay { 
+                font-size: 11pt !important; 
+                display: block !important; 
+                margin-bottom: 2mm !important; 
+                text-align: center !important; 
+                line-height: 1 !important; 
+            }
             
-            /* Meta Info (Program and Participants) - COMPACT, ALIGNED LEFT & FLEXIBLE */
             #metaInfoDisplay { 
                 display: flex !important; 
                 justify-content: flex-end !important; 
@@ -115,6 +340,7 @@
                 margin-bottom: 2mm !important;
                 flex-wrap: nowrap !important;
             }
+
             #metaInfoDisplay > div {
                 padding: 1.5mm 3mm !important;
                 border: 1pt solid #cbd5e1 !important;
@@ -125,25 +351,44 @@
                 align-items: center !important;
                 white-space: nowrap !important;
             }
+
             #metaInfoDisplay > div.min-w-0 {
                 flex-shrink: 1 !important;
                 overflow: hidden !important;
             }
-            #metaInfoDisplay span { line-height: 1 !important; }
+
+            #metaInfoDisplay span { 
+                line-height: 1 !important; 
+            }
+
             #programNameText {
                 overflow: hidden !important;
                 text-overflow: ellipsis !important;
                 white-space: nowrap !important;
             }
             
-            h2 { font-size: 10pt !important; padding: 1mm 2mm !important; margin-bottom: 0 !important; border: none !important; background-color: transparent !important; }
-            h3, h4 { font-size: 9pt !important; margin-bottom: 1mm !important; }
+            h2 { 
+                font-size: 10pt !important; 
+                padding: 1mm 2mm !important; 
+                margin-bottom: 0 !important; 
+                border: none !important; 
+                background-color: transparent !important; 
+            }
 
-            /* Overriding Tailwind Spacing for Print to eliminate wide blank spaces */
-            #reportPrintScope .space-y-8 > div { margin-bottom: 2mm !important; margin-top: 0 !important; }
-            #reportPrintScope .mt-8, #reportPrintScope .mt-10, #reportPrintScope .mt-12 { margin-top: 2mm !important; }
+            h3, h4 { 
+                font-size: 9pt !important; 
+                margin-bottom: 1mm !important; 
+            }
 
-            /* General Wrappers - COMPACT AND FIX MASSIVE BLANK PAGES */
+            #reportPrintScope .space-y-8 > div { 
+                margin-bottom: 2mm !important; 
+                margin-top: 0 !important; 
+            }
+
+            #reportPrintScope .mt-8, #reportPrintScope .mt-10, #reportPrintScope .mt-12 { 
+                margin-top: 2mm !important; 
+            }
+
             .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper {
                 margin-bottom: 2mm !important;
                 border: 1pt solid #cbd5e1 !important;
@@ -154,22 +399,63 @@
                 overflow: visible !important; 
                 page-break-inside: auto !important; 
             }
-            .domain-result-wrapper h2, .summary-table-wrapper h2, .suggestion-wrapper h2 { padding: 1mm 2mm !important; background-color: #f8fafc !important; border-bottom: 1pt solid #cbd5e1 !important; margin: 0 !important; border-top-left-radius: 4pt !important; border-top-right-radius: 4pt !important; }
-            .suggestion-wrapper .p-4 { padding: 1mm !important; }
-            .suggestion-box { min-height: auto !important; padding: 1mm !important; }
 
-            /* Prevent breaks inside smaller containers. Let large tables break naturally. */
-            .suggestion-wrapper, .summary-table-wrapper { page-break-inside: avoid !important; break-inside: avoid !important; }
+            .domain-result-wrapper h2, .summary-table-wrapper h2, .suggestion-wrapper h2 { 
+                padding: 1mm 2mm !important; 
+                background-color: #f8fafc !important; 
+                border-bottom: 1pt solid #cbd5e1 !important; 
+                margin: 0 !important; 
+                border-top-left-radius: 4pt !important; 
+                border-top-right-radius: 4pt !important; 
+            }
 
-            /* 2-Column Layout Forces (Highlights) - COMPACT */
-            #positiveNegativeItemsContainer { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 2% !important; justify-content: space-between !important; align-items: stretch !important; page-break-inside: avoid !important; }
-            #positiveNegativeItemsContainer > div { width: 49% !important; box-sizing: border-box !important; margin-bottom: 2mm !important; border: 1pt solid #cbd5e1 !important; padding: 2mm !important; border-radius: 4pt !important; background-color: #f8fafc !important; }
-            #positiveNegativeItemsContainer ul.space-y-3 > li { margin-bottom: 0 !important; padding: 1mm !important; font-size: 8pt !important; }
+            .suggestion-wrapper .p-4 { 
+                padding: 1mm !important; 
+            }
+
+            .suggestion-box { 
+                min-height: auto !important; 
+                padding: 1mm !important; 
+            }
+
+            .suggestion-wrapper, .summary-table-wrapper { 
+                page-break-inside: avoid !important; 
+                break-inside: avoid !important; 
+            }
+
+            #positiveNegativeItemsContainer { 
+                display: flex !important; 
+                flex-direction: row !important; 
+                flex-wrap: wrap !important; 
+                gap: 2% !important; 
+                justify-content: space-between !important; 
+                align-items: stretch !important; 
+                page-break-inside: avoid !important; 
+            }
+
+            #positiveNegativeItemsContainer > div { 
+                width: 49% !important; 
+                box-sizing: border-box !important; 
+                margin-bottom: 2mm !important; 
+                border: 1pt solid #cbd5e1 !important; 
+                padding: 2mm !important; 
+                border-radius: 4pt !important; 
+                background-color: #f8fafc !important; 
+            }
+
+            #positiveNegativeItemsContainer ul.space-y-3 > li { 
+                margin-bottom: 0 !important; 
+                padding: 1mm !important; 
+                font-size: 8pt !important; 
+            }
             
-            /* ========================================= */
-            /* STRICT CHARTS PRINT CAGE FIX - COMPACT */
-            /* ========================================= */
-            #chartContainer { display: flex !important; flex-wrap: wrap !important; gap: 2% !important; justify-content: space-between !important; }
+            #chartContainer { 
+                display: flex !important; 
+                flex-wrap: wrap !important; 
+                gap: 2% !important; 
+                justify-content: space-between !important; 
+            }
+
             #chartContainer > div { 
                 width: 48% !important; 
                 min-width: 300px !important; 
@@ -182,49 +468,118 @@
                 background-color: white !important;
             }
             
-            /* Chart for Multi-select needs full width in print sometimes */
             #chartContainer > div.lg\\:col-span-2 {
                 width: 100% !important;
             }
             
-            /* Caging the canvas heavily for print */
             #chartContainer .relative {
                 height: 160px !important;
                 max-height: 160px !important;
                 width: 100% !important;
             }
+
             canvas {
                 max-width: 100% !important;
                 height: 100% !important;
             }
-            /* ========================================= */
             
-            /* FINAL RECOMMENDATION FIXES - COMPACT */
-            #finalRecommendationContainer { page-break-inside: avoid !important; break-inside: avoid !important; }
-            #finalRecommendationContainer > div { padding: 2mm !important; border: 1pt solid #818cf8 !important; border-radius: 6pt !important; box-shadow: none !important; background-color: white !important; margin-bottom: 2mm !important;}
-            #finalRecommendationContainer h2 { font-size: 12pt !important; margin-bottom: 1mm !important; border-bottom: 1pt solid #e0e7ff !important; padding-bottom: 1mm !important; background-color: transparent !important; }
-            #finalRecommendationContainer > div > .grid { display: flex !important; flex-direction: row !important; gap: 2% !important; justify-content: center !important; }
-            #finalRecommendationContainer > div > .grid > div { width: 48% !important; padding: 1mm !important; border-radius: 4pt !important; border: 1pt solid #cbd5e1 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; background-color: #f8fafc !important; }
-            #finalRecommendationContainer .text-5xl { font-size: 16pt !important; line-height: 1 !important; margin-top: 1mm !important; } 
-            #finalRecommendationContainer .text-xs { font-size: 8pt !important; }
+            #finalRecommendationContainer { 
+                page-break-inside: avoid !important; 
+                break-inside: avoid !important; 
+            }
+
+            #finalRecommendationContainer > div { 
+                padding: 2mm !important; 
+                border: 1pt solid #818cf8 !important; 
+                border-radius: 6pt !important; 
+                box-shadow: none !important; 
+                background-color: white !important; 
+                margin-bottom: 2mm !important;
+            }
+
+            #finalRecommendationContainer h2 { 
+                font-size: 12pt !important; 
+                margin-bottom: 1mm !important; 
+                border-bottom: 1pt solid #e0e7ff !important; 
+                padding-bottom: 1mm !important; 
+                background-color: transparent !important; 
+            }
+
+            #finalRecommendationContainer > div > .grid { 
+                display: flex !important; 
+                flex-direction: row !important; 
+                gap: 2% !important; 
+                justify-content: center !important; 
+            }
+
+            #finalRecommendationContainer > div > .grid > div { 
+                width: 48% !important; 
+                padding: 1mm !important; 
+                border-radius: 4pt !important; 
+                border: 1pt solid #cbd5e1 !important; 
+                display: flex !important; 
+                flex-direction: column !important; 
+                align-items: center !important; 
+                justify-content: center !important; 
+                background-color: #f8fafc !important; 
+            }
+
+            #finalRecommendationContainer .text-5xl { 
+                font-size: 16pt !important; 
+                line-height: 1 !important; 
+                margin-top: 1mm !important; 
+            } 
+
+            #finalRecommendationContainer .text-xs { 
+                font-size: 8pt !important; 
+            }
             
-            /* Table Optimization to fit on Page and Break Cleanly - COMPACT */
-            .overflow-x-auto { overflow: visible !important; } /* Fixes horizontal clipping */
-            table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; margin: 0 !important; background-color: white !important; }
-            thead { display: table-header-group !important; } /* Repeats headers on new pages */
-            tfoot { display: table-row-group !important; } /* Prevents overlapping text bugs at page bottom */
-            tr { page-break-inside: avoid !important; break-inside: avoid !important; } /* Prevents cutting a single row in half */
+            .overflow-x-auto { 
+                overflow: visible !important; 
+            } 
+
+            table { 
+                width: 100% !important; 
+                border-collapse: collapse !important; 
+                table-layout: fixed !important; 
+                margin: 0 !important; 
+                background-color: white !important; 
+            }
+
+            thead { 
+                display: table-header-group !important; 
+            } 
+
+            tfoot { 
+                display: table-row-group !important; 
+            } 
+
+            tr { 
+                page-break-inside: avoid !important; 
+                break-inside: avoid !important; 
+            } 
             
-            th, td { border: 1pt solid #cbd5e1 !important; padding: 1.5pt 2pt !important; font-size: 7.5pt !important; word-wrap: break-word !important; overflow-wrap: break-word !important; white-space: normal !important; vertical-align: middle !important; }
-            th { background-color: #f1f5f9 !important; font-weight: 900 !important; color: #1e293b !important; }
+            th, td { 
+                border: 1pt solid #cbd5e1 !important; 
+                padding: 1.5pt 2pt !important; 
+                font-size: 7.5pt !important; 
+                word-wrap: break-word !important; 
+                overflow-wrap: break-word !important; 
+                white-space: normal !important; 
+                vertical-align: middle !important; 
+            }
+
+            th { 
+                background-color: #f1f5f9 !important; 
+                font-weight: 900 !important; 
+                color: #1e293b !important; 
+            }
             
-            /* Column Width Distribution */
-            table th:nth-child(1), table td:nth-child(1) { width: 5% !important; text-align: center !important; } /* # */
-            table th:nth-child(2), table td:nth-child(2) { width: 35% !important; text-align: right !important; } /* Item */
-            table th:nth-last-child(2), table td:nth-last-child(2) { width: 10% !important; text-align: center !important; } /* Check Sum */
-            table th:nth-last-child(1), table td:nth-last-child(1) { width: 10% !important; text-align: center !important; } /* Positives */
+            table th:nth-child(1), table td:nth-child(1) { width: 5% !important; text-align: center !important; } 
+            table th:nth-child(2), table td:nth-child(2) { width: 35% !important; text-align: right !important; } 
+            table th:nth-last-child(2), table td:nth-last-child(2) { width: 10% !important; text-align: center !important; } 
+            table th:nth-last-child(1), table td:nth-last-child(1) { width: 10% !important; text-align: center !important; } 
             
-            /* Signature Print Fix - COMPACT */
             #signatureSection { 
                 page-break-inside: avoid !important; 
                 display: flex !important; 
@@ -238,50 +593,107 @@
                 padding-bottom: 10mm !important; 
                 font-size: 11pt !important;
             }
-            #signatureSection .text-center { display: flex !important; flex-direction: column !important; align-items: center !important; }
-            #signatureSection .sig-space { height: 12mm !important; width: 100% !important; display: block !important; } 
-            #signatureSection p { margin-bottom: 0 !important; display: block !important; color: black !important; }
+
+            #signatureSection .text-center { 
+                display: flex !important; 
+                flex-direction: column !important; 
+                align-items: center !important; 
+            }
+
+            #signatureSection .sig-space { 
+                height: 12mm !important; 
+                width: 100% !important; 
+                display: block !important; 
+            } 
+
+            #signatureSection p { 
+                margin-bottom: 0 !important; 
+                display: block !important; 
+                color: black !important; 
+            }
             
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+            * { 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+                color-adjust: exact !important; 
+            }
         }
     </style>
 </head>
 <body class="p-4 md:p-12 text-right" dir="rtl">
+    
+    <!-- Floating Navigation -->
     <nav class="floating-nav" id="floatingNav">
         <a href="#step1Title" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
             <span class="nav-tooltip" id="tip-step1"></span>
         </a>
         <a href="#step2Title" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
             <span class="nav-tooltip" id="tip-step2"></span>
         </a>
         <a href="#filterSection" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
             <span class="nav-tooltip" id="tip-filter"></span>
         </a>
         <a href="#scaleOrderSection" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
             <span class="nav-tooltip" id="tip-step3"></span>
         </a>
         <a href="#resultsContainer" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
             <span class="nav-tooltip" id="tip-results"></span>
         </a>
         <a href="#chartContainer" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v10l8.5 2"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 2v10l8.5 2"></path>
+            </svg>
             <span class="nav-tooltip" id="tip-charts"></span>
         </a>
         <a href="#positiveNegativeItemsContainer" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14l2 2 4-4"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                <path d="M9 14l2 2 4-4"></path>
+            </svg>
             <span class="nav-tooltip" id="tip-highlights"></span>
         </a>
         <a href="#finalRecommendationContainer" class="nav-dot hover-zoom">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                <path d="M4 22h16"></path>
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+            </svg>
             <span class="nav-tooltip" id="tip-final"></span>
         </a>
     </nav>
 
+    <!-- Message Box Modal -->
     <div id="messageBoxModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[110]">
         <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border-4 border-indigo-100 text-center font-black">
             <div id="messageBoxIcon" class="mb-4 text-5xl">⚠️</div>
@@ -291,18 +703,23 @@
         </div>
     </div>
 
+    <!-- Header Logos -->
     <div class="flex justify-between items-start mb-8 relative">
         <img src="00.png" alt="Logo1" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo1'">
         <img src="02.jpg" alt="Logo2" class="h-24 w-24 shadow-md rounded-full bg-white p-2 hover-zoom" onerror="this.src='https://via.placeholder.com/100?text=Logo2'">
     </div>
 
+    <!-- Main Content Area -->
     <main class="max-w-7xl mx-auto w-full bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl flex-grow mb-12">
+        
         <h1 id="mainTitle" class="text-4xl thin-title text-center mb-2 text-slate-800 font-black uppercase tracking-tight">تحليل نتائج الاستبيان</h1>
         <p class="text-center text-indigo-700 mb-8 text-xl font-bold" id="instituteTitle"></p>
 
+        <!-- Step 1: Data Source -->
         <div class="max-w-4xl mx-auto mb-10 mt-8">
             <div class="input-card border-2 border-blue-100">
                 <h2 id="step1Title" class="text-xl font-bold text-center mb-6 text-slate-700 font-black">الخطوة 1: اختر مصدر ملف البيانات</h2>
+                
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <button id="srcLocalBtn" class="p-6 border-2 border-blue-200 rounded-2xl hover-zoom bg-blue-50 font-bold text-indigo-800 transition-all">📁 تحميل ملف محلي</button>
                     <button id="srcGoogleBtn" class="p-6 border-2 border-green-200 rounded-2xl hover-zoom bg-green-50 font-bold text-green-800 transition-all">🌐 رابط جوجل شيت</button>
@@ -327,52 +744,71 @@
             </div>
         </div>
 
+        <!-- Step 2: Mapping Configuration -->
         <div id="dataConfigSection" class="hidden grid grid-cols-1 gap-8 mb-10">
             <div class="input-card bg-blue-50/50 border-2 border-blue-100">
                 <div class="text-center border-b border-blue-100 pb-4 mb-6">
                     <p id="step2Title" class="text-slate-900 font-black thin-title text-2xl uppercase">الخطوة 2: تعيين البيانات</p>
                 </div>
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-6">
                     <div class="flex flex-col">
                         <label id="labelFilterCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
                         <select id="filterColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
                     </div>
+                    
                     <div class="flex flex-col">
                         <label id="labelCategoryCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
                         <select id="categoryColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
                     </div>
+                    
                     <div class="flex flex-col">
                         <label id="labelStartCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
                         <select id="analysisStartColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
                     </div>
+                    
                     <div class="flex flex-col">
                         <label id="labelEndCol" class="text-xs font-black text-indigo-800 mb-2 uppercase tracking-widest text-center"></label>
                         <select id="analysisEndColSelect" class="p-4 font-bold text-center hover-zoom border rounded-xl"></select>
                     </div>
                 </div>
+                
                 <div class="flex flex-col md:flex-row justify-center gap-4 mt-8">
-                    <button id="confirmMappingBtn" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-lg hover-zoom uppercase text-white flex-1 md:flex-none"></button>
-                    <button id="manualGroupingBtn" class="px-8 py-4 bg-purple-600 hover:bg-purple-700 transition-all text-lg font-black rounded-2xl shadow-lg hover-zoom uppercase text-white flex-1 md:flex-none">تجميع وتصنيف يدوي</button>
+                    <button id="confirmMappingBtn" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-lg hover-zoom uppercase text-white flex-1 md:flex-none">
+                        تأكيد واستخراج تلقائي
+                    </button>
+                    <button id="manualGroupingBtn" class="px-8 py-4 bg-purple-600 hover:bg-purple-700 transition-all text-lg font-black rounded-2xl shadow-lg hover-zoom uppercase text-white flex-1 md:flex-none">
+                        تجميع وتصنيف يدوي
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- MANUAL GROUPING SECTION -->
+        <!-- NEW: MANUAL GROUPING SECTION -->
         <div id="manualGroupSection" class="hidden mb-10 input-card bg-purple-50/40 border-2 border-purple-200">
             <h2 class="text-3xl font-black text-purple-900 mb-2 text-center thin-title">التجميع والتصنيف اليدوي</h2>
-            <p class="text-center text-slate-500 font-bold mb-8 text-sm">أضف مجموعات وحدد نوعها، ثم اختر الأسئلة التي تنتمي لكل مجموعة (سيتم حجب الأسئلة المختارة من باقي المجموعات لمنع التكرار).</p>
+            <p class="text-center text-slate-500 font-bold mb-8 text-sm leading-relaxed">
+                أضف مجموعات وحدد نوعها، ثم اختر الأسئلة التي تنتمي لكل مجموعة (سيتم حجب الأسئلة المختارة لمنع التكرار).
+                <br>
+                <span class="text-purple-700 font-black">ملاحظة الذكاء الاصطناعي:</span> اترك أسئلة "النصوص المفتوحة/المقترحات" بدون تحديد، وسيتكفل النظام تلقائياً باكتشافها وتلخيصها لك!
+            </p>
             
             <div id="manualGroupsContainer" class="space-y-6 mb-8"></div>
             
             <div class="flex justify-center mb-8">
-                <button id="addManualGroupBtn" class="px-6 py-3 bg-white text-purple-600 border-2 border-purple-200 font-black rounded-xl hover-zoom shadow-sm">+ إضافة مجموعة جديدة</button>
+                <button id="addManualGroupBtn" class="px-6 py-3 bg-white text-purple-600 border-2 border-purple-200 font-black rounded-xl hover-zoom shadow-sm">
+                    + إضافة مجموعة جديدة
+                </button>
             </div>
 
             <div class="flex justify-center border-t border-purple-100 pt-8">
-                <button id="applyManualGroupsBtn" class="px-12 py-4 btn-execute text-xl font-black rounded-2xl shadow-lg hover-zoom uppercase text-white w-full md:w-auto">اعتماد التقسيم اليدوي ومتابعة</button>
+                <button id="applyManualGroupsBtn" class="px-12 py-4 btn-execute text-xl font-black rounded-2xl shadow-lg hover-zoom uppercase text-white w-full md:w-auto">
+                    اعتماد التقسيم اليدوي ومتابعة
+                </button>
             </div>
         </div>
 
+        <!-- Filters Section -->
         <div id="filterSection" class="hidden max-w-4xl mx-auto mb-10">
             <div class="input-card border-indigo-200 bg-indigo-50/30">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -381,7 +817,9 @@
                         <div class="multi-select-container mt-2">
                             <div class="multi-select-trigger hover-zoom" id="deptMultiTrigger">
                                 <span id="deptSelectedText">...</span>
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
                             </div>
                             <div class="multi-select-dropdown" id="deptMultiDropdown">
                                 <!-- Items populated via JS -->
@@ -394,7 +832,9 @@
                         <div class="multi-select-container mt-2">
                             <div class="multi-select-trigger hover-zoom" id="catMultiTrigger">
                                 <span id="catSelectedText">...</span>
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
                             </div>
                             <div class="multi-select-dropdown" id="catMultiDropdown">
                                 <!-- Items populated via JS -->
@@ -405,6 +845,7 @@
             </div>
         </div>
 
+        <!-- Step 3: Scale Configuration -->
         <div id="scaleOrderSection" class="hidden mb-10 p-8 bg-slate-100 rounded-3xl shadow-inner border border-slate-200">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 text-right">
                 <div id="scaleHeaderBox">
@@ -419,8 +860,11 @@
             <div id="scaleGroupsContainer" class="space-y-10"></div>
         </div>
 
+        <!-- Action Buttons -->
         <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
-            <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase text-white">حلل البيانات الآن</button>
+            <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase text-white">
+                حلل البيانات الآن
+            </button>
             <div class="flex flex-wrap gap-4 w-full justify-center">
                 <button id="exportButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white"></button>
                 <button id="printButton" class="px-8 py-4 btn-execute text-lg font-black rounded-2xl shadow-xl hover-zoom transition-all uppercase text-white"></button>
@@ -428,11 +872,12 @@
             </div>
         </div>
 
+        <!-- Report Output Scope -->
         <div id="reportPrintScope">
+            
             <div class="mb-6 relative">
                 <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 hidden font-black uppercase text-center mb-4"></p>
                 
-                <!-- القسم الخاص: البرنامج والمشاركين في أقصى اليسار مع مرونة النص الطويل -->
                 <div id="metaInfoDisplay" class="hidden flex justify-end gap-2 md:gap-4 text-base md:text-lg font-black w-full overflow-hidden">
                     <div class="bg-indigo-50 text-indigo-800 px-3 md:px-4 py-2 rounded-xl border border-indigo-100 flex items-center whitespace-nowrap shrink-0">
                         <span id="participantCountDisplay"></span>
@@ -444,11 +889,13 @@
                 </div>
             </div>
 
+            <!-- Output Containers -->
             <div id="resultsContainer" class="hidden space-y-8"></div>
             <div id="chartContainer" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8"></div>
             <div id="positiveNegativeItemsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 mt-8"></div>
             <div id="finalRecommendationContainer" class="hidden mt-10"></div>
             
+            <!-- Signature Section -->
             <div id="signatureSection" class="hidden mt-12 pt-8 border-t-2 border-slate-200 flex justify-between items-center text-lg font-black px-4 md:px-16">
                 <div class="text-center flex flex-col items-center">
                     <p class="text-slate-700">مقرر لجنة الاستبيانات وتقييم الاداء</p>
@@ -461,19 +908,21 @@
                     <p class="text-indigo-900 font-black">د. احمد عوض</p>
                 </div>
             </div>
+
         </div>
     </main>
 
+    <!-- Footer -->
     <footer class="w-full text-center py-6 mt-auto text-slate-900 font-black border-t border-blue-200 bg-blue-100/95 backdrop-blur-sm uppercase text-sm tracking-widest">
         All rights are reserved to Dr. Mazen Badawy – Doctorate of English Teaching & Testing
     </footer>
 
+    <!-- Main JavaScript Logic -->
     <script>
         /* --- 1. Global State --- */
         let currentLang = 'ar';
         let rawExcelData = null;
         let identifiedScaleGroups = new Map();
-        let itemToScaleGroup = new Map();
         let chartInstances = [];
         let selectedDepts = new Set();
         let selectedCats = new Set();
@@ -487,7 +936,14 @@
                 pos: 'إيجابي',
                 copied: 'تم النسخ!',
                 emptyList: 'لا توجد بنود',
-                headers: { no: '#', item: 'بيان البند', checkTotal: 'إجمالي الصف (%)', total: 'الإجمالي (%)', positives: 'إيجابيات (%)', footer: 'المتوسط' },
+                headers: { 
+                    no: '#', 
+                    item: 'بيان البند', 
+                    checkTotal: 'إجمالي الصف (%)', 
+                    total: 'الإجمالي (%)', 
+                    positives: 'إيجابيات (%)', 
+                    footer: 'المتوسط' 
+                },
                 strengths: '★ نقاط القوة الأساسية',
                 improvement: '⚠️ مجالات التحسين الحرجة',
                 recommendation: 'التوصية النهائية',
@@ -523,25 +979,41 @@
                 evalLabel: 'التقييم العام للمعهد',
                 googleErrorTitle: 'خطأ في بيانات جوجل',
                 googleErrorBody: 'تأكد أن الملف متاح للجميع ومنشور على الويب.',
-                nav: { step1: 'المصدر', step2: 'التعيين', filter: 'الفلترة', step3: 'المقاييس', results: 'الجداول', charts: 'الرسوم', highlights: 'النقاط', final: 'التقييم' },
+                nav: { 
+                    step1: 'المصدر', 
+                    step2: 'التعيين', 
+                    filter: 'الفلترة', 
+                    step3: 'المقاييس', 
+                    results: 'الجداول', 
+                    charts: 'الرسوم', 
+                    highlights: 'النقاط', 
+                    final: 'التقييم' 
+                },
                 selectAll: 'اختيار الكل'
             }
         };
 
-        /* --- AI --- */
+        /* --- 2. AI Summarization --- */
         async function summarizeWithAI(text) {
             const apiKey = "AQ.Ab8RN6JplE3DZVQudKfYkN13PedZrPJ3FsIsvEaVZeGapMBjGA"; 
             const modelName = "gemini-1.5-flash";             
             
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
             const systemPrompt = "أنت خبير في تحليل البيانات التعليمية. لديك مجموعة من الملاحظات والاستجابات المفتوحة. يرجى قراءتها بعناية واستخلاص الأفكار الرئيسية والاتجاهات العامة، وتقديم ملخص شامل وموجز يعبر عن جوهر الملاحظات بدلاً من سردها أو تكرارها. اكتب الملخص في نقاط واضحة ومهنية باللغة العربية، وابدأ مباشرة بالنقاط دون مقدمات.";
-            const payload = { contents: [{ parts: [{ text: text }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+            const payload = { 
+                contents: [{ parts: [{ text: text }] }], 
+                systemInstruction: { parts: [{ text: systemPrompt }] } 
+            };
             
             try {
-                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const response = await fetch(url, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payload) 
+                });
                 const result = await response.json();
                 
-                if(result.error) {
+                if (result.error) {
                     console.error("خطأ من جوجل API:", result.error);
                     return text; 
                 }
@@ -556,10 +1028,12 @@
             }
         }
 
-        /* --- Helpers --- */
+        /* --- 3. Helper Functions --- */
         function sanitizeValue(val) {
             if (typeof val !== 'string') return val;
-            if (['=', '-', '+', '@'].includes(val.trim().charAt(0))) return "'" + val;
+            if (['=', '-', '+', '@'].includes(val.trim().charAt(0))) {
+                return "'" + val;
+            }
             return val;
         }
 
@@ -567,22 +1041,41 @@
             if (!btnEl) return;
             const originalHtml = btnEl.innerHTML;
             btnEl.innerHTML = `<span class="text-[12px] font-black uppercase px-2 text-green-600">${languageData[currentLang].copied}</span>`;
-            setTimeout(() => btnEl.innerHTML = originalHtml, 2000);
+            setTimeout(() => {
+                btnEl.innerHTML = originalHtml;
+            }, 2000);
         }
 
         function copyToClipboard(text) {
             const textArea = document.createElement("textarea");
-            textArea.value = text; textArea.style.position = "fixed"; textArea.style.left = "-9999px"; textArea.style.top = "0";
-            document.body.appendChild(textArea); textArea.focus(); textArea.select();
-            try { const ok = document.execCommand('copy'); document.body.removeChild(textArea); return ok; } 
-            catch (err) { return false; }
+            textArea.value = text; 
+            textArea.style.position = "fixed"; 
+            textArea.style.left = "-9999px"; 
+            textArea.style.top = "0";
+            
+            document.body.appendChild(textArea); 
+            textArea.focus(); 
+            textArea.select();
+            
+            try { 
+                const ok = document.execCommand('copy'); 
+                document.body.removeChild(textArea); 
+                return ok; 
+            } catch (err) { 
+                return false; 
+            }
         }
 
         function attachCopyButton(container, copyLogic) {
             const wrapper = document.createElement('div');
             wrapper.className = 'copy-btn-wrapper';
             wrapper.innerHTML = `<div class="copy-btn-inner hover-zoom"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></div>`;
-            wrapper.onclick = (e) => { e.stopPropagation(); copyLogic(wrapper.querySelector('.copy-btn-inner')); };
+            
+            wrapper.onclick = (e) => { 
+                e.stopPropagation(); 
+                copyLogic(wrapper.querySelector('.copy-btn-inner')); 
+            };
+            
             container.style.position = 'relative';
             container.appendChild(wrapper);
         }
@@ -593,10 +1086,11 @@
             document.getElementById('messageBoxModal').classList.remove('hidden');
         }
 
-        /* --- Components Rendering --- */
+        /* --- 4. Components Rendering --- */
         function renderScaleGroups() {
             const container = document.getElementById('scaleGroupsContainer');
             container.innerHTML = '';
+            
             identifiedScaleGroups.forEach((group, domainName) => {
                 if (group.isSuggestion || group.isMultiSelect) return; 
                 
@@ -613,18 +1107,43 @@
                 wrap.innerHTML = `<h3 class="font-black text-indigo-900 uppercase tracking-tighter text-lg mb-3 pr-2">محور: ${domainName}</h3><div class="scale-list space-y-2 font-black" data-sig="${domainName}"></div>` + addScaleHtml;
                 
                 const list = wrap.querySelector('.scale-list');
+                
                 group.options.forEach((opt, idx) => {
                     const item = document.createElement('div');
                     item.className = 'p-3 bg-slate-50 border-2 border-slate-200 rounded-xl flex justify-between items-center cursor-move font-black';
                     item.draggable = true;
-                    item.innerHTML = `<span class="font-bold text-slate-900">${opt}</span><label class="flex items-center cursor-pointer font-black"><input type="checkbox" class="w-5 h-5 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}><span class="mr-2 text-xs font-black text-indigo-800">${languageData[currentLang].pos}</span></label>`;
-                    item.querySelector('input').onchange = (e) => e.target.checked ? group.positives.add(opt) : group.positives.delete(opt);
-                    item.ondragstart = (e) => { e.dataTransfer.setData('idx', idx); e.dataTransfer.setData('sig', domainName); };
-                    item.ondragover = (e) => e.preventDefault();
-                    item.ondrop = (e) => {
-                        const fromIdx = e.dataTransfer.getData('idx'); if(e.dataTransfer.getData('sig') !== domainName) return;
-                        const moved = group.options.splice(fromIdx, 1)[0]; group.options.splice(idx, 0, moved); renderScaleGroups();
+                    item.innerHTML = `
+                        <span class="font-bold text-slate-900">${opt}</span>
+                        <label class="flex items-center cursor-pointer font-black">
+                            <input type="checkbox" class="w-5 h-5 text-green-600 rounded" ${group.positives.has(opt) ? 'checked' : ''}>
+                            <span class="mr-2 text-xs font-black text-indigo-800">${languageData[currentLang].pos}</span>
+                        </label>
+                    `;
+                    
+                    item.querySelector('input').onchange = (e) => {
+                        if (e.target.checked) {
+                            group.positives.add(opt);
+                        } else {
+                            group.positives.delete(opt);
+                        }
                     };
+                    
+                    item.ondragstart = (e) => { 
+                        e.dataTransfer.setData('idx', idx); 
+                        e.dataTransfer.setData('sig', domainName); 
+                    };
+                    
+                    item.ondragover = (e) => e.preventDefault();
+                    
+                    item.ondrop = (e) => {
+                        const fromIdx = e.dataTransfer.getData('idx'); 
+                        if(e.dataTransfer.getData('sig') !== domainName) return;
+                        
+                        const moved = group.options.splice(fromIdx, 1)[0]; 
+                        group.options.splice(idx, 0, moved); 
+                        renderScaleGroups();
+                    };
+                    
                     list.appendChild(item);
                 });
                 
@@ -664,19 +1183,21 @@
             
             const thCells = opts.map(o => `<th class="p-3 text-center text-indigo-700 font-black">${o}</th>`).join('');
             
-            let html = `<h2 class="text-2xl thin-title p-4 bg-blue-50 border-b border-blue-100 text-slate-900 font-black ${align}">${title}</h2>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm ${align} font-black">
-                                <thead class="bg-slate-100">
-                                    <tr>
-                                        <th class="p-3 text-center font-black">#</th>
-                                        <th class="p-3 text-right font-black">${d.headers.item}</th>
-                                        ${thCells}
-                                        <th class="p-3 text-center font-bold text-blue-600 font-black">${d.headers.checkTotal}</th>
-                                        <th class="p-3 text-center font-black">${d.headers.positives}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
+            let html = `
+                <h2 class="text-2xl thin-title p-4 bg-blue-50 border-b border-blue-100 text-slate-900 font-black ${align}">${title}</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm ${align} font-black">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <th class="p-3 text-center font-black">#</th>
+                                <th class="p-3 text-right font-black">${d.headers.item}</th>
+                                ${thCells}
+                                <th class="p-3 text-center font-bold text-blue-600 font-black">${d.headers.checkTotal}</th>
+                                <th class="p-3 text-center font-black">${d.headers.positives}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
             
             rows.forEach((r, i) => {
                 const rowCheckSum = opts.reduce((acc, o) => acc + (r.freqs[o] / r.total * 100), 0);
@@ -685,13 +1206,15 @@
                     return `<td class="p-3 text-center font-black">${cellVal}%</td>`;
                 }).join('');
                 
-                html += `<tr class="border-b border-slate-50 font-black">
-                            <td class="p-3 text-center text-slate-500 font-bold font-black">${r.originalIdx}</td>
-                            <td class="p-3 font-bold text-slate-800 text-right font-black">${r.item}</td>
-                            ${tdCells}
-                            <td class="p-3 text-center font-bold text-blue-500 bg-blue-50/30 font-black">${rowCheckSum.toFixed(1)}%</td>
-                            <td class="p-3 text-center font-black text-green-700 bg-green-50 font-black">${r.posPerc.toFixed(1)}%</td>
-                        </tr>`;
+                html += `
+                    <tr class="border-b border-slate-50 font-black">
+                        <td class="p-3 text-center text-slate-500 font-bold font-black">${r.originalIdx}</td>
+                        <td class="p-3 font-bold text-slate-800 text-right font-black">${r.item}</td>
+                        ${tdCells}
+                        <td class="p-3 text-center font-bold text-blue-500 bg-blue-50/30 font-black">${rowCheckSum.toFixed(1)}%</td>
+                        <td class="p-3 text-center font-black text-green-700 bg-green-50 font-black">${r.posPerc.toFixed(1)}%</td>
+                    </tr>
+                `;
             });
             
             const footTdCells = opts.map(o => {
@@ -699,27 +1222,39 @@
                 return `<td class="p-3 text-center font-black">${footVal}%</td>`;
             }).join('');
             
-            html += `           </tbody>
-                                <tfoot class="bg-slate-50 font-black border-t-2 border-slate-200">
-                                    <tr>
-                                        <td colspan="2" class="p-3 text-center uppercase font-black">${d.headers.footer}</td>
-                                        ${footTdCells}
-                                        <td class="p-3 text-center font-black">${totalRes > 0 ? '100.0' : '0.0'}%</td>
-                                        <td class="p-3 text-center text-green-800 text-lg font-black">${avgPos}%</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>`;
+            html += `
+                        </tbody>
+                        <tfoot class="bg-slate-50 font-black border-t-2 border-slate-200">
+                            <tr>
+                                <td colspan="2" class="p-3 text-center uppercase font-black">${d.headers.footer}</td>
+                                ${footTdCells}
+                                <td class="p-3 text-center font-black">${totalRes > 0 ? '100.0' : '0.0'}%</td>
+                                <td class="p-3 text-center text-green-800 text-lg font-black">${avgPos}%</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            `;
             
             div.innerHTML = html;
+            
             attachCopyButton(div, (btn) => {
                 let tableContent = title + '\n';
                 div.querySelectorAll('table tr').forEach(tr => {
-                    let rArr = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); rArr.push(c.innerText.trim()); for(let k=1; k < cs; k++) rArr.push(""); });
+                    let rArr = []; 
+                    tr.querySelectorAll('th, td').forEach(c => { 
+                        const cs = parseInt(c.getAttribute('colspan') || 1); 
+                        rArr.push(c.innerText.trim()); 
+                        for(let k = 1; k < cs; k++) {
+                            rArr.push(""); 
+                        }
+                    });
                     tableContent += rArr.join('\t') + '\n';
                 });
-                copyToClipboard(tableContent); showStatus(btn);
+                copyToClipboard(tableContent); 
+                showStatus(btn);
             });
+            
             container.appendChild(div);
         }
 
@@ -730,39 +1265,50 @@
             const align = 'text-right';
             
             let totalSelections = 0;
-            options.forEach(opt => totalSelections += (freqs[opt] || 0));
+            options.forEach(opt => {
+                totalSelections += (freqs[opt] || 0);
+            });
             
-            let html = `<h2 class="text-2xl thin-title p-4 bg-blue-50 border-b border-blue-100 text-slate-900 font-black ${align}">${title} (تكرارات)</h2>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm ${align} font-black">
-                                <thead class="bg-slate-100">
-                                    <tr>
-                                        <th class="p-3 text-center font-black">#</th>
-                                        <th class="p-3 text-right font-black">العنصر</th>
-                                        <th class="p-3 text-center font-black">التكرار</th>
-                                        <th class="p-3 text-center font-black">نسبة الاختيارات (%)</th>
-                                        <th class="p-3 text-center font-black">النسبة من العدد الكلي</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
+            let html = `
+                <h2 class="text-2xl thin-title p-4 bg-blue-50 border-b border-blue-100 text-slate-900 font-black ${align}">${title} (تكرارات)</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm ${align} font-black">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <th class="p-3 text-center font-black">#</th>
+                                <th class="p-3 text-right font-black">العنصر</th>
+                                <th class="p-3 text-center font-black">التكرار</th>
+                                <th class="p-3 text-center font-black">نسبة الاختيارات (%)</th>
+                                <th class="p-3 text-center font-black">النسبة من العدد الكلي</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
             
             options.forEach((opt, i) => {
                 const count = freqs[opt] || 0;
                 const percResp = totalRespondents > 0 ? ((count / totalRespondents) * 100).toFixed(2) : "0.00";
                 const percTotal = totalSelections > 0 ? ((count / totalSelections) * 100).toFixed(2) : "0.00";
-                html += `<tr class="border-b border-slate-50 font-black">
-                            <td class="p-3 text-center text-slate-500 font-bold font-black">${i + 1}</td>
-                            <td class="p-3 font-bold text-slate-800 text-right font-black">${opt}</td>
-                            <td class="p-3 text-center font-bold text-blue-500 font-black">${count}</td>
-                            <td class="p-3 text-center font-black text-green-700 bg-green-50 font-black">${percResp}%</td>
-                            <td class="p-3 text-center font-black text-indigo-700 bg-indigo-50 font-black">${percTotal}%</td>
-                        </tr>`;
+                
+                html += `
+                    <tr class="border-b border-slate-50 font-black">
+                        <td class="p-3 text-center text-slate-500 font-bold font-black">${i + 1}</td>
+                        <td class="p-3 font-bold text-slate-800 text-right font-black">${opt}</td>
+                        <td class="p-3 text-center font-bold text-blue-500 font-black">${count}</td>
+                        <td class="p-3 text-center font-black text-green-700 bg-green-50 font-black">${percResp}%</td>
+                        <td class="p-3 text-center font-black text-indigo-700 bg-indigo-50 font-black">${percTotal}%</td>
+                    </tr>
+                `;
             });
             
-            html += `           </tbody>
-                            </table>
-                        </div>`;
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
             div.innerHTML = html;
+            
             attachCopyButton(div, (btn) => {
                 let tableContent = title + '\n';
                 div.querySelectorAll('table tr').forEach(tr => {
@@ -772,20 +1318,25 @@
                     });
                     tableContent += rArr.join('\t') + '\n';
                 });
-                copyToClipboard(tableContent); showStatus(btn);
+                copyToClipboard(tableContent); 
+                showStatus(btn);
             });
+            
             container.appendChild(div);
         }
 
         function renderMultiSelectChart(title, options, freqs, totalRespondents) {
             const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
             const divC = document.createElement('div');
+            
             divC.className = 'bg-white p-4 rounded-2xl shadow-xl border border-blue-100 flex flex-col items-center lg:col-span-2';
             
-            divC.innerHTML = `<h3 class="text-lg font-black mb-3 text-center text-indigo-900">${title}</h3>
-                              <div class="w-full relative flex-grow" style="height: 350px; max-height: 350px;">
-                                  <canvas id="${canvasId}"></canvas>
-                              </div>`;
+            divC.innerHTML = `
+                <h3 class="text-lg font-black mb-3 text-center text-indigo-900">${title}</h3>
+                <div class="w-full relative flex-grow" style="height: 350px; max-height: 350px;">
+                    <canvas id="${canvasId}"></canvas>
+                </div>
+            `;
             document.getElementById('chartContainer').appendChild(divC);
             
             const ctx = document.getElementById(canvasId).getContext('2d');
@@ -797,7 +1348,7 @@
                     labels: options,
                     datasets: [{
                         data: dataVals,
-                        backgroundColor: '#10b981',
+                        backgroundColor: '#10b981', // green for standard frequencies
                         borderRadius: 4,
                         maxBarThickness: 60,
                         barPercentage: 0.8
@@ -815,10 +1366,12 @@
                     },
                     scales: {
                         y: { 
-                             beginAtZero: true,
+                            beginAtZero: true,
                             grace: '15%',
                             position: 'right',
-                            ticks: { font: { weight: '900', family: 'Cairo', size: 11 } }
+                            ticks: { 
+                                font: { weight: '900', family: 'Cairo', size: 11 } 
+                            }
                         },
                         x: {
                             grid: { display: false }, 
@@ -836,7 +1389,7 @@
                             anchor: 'end',
                             align: 'top',
                             font: { weight: '900', size: 11, family: 'Cairo' },
-                            formatter: v => v+'%'
+                            formatter: v => v + '%'
                         }
                     } 
                 } 
@@ -846,26 +1399,37 @@
         async function renderAISuggestionBox(title, responses) {
             const rawText = responses.filter(r => String(r || "").trim() !== "").join('. ');
             if (!rawText) return;
+            
             const d = languageData[currentLang];
             const container = document.getElementById('resultsContainer');
             const div = document.createElement('div');
+            
             div.className = 'bg-white rounded-2xl shadow-lg border border-indigo-100 overflow-hidden hover-zoom mb-6 suggestion-wrapper';
             const align = 'text-right';
-            div.innerHTML = `<div class="p-4 bg-indigo-50 border-b border-indigo-100 ${align} font-black">
-                                <h2 class="text-2xl font-black">${title}</h2>
-                                <div class="mt-1 flex items-center font-black">
-                                     <span class="text-sm font-black text-indigo-600 uppercase tracking-widest">${d.suggestionsTitle}</span>
-                                </div>
-                             </div>
-                             <div class="p-4 ${align} font-black">
-                                <div class="suggestion-box italic text-slate-400 font-black !p-4 !min-h-[60px]">${d.loadingAI}</div>
-                             </div>`;
+            
+            div.innerHTML = `
+                <div class="p-4 bg-indigo-50 border-b border-indigo-100 ${align} font-black">
+                    <h2 class="text-2xl font-black">${title}</h2>
+                    <div class="mt-1 flex items-center font-black">
+                         <span class="text-sm font-black text-indigo-600 uppercase tracking-widest">${d.suggestionsTitle}</span>
+                    </div>
+                </div>
+                <div class="p-4 ${align} font-black">
+                    <div class="suggestion-box italic text-slate-400 font-black !p-4 !min-h-[60px]">${d.loadingAI}</div>
+                </div>
+            `;
             container.appendChild(div);
+            
             const summary = await summarizeWithAI(rawText);
+            
             const aiOutputEl = div.querySelector('.suggestion-box');
             aiOutputEl.classList.remove('italic', 'text-slate-400');
             aiOutputEl.textContent = summary;
-            attachCopyButton(div, (btn) => { copyToClipboard(`${title}\n---\n${summary}`); showStatus(btn); });
+            
+            attachCopyButton(div, (btn) => { 
+                copyToClipboard(`${title}\n---\n${summary}`); 
+                showStatus(btn); 
+            });
         }
 
         function renderSummaryTable(summaryDataList) {
@@ -878,43 +1442,61 @@
             const gPos = summaryDataList.reduce((s, dm) => s + Array.from(dm.positives).reduce((sum, o) => sum + (dm.freqs[o] || 0), 0), 0);
             const align = 'text-right';
             
-            let html = `<h2 class="text-2xl thin-title p-4 bg-indigo-700 text-white font-black text-center">ملخص كل المحاور</h2>
-                        <table class="w-full text-base ${align} font-black">
-                            <thead class="bg-indigo-50 font-black">
-                                <tr>
-                                    <th class="p-4 text-center font-black">#</th>
-                                    <th class="p-4 font-black">المحور</th>
-                                    <th class="p-4 text-center font-black">${d.headers.positives}</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
+            let html = `
+                <h2 class="text-2xl thin-title p-4 bg-indigo-700 text-white font-black text-center">ملخص كل المحاور</h2>
+                <table class="w-full text-base ${align} font-black">
+                    <thead class="bg-indigo-50 font-black">
+                        <tr>
+                            <th class="p-4 text-center font-black">#</th>
+                            <th class="p-4 font-black">المحور</th>
+                            <th class="p-4 text-center font-black">${d.headers.positives}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
             
             summaryDataList.forEach((dm, i) => { 
-                const pSum = Array.from(dm.positives).reduce((s,o)=>s+(dm.freqs[o]||0),0);
-                html += `<tr class="border-b border-indigo-50 font-black">
-                            <td class="p-4 text-center text-indigo-300 font-black">${i+1}</td>
-                            <td class="p-4 font-black text-slate-800">${dm.name}</td>
-                            <td class="p-4 text-center font-black text-green-600">${dm.total > 0 ? (pSum/dm.total*100).toFixed(1) : "0.0"}%</td>
-                         </tr>`;
+                const pSum = Array.from(dm.positives).reduce((s, o) => s + (dm.freqs[o] || 0), 0);
+                
+                html += `
+                    <tr class="border-b border-indigo-50 font-black">
+                        <td class="p-4 text-center text-indigo-300 font-black">${i + 1}</td>
+                        <td class="p-4 font-black text-slate-800">${dm.name}</td>
+                        <td class="p-4 text-center font-black text-green-600">${dm.total > 0 ? (pSum / dm.total * 100).toFixed(1) : "0.0"}%</td>
+                    </tr>
+                `;
             });
             
-            html += `       </tbody>
-                            <tfoot class="bg-indigo-100 font-black border-t-2 border-indigo-300">
-                                <tr>
-                                    <td colspan="2" class="p-4 text-center uppercase font-black">المتوسط الكلي</td>
-                                    <td class="p-4 text-center text-green-800 text-xl font-black">${gTotal > 0 ? (gPos/gTotal*100).toFixed(1) : "0.0"}%</td>
-                                </tr>
-                            </tfoot>
-                        </table>`;
+            html += `
+                    </tbody>
+                    <tfoot class="bg-indigo-100 font-black border-t-2 border-indigo-300">
+                        <tr>
+                            <td colspan="2" class="p-4 text-center uppercase font-black">المتوسط الكلي</td>
+                            <td class="p-4 text-center text-green-800 text-xl font-black">${gTotal > 0 ? (gPos / gTotal * 100).toFixed(1) : "0.0"}%</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+            
             div.innerHTML = html;
+            
             attachCopyButton(div, (btn) => {
                 let summaryContent = 'Summary\n';
                 div.querySelectorAll('table tr').forEach(tr => {
-                    let rArr=[]; tr.querySelectorAll('th, td').forEach(c=>{ const cs = parseInt(c.getAttribute('colspan') || 1); rArr.push(c.innerText.trim()); for(let k=1; k < cs; k++) rArr.push(""); });
+                    let rArr = []; 
+                    tr.querySelectorAll('th, td').forEach(c => { 
+                        const cs = parseInt(c.getAttribute('colspan') || 1); 
+                        rArr.push(c.innerText.trim()); 
+                        for(let k = 1; k < cs; k++) {
+                            rArr.push(""); 
+                        }
+                    });
                     summaryContent += rArr.join('\t') + '\n';
                 });
-                copyToClipboard(summaryContent); showStatus(btn);
+                copyToClipboard(summaryContent); 
+                showStatus(btn);
             });
+            
             container.appendChild(div);
         }
 
@@ -922,19 +1504,35 @@
             const d = languageData[currentLang];
             const container = document.getElementById('positiveNegativeItemsContainer');
             const thresh = parseInt(document.getElementById('positivesThresholdInput').value || 85);
+            
             const high = items.filter(i => i.posPerc >= thresh && i.total > 0);
             const low = items.filter(i => i.posPerc < thresh && i.total > 0);
+            
             container.innerHTML = '';
             
             const sDiv = document.createElement('div');
             sDiv.className = `p-6 bg-green-50 rounded-2xl border-2 border-green-200 shadow-md hover-zoom w-full font-black`;
-            const highItemsStr = high.length ? high.map(i => `<li class="bg-white/80 p-3 rounded-xl border border-green-100 shadow-sm font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`;
-            sDiv.innerHTML = `<h4 class="text-2xl font-black text-green-800 mb-4">${d.strengths}</h4><ul class="space-y-3 text-green-900 font-bold font-black">${highItemsStr}</ul>`;
+            
+            const highItemsStr = high.length 
+                ? high.map(i => `<li class="bg-white/80 p-3 rounded-xl border border-green-100 shadow-sm font-black">${i.item}</li>`).join('') 
+                : `<li>${d.emptyList}</li>`;
+                
+            sDiv.innerHTML = `
+                <h4 class="text-2xl font-black text-green-800 mb-4">${d.strengths}</h4>
+                <ul class="space-y-3 text-green-900 font-bold font-black">${highItemsStr}</ul>
+            `;
             
             const iDiv = document.createElement('div');
             iDiv.className = `p-6 bg-red-50 rounded-2xl border-2 border-red-200 shadow-md hover-zoom w-full font-black`;
-            const lowItemsStr = low.length ? low.map(i => `<li class="bg-white/80 p-3 rounded-xl border border-red-100 shadow-sm font-black">${i.item}</li>`).join('') : `<li>${d.emptyList}</li>`;
-            iDiv.innerHTML = `<h4 class="text-2xl font-black text-red-800 mb-4">${d.improvement}</h4><ul class="space-y-3 text-red-900 font-bold font-black">${lowItemsStr}</ul>`;
+            
+            const lowItemsStr = low.length 
+                ? low.map(i => `<li class="bg-white/80 p-3 rounded-xl border border-red-100 shadow-sm font-black">${i.item}</li>`).join('') 
+                : `<li>${d.emptyList}</li>`;
+                
+            iDiv.innerHTML = `
+                <h4 class="text-2xl font-black text-red-800 mb-4">${d.improvement}</h4>
+                <ul class="space-y-3 text-red-900 font-bold font-black">${lowItemsStr}</ul>
+            `;
             
             container.appendChild(sDiv); 
             container.appendChild(iDiv);
@@ -945,29 +1543,39 @@
             const d = languageData[currentLang];
             const container = document.getElementById('finalRecommendationContainer');
             const div = document.createElement('div');
-            div.className = 'relative p-8 bg-white rounded-2xl shadow-xl border-2 border-indigo-400 hover-zoom mb-8 text-center animate-in fade-in duration-700 font-black';
-            let evalTxt = score > 85 ? d.evaluations[0] : score > 75 ? d.evaluations[1] : score > 65 ? d.evaluations[2] : score > 50 ? d.evaluations[3] : d.evaluations[4];
             
-            div.innerHTML = `<h2 class="text-3xl thin-title mb-6 text-center text-indigo-900 font-black border-b border-indigo-50 pb-4">${d.recommendation}</h2>
-                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-black">
-                                <div class="p-6 bg-indigo-50 rounded-xl text-center border border-indigo-100 flex flex-col justify-center items-center font-black">
-                                    <span class="text-xs font-black text-indigo-400 mb-1 uppercase">${d.finalResult}</span>
-                                    <span class="text-5xl font-black text-indigo-800">${score.toFixed(2)}%</span>
-                                </div>
-                                <div class="p-6 bg-green-50 rounded-xl text-center border border-green-100 flex flex-col justify-center items-center font-black">
-                                    <span class="text-xs font-black text-green-400 mb-1 uppercase">${d.evalLabel}</span>
-                                    <span class="text-5xl font-black text-green-700">${evalTxt}</span>
-                                </div>
-                             </div>`;
+            div.className = 'relative p-8 bg-white rounded-2xl shadow-xl border-2 border-indigo-400 hover-zoom mb-8 text-center animate-in fade-in duration-700 font-black';
+            
+            let evalTxt = score > 85 ? d.evaluations[0] 
+                        : score > 75 ? d.evaluations[1] 
+                        : score > 65 ? d.evaluations[2] 
+                        : score > 50 ? d.evaluations[3] 
+                        : d.evaluations[4];
+            
+            div.innerHTML = `
+                <h2 class="text-3xl thin-title mb-6 text-center text-indigo-900 font-black border-b border-indigo-50 pb-4">${d.recommendation}</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-black">
+                    <div class="p-6 bg-indigo-50 rounded-xl text-center border border-indigo-100 flex flex-col justify-center items-center font-black">
+                        <span class="text-xs font-black text-indigo-400 mb-1 uppercase">${d.finalResult}</span>
+                        <span class="text-5xl font-black text-indigo-800">${score.toFixed(2)}%</span>
+                    </div>
+                    <div class="p-6 bg-green-50 rounded-xl text-center border border-green-100 flex flex-col justify-center items-center font-black">
+                        <span class="text-xs font-black text-green-400 mb-1 uppercase">${d.evalLabel}</span>
+                        <span class="text-5xl font-black text-green-700">${evalTxt}</span>
+                    </div>
+                </div>
+            `;
                              
             container.innerHTML = ''; 
             container.appendChild(div); 
             container.classList.remove('hidden');
         }
 
-        /* --- Logic & Controllers --- */
+        /* --- 5. Main Logic & Controllers --- */
         document.addEventListener('DOMContentLoaded', () => {
-            if (typeof ChartDataLabels !== 'undefined') { Chart.register(ChartDataLabels); }
+            if (typeof ChartDataLabels !== 'undefined') { 
+                Chart.register(ChartDataLabels); 
+            }
 
             document.getElementById('closeMessageBox').onclick = () => {
                 document.getElementById('messageBoxModal').classList.add('hidden');
@@ -975,8 +1583,10 @@
 
             function updateUI() {
                 const d = languageData[currentLang];
+                
                 document.getElementById('mainTitle').textContent = d.title;
                 document.getElementById('instituteTitle').innerText = d.devCredit;
+                
                 document.getElementById('step1Title').textContent = d.step1;
                 document.getElementById('srcLocalBtn').textContent = d.step1Btn;
                 document.getElementById('srcGoogleBtn').textContent = d.step1G;
@@ -984,8 +1594,8 @@
                 document.getElementById('localFileBtnText').textContent = d.localHint;
                 document.getElementById('fetchGoogleBtn').textContent = d.fetch;
                 document.getElementById('googleLink').placeholder = d.googleHint;
-                document.getElementById('step2Title').textContent = d.step2;
                 
+                document.getElementById('step2Title').textContent = d.step2;
                 document.getElementById('confirmMappingBtn').textContent = d.confirm;
                 
                 document.getElementById('labelFilterCol').textContent = d.deptLabel;
@@ -999,6 +1609,7 @@
                 document.getElementById('scaleOrderTitle').textContent = d.step3;
                 document.getElementById('scaleOrderSubtitle').textContent = d.step3Hint;
                 document.getElementById('labelThreshold').textContent = d.threshold;
+                
                 document.getElementById('analyzeButton').textContent = d.analyzeNow;
                 document.getElementById('exportButton').textContent = d.export;
                 document.getElementById('printButton').textContent = d.print;
@@ -1041,7 +1652,10 @@
                 const as = document.getElementById('analysisStartColSelect');
                 const es = document.getElementById('analysisEndColSelect');
                 
-                fs.innerHTML = ''; cs.innerHTML = ''; as.innerHTML = ''; es.innerHTML = '';
+                fs.innerHTML = ''; 
+                cs.innerHTML = ''; 
+                as.innerHTML = ''; 
+                es.innerHTML = '';
                 
                 es.add(new Option(languageData[currentLang].endColDefault, ""));
                 cs.add(new Option(languageData[currentLang].noFilter, ""));
@@ -1063,14 +1677,27 @@
                 loadingMessage.classList.add('hidden');
             }
 
-            document.getElementById('srcLocalBtn').onclick = () => { document.getElementById('localInputPanel').classList.toggle('hidden'); document.getElementById('googleInputPanel').classList.add('hidden'); };
-            document.getElementById('srcGoogleBtn').onclick = () => { document.getElementById('googleInputPanel').classList.toggle('hidden'); document.getElementById('localInputPanel').classList.add('hidden'); };
+            document.getElementById('srcLocalBtn').onclick = () => { 
+                document.getElementById('localInputPanel').classList.toggle('hidden'); 
+                document.getElementById('googleInputPanel').classList.add('hidden'); 
+            };
+            
+            document.getElementById('srcGoogleBtn').onclick = () => { 
+                document.getElementById('googleInputPanel').classList.toggle('hidden'); 
+                document.getElementById('localInputPanel').classList.add('hidden'); 
+            };
 
             xlsxFile.addEventListener('change', (e) => {
-                const file = e.target.files[0]; if (!file) return;
+                const file = e.target.files[0]; 
+                if (!file) return;
+                
                 loadingMessage.classList.remove('hidden');
                 const reader = new FileReader();
-                reader.onload = (ev) => processWorkbook(XLSX.read(new Uint8Array(ev.target.result), { type: 'array' }), file.name.split('.')[0]);
+                
+                reader.onload = (ev) => {
+                    processWorkbook(XLSX.read(new Uint8Array(ev.target.result), { type: 'array' }), file.name.split('.')[0]);
+                };
+                
                 reader.readAsArrayBuffer(file);
             });
 
@@ -1121,17 +1748,16 @@
                 }
             };
 
-            /* Multi-select Dropdown toggles */
-            const deptTrigger = document.getElementById('deptMultiTrigger');
+            /* Filter Multi-select Logic */
             const deptDropdown = document.getElementById('deptMultiDropdown');
-            deptTrigger.onclick = (e) => {
+            const catDropdown = document.getElementById('catMultiDropdown');
+            
+            document.getElementById('deptMultiTrigger').onclick = (e) => {
                 e.stopPropagation();
                 deptDropdown.classList.toggle('active');
             };
             
-            const catTrigger = document.getElementById('catMultiTrigger');
-            const catDropdown = document.getElementById('catMultiDropdown');
-            catTrigger.onclick = (e) => {
+            document.getElementById('catMultiTrigger').onclick = (e) => {
                 e.stopPropagation();
                 catDropdown.classList.toggle('active');
             };
@@ -1140,6 +1766,7 @@
                 deptDropdown.classList.remove('active');
                 catDropdown.classList.remove('active');
             });
+            
             deptDropdown.onclick = (e) => e.stopPropagation();
             catDropdown.onclick = (e) => e.stopPropagation();
 
@@ -1170,45 +1797,54 @@
                 const departments = new Set();
                 for (let r = 1; r < rawExcelData.length; r++) {
                     const val = String(rawExcelData[r][filterColIdx] || "").trim();
-                    if (val !== "") departments.add(val);
+                    if (val !== "") {
+                        departments.add(val);
+                    }
                 }
 
                 /* Populate Dept Multi-select */
                 deptDropdown.innerHTML = '';
                 selectedDepts.clear();
 
-                /* "Select All" Option Dept */
                 const allDeptItem = document.createElement('div');
                 allDeptItem.className = 'multi-select-item border-b border-gray-100 font-black';
                 allDeptItem.innerHTML = `<input type="checkbox" id="selectAllDepts"><span>${languageData[currentLang].selectAll}</span>`;
+                
                 allDeptItem.querySelector('input').onchange = (e) => {
                     const checked = e.target.checked;
                     const checkboxes = deptDropdown.querySelectorAll('.dept-checkbox');
                     checkboxes.forEach(cb => {
                         cb.checked = checked;
-                        if (checked) selectedDepts.add(cb.value);
-                        else selectedDepts.delete(cb.value);
+                        if (checked) {
+                            selectedDepts.add(cb.value);
+                        } else {
+                            selectedDepts.delete(cb.value);
+                        }
                     });
                     updateDeptSelectedText();
                 };
+                
                 deptDropdown.appendChild(allDeptItem);
 
                 Array.from(departments).forEach(dept => {
                     const item = document.createElement('div');
                     item.className = 'multi-select-item font-bold';
                     item.innerHTML = `<input type="checkbox" class="dept-checkbox" value="${dept}"><span>${dept}</span>`;
+                    
                     item.querySelector('input').onchange = (e) => {
-                        if (e.target.checked) selectedDepts.add(dept);
-                        else {
+                        if (e.target.checked) {
+                            selectedDepts.add(dept);
+                        } else {
                             selectedDepts.delete(dept);
                             document.getElementById('selectAllDepts').checked = false;
                         }
                         updateDeptSelectedText();
                     };
+                    
                     deptDropdown.appendChild(item);
                 });
                 
-                /* Populate Category Multi-select (if selected) */
+                /* Populate Category Multi-select */
                 const categories = new Set();
                 catDropdown.innerHTML = '';
                 selectedCats.clear();
@@ -1217,51 +1853,63 @@
                     const catColIdx = parseInt(catColVal);
                     for (let r = 1; r < rawExcelData.length; r++) {
                         const val = String(rawExcelData[r][catColIdx] || "").trim();
-                        if (val !== "") categories.add(val);
+                        if (val !== "") {
+                            categories.add(val);
+                        }
                     }
+                    
                     document.getElementById('catFilterContainer').classList.remove('hidden');
                     
                     if (categories.size > 0) {
                         const allCatItem = document.createElement('div');
                         allCatItem.className = 'multi-select-item border-b border-gray-100 font-black';
                         allCatItem.innerHTML = `<input type="checkbox" id="selectAllCats"><span>${languageData[currentLang].selectAll}</span>`;
+                        
                         allCatItem.querySelector('input').onchange = (e) => {
                             const checked = e.target.checked;
                             const checkboxes = catDropdown.querySelectorAll('.cat-checkbox');
                             checkboxes.forEach(cb => {
                                 cb.checked = checked;
-                                if (checked) selectedCats.add(cb.value);
-                                else selectedCats.delete(cb.value);
+                                if (checked) {
+                                    selectedCats.add(cb.value);
+                                } else {
+                                    selectedCats.delete(cb.value);
+                                }
                             });
                             updateCatSelectedText();
                         };
+                        
                         catDropdown.appendChild(allCatItem);
                         
                         Array.from(categories).forEach(cat => {
                             const item = document.createElement('div');
                             item.className = 'multi-select-item font-bold';
                             item.innerHTML = `<input type="checkbox" class="cat-checkbox" value="${cat}"><span>${cat}</span>`;
+                            
                             item.querySelector('input').onchange = (e) => {
-                                if (e.target.checked) selectedCats.add(cat);
-                                else {
+                                if (e.target.checked) {
+                                    selectedCats.add(cat);
+                                } else {
                                     selectedCats.delete(cat);
                                     document.getElementById('selectAllCats').checked = false;
                                 }
                                 updateCatSelectedText();
                             };
+                            
                             catDropdown.appendChild(item);
                         });
                     }
                 } else {
                     document.getElementById('catFilterContainer').classList.add('hidden');
                 }
+                
                 updateCatSelectedText();
             }
 
+            // AUTO Extraction Mapping
             document.getElementById('confirmMappingBtn').onclick = () => {
                 if (!rawExcelData) return;
                 identifiedScaleGroups.clear();
-                
                 setupFilters();
 
                 const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
@@ -1269,7 +1917,6 @@
                 const headers = rawExcelData[0];
                 const endColIdx = endColVal !== "" ? parseInt(endColVal) : headers.length - 1;
                 
-                /* --- DOMAIN-BASED ISOLATED SCALE LOGIC --- */
                 for (let col = startColIdx; col <= endColIdx; col++) {
                     const headerStr = String(headers[col] || "").trim();
                     const matchFull = headerStr.match(/(.+) \[(.+)\]/);
@@ -1298,9 +1945,10 @@
                             isSuggestion: false,
                             isMultiSelect: false,
                             userAddedOptions: new Set(),
-                            frequencies: new Map() // Track overall frequency for sorting
+                            frequencies: new Map() 
                         });
                     }
+                    
                     const group = identifiedScaleGroups.get(dName);
                     group.cols.push(col);
                     group.items.push(iName);
@@ -1308,10 +1956,11 @@
                     const colVals = [];
                     for (let r = 1; r < rawExcelData.length; r++) {
                         const val = String(rawExcelData[r][col] || "").trim();
-                        if (val !== "") colVals.push(val);
+                        if (val !== "") {
+                            colVals.push(val);
+                        }
                     }
 
-                    // Frequencies vs Suggestions Heuristic Fix
                     let isColMultiSelect = false;
                     let splitTokens = [];
                     const hasCommas = colVals.some(v => v.includes(',') || v.includes('،'));
@@ -1327,10 +1976,10 @@
                                 }
                             });
                         });
+                        
                         const uniqueTokens = new Set(splitTokens);
                         const avgTokenLen = splitTokens.length > 0 ? (totalTokenLen / splitTokens.length) : 0;
                         
-                        // If unique tokens is reasonable for a multiple choice question AND average token length is short
                         if (uniqueTokens.size <= 80 && avgTokenLen < 35) {
                             isColMultiSelect = true;
                         }
@@ -1349,9 +1998,9 @@
                             group.options.add(val);
                             group.frequencies.set(val, (group.frequencies.get(val) || 0) + 1);
                         });
+                        
                         const avgStrLen = colVals.length > 0 ? (totalStrLen / colVals.length) : 0;
                         
-                        // Treat as suggestion if answers are long open-ended sentences
                         if (avgStrLen > 35) {
                             group.isSuggestion = true;
                         }
@@ -1360,7 +2009,6 @@
 
                 for (const [dName, group] of identifiedScaleGroups.entries()) {
                     group.options = Array.from(group.options);
-                    // Sort options based on frequency descending
                     group.options.sort((a, b) => (group.frequencies.get(b) || 0) - (group.frequencies.get(a) || 0));
                     
                     if (!group.isMultiSelect && !group.isSuggestion) {
@@ -1381,7 +2029,7 @@
             };
 
             /* ========================================================= */
-            /* --- MANUAL GROUPING LOGIC WITH EXCLUSION OF SELECTED ITEMS --- */
+            /* --- MANUAL GROUPING LOGIC WITH EXCLUSION & AUTO-FALLBACK  */
             /* ========================================================= */
             function getAllAvailableColumns() {
                 const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
@@ -1397,17 +2045,15 @@
 
             function updateManualGroupCheckboxes() {
                 const groups = document.querySelectorAll('.manual-group-item');
-                const selectedColMap = new Map(); // colIdx -> groupElement
+                const selectedColMap = new Map();
 
-                // Collect all currently checked columns and in which group
                 groups.forEach(g => {
                     const checkedBoxes = g.querySelectorAll('.group-col-checkbox:checked');
-                    checkedBoxes.forEach(cb => {
-                        selectedColMap.set(cb.value, g);
+                    checkedBoxes.forEach(cb => { 
+                        selectedColMap.set(cb.value, g); 
                     });
                 });
 
-                // Update state of all checkboxes in all groups
                 groups.forEach(g => {
                     const allCheckboxes = g.querySelectorAll('.group-col-checkbox');
                     allCheckboxes.forEach(cb => {
@@ -1431,7 +2077,9 @@
                                 parentLabel.classList.remove('opacity-40', 'bg-slate-100', 'cursor-not-allowed');
                                 parentLabel.classList.add('hover:bg-white');
                             }
-                            if (badge) badge.remove();
+                            if (badge) {
+                                badge.remove();
+                            }
                         }
                     });
                 });
@@ -1453,8 +2101,8 @@
                             <label class="block text-xs font-black text-purple-800 mb-1">نوع البيانات</label>
                             <select class="w-full p-3 border border-purple-200 focus:border-purple-500 rounded-xl font-bold group-type-select outline-none transition-all text-purple-900">
                                 <option value="scale">مقياس متدرج (Scale)</option>
-                                <option value="multi">اختيار متعدد (Multi-select)</option>
-                                <option value="open">نصوص مفتوحة (Suggestions)</option>
+                                <option value="multi">تكرارات / اختيار متعدد (Multi-select)</option>
+                                <!-- Suggestions removed here to be treated automatically as requested -->
                             </select>
                         </div>
                     </div>
@@ -1469,12 +2117,12 @@
                 groupDiv.querySelectorAll('.group-col-checkbox').forEach(cb => {
                     cb.onchange = () => updateManualGroupCheckboxes();
                 });
-
+                
                 groupDiv.querySelector('.delete-group-btn').onclick = () => {
                     groupDiv.remove();
                     updateManualGroupCheckboxes();
                 };
-
+                
                 document.getElementById('manualGroupsContainer').appendChild(groupDiv);
                 updateManualGroupCheckboxes();
             }
@@ -1482,19 +2130,23 @@
             document.getElementById('manualGroupingBtn').onclick = () => {
                 if (!rawExcelData) return;
                 setupFilters();
+                
                 document.getElementById('manualGroupSection').classList.remove('hidden');
                 document.getElementById('manualGroupsContainer').innerHTML = '';
                 createManualGroupItem();
                 document.getElementById('manualGroupSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
             };
 
-            document.getElementById('addManualGroupBtn').onclick = () => createManualGroupItem();
+            document.getElementById('addManualGroupBtn').onclick = () => {
+                createManualGroupItem();
+            };
 
             document.getElementById('applyManualGroupsBtn').onclick = () => {
                 identifiedScaleGroups.clear();
                 const groups = document.querySelectorAll('.manual-group-item');
-                if(groups.length === 0) { showMessage("تنبيه", "أضف مجموعة واحدة على الأقل للاستمرار."); return; }
+                const manuallyAssignedCols = new Set();
                 
+                // 1. Process Manually Assigend Groups
                 groups.forEach(g => {
                     const dName = g.querySelector('.group-name-input').value.trim() || 'مجموعة بدون اسم';
                     const type = g.querySelector('.group-type-select').value;
@@ -1504,23 +2156,32 @@
                     
                     if (!identifiedScaleGroups.has(dName)) {
                         identifiedScaleGroups.set(dName, { 
-                            options: new Set(), positives: new Set(), cols: [], items: [], 
-                            isSuggestion: type === 'open', isMultiSelect: type === 'multi', 
-                            userAddedOptions: new Set(), frequencies: new Map() 
+                            options: new Set(), 
+                            positives: new Set(), 
+                            cols: [], 
+                            items: [], 
+                            isSuggestion: false, // Suggestions are automatic
+                            isMultiSelect: type === 'multi', 
+                            userAddedOptions: new Set(), 
+                            frequencies: new Map(),
+                            isManual: true 
                         });
                     }
+                    
                     const group = identifiedScaleGroups.get(dName);
                     
                     checkedCols.forEach(col => {
+                        manuallyAssignedCols.add(col);
                         group.cols.push(col);
                         group.items.push(rawExcelData[0][col]);
+                        
                         for (let r = 1; r < rawExcelData.length; r++) {
                             const val = String(rawExcelData[r][col] || "").trim();
                             if (val !== "") {
                                 if (type === 'multi') {
                                     val.split(/[,،]/).forEach(t => { 
                                         let trim = t.trim(); 
-                                        if(trim) { 
+                                        if (trim) { 
                                             group.options.add(trim); 
                                             group.frequencies.set(trim, (group.frequencies.get(trim) || 0) + 1); 
                                         } 
@@ -1534,10 +2195,112 @@
                     });
                 });
 
+                // 2. Process Remaining unassigned columns AUTOMATICALLY
+                const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
+                const endColVal = document.getElementById('analysisEndColSelect').value;
+                const headers = rawExcelData[0];
+                const endColIdx = endColVal !== "" ? parseInt(endColVal) : headers.length - 1;
+                
+                for (let col = startColIdx; col <= endColIdx; col++) {
+                    if (manuallyAssignedCols.has(col)) continue; // Skip handled columns
+
+                    const headerStr = String(headers[col] || "").trim();
+                    const matchFull = headerStr.match(/(.+) \[(.+)\]/);
+                    const matchBracket = headerStr.match(/^\[(.+)\]$/);
+
+                    let dName = ""; 
+                    let iName = "";
+                    
+                    if (matchFull) { 
+                        dName = matchFull[1].trim(); 
+                        iName = matchFull[2].trim(); 
+                    } else if (matchBracket) { 
+                        dName = "الأسئلة المستقلة"; 
+                        iName = matchBracket[1].trim(); 
+                    } else { 
+                        dName = headerStr; 
+                        iName = headerStr; 
+                    }
+
+                    if (!identifiedScaleGroups.has(dName)) {
+                        identifiedScaleGroups.set(dName, { 
+                            options: new Set(), 
+                            positives: new Set(), 
+                            cols: [], 
+                            items: [], 
+                            isSuggestion: false, 
+                            isMultiSelect: false, 
+                            userAddedOptions: new Set(), 
+                            frequencies: new Map(), 
+                            isManual: false 
+                        });
+                    }
+                    
+                    const group = identifiedScaleGroups.get(dName);
+                    group.cols.push(col); 
+                    group.items.push(iName);
+
+                    const colVals = [];
+                    for (let r = 1; r < rawExcelData.length; r++) { 
+                        const val = String(rawExcelData[r][col] || "").trim(); 
+                        if (val !== "") {
+                            colVals.push(val); 
+                        }
+                    }
+
+                    let isColMultiSelect = false; 
+                    let splitTokens = [];
+                    const hasCommas = colVals.some(v => v.includes(',') || v.includes('،'));
+                    
+                    if (hasCommas) {
+                        let totalTokenLen = 0;
+                        colVals.forEach(v => { 
+                            v.split(/[,،]/).forEach(t => { 
+                                let trimmed = t.trim(); 
+                                if (trimmed) { 
+                                    splitTokens.push(trimmed); 
+                                    totalTokenLen += trimmed.length; 
+                                } 
+                            }); 
+                        });
+                        
+                        const uniqueTokens = new Set(splitTokens);
+                        if (uniqueTokens.size <= 80 && (splitTokens.length > 0 ? (totalTokenLen / splitTokens.length) : 0) < 35) {
+                            isColMultiSelect = true;
+                        }
+                    }
+
+                    if (isColMultiSelect) {
+                        group.isMultiSelect = true;
+                        splitTokens.forEach(t => { 
+                            group.options.add(t); 
+                            group.frequencies.set(t, (group.frequencies.get(t) || 0) + 1); 
+                        });
+                    } else {
+                        let totalStrLen = 0;
+                        colVals.forEach(val => { 
+                            totalStrLen += val.length; 
+                            group.options.add(val); 
+                            group.frequencies.set(val, (group.frequencies.get(val) || 0) + 1); 
+                        });
+                        if ((colVals.length > 0 ? (totalStrLen / colVals.length) : 0) > 35) {
+                            group.isSuggestion = true;
+                        }
+                    }
+                }
+
+                // 3. Finalize all groups
                 for (const [dName, group] of identifiedScaleGroups.entries()) {
                     group.options = Array.from(group.options);
                     group.options.sort((a, b) => (group.frequencies.get(b) || 0) - (group.frequencies.get(a) || 0));
                     
+                    // Apply heuristic to automatic groups only
+                    if (!group.isManual && !group.isMultiSelect && !group.isSuggestion) {
+                        if (group.options.length > 12 || (group.cols.length === 1 && group.options.length > 6)) {
+                            group.isSuggestion = true;
+                        }
+                    }
+
                     if (group.isSuggestion) {
                         group.options = [];
                     }
@@ -1545,29 +2308,36 @@
 
                 document.getElementById('manualGroupSection').classList.add('hidden');
                 document.getElementById('filterSection').classList.remove('hidden'); 
+                
                 renderScaleGroups();
+                
                 document.getElementById('scaleOrderSection').classList.remove('hidden'); 
                 document.getElementById('actionButtons').classList.remove('hidden');
-                
                 document.getElementById('scaleOrderSection').scrollIntoView({ behavior: 'smooth' });
             };
             /* ========================================================= */
 
             document.getElementById('analyzeButton').onclick = async () => {
                 if (!rawExcelData) return;
-                const allItemsList = []; const summaryDataList = []; 
+                
+                const allItemsList = []; 
+                const summaryDataList = []; 
                 const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
                 const filterColIdx = parseInt(document.getElementById('filterColSelect').value);
                 const catColVal = document.getElementById('categoryColSelect').value;
                 
                 const resultsContainer = document.getElementById('resultsContainer');
+                
                 resultsContainer.innerHTML = ''; 
                 document.getElementById('chartContainer').innerHTML = ''; 
                 document.getElementById('positiveNegativeItemsContainer').innerHTML = ''; 
                 document.getElementById('finalRecommendationContainer').innerHTML = '';
-                chartInstances.forEach(c => c.destroy()); chartInstances = [];
+                
+                chartInstances.forEach(c => c.destroy()); 
+                chartInstances = [];
                 
                 let rows = rawExcelData.slice(1);
+                
                 if (selectedDepts.size > 0) {
                     rows = rows.filter(r => r && selectedDepts.has(String(r[filterColIdx] || "").trim()));
                 }
@@ -1579,13 +2349,7 @@
                 
                 document.getElementById('participantCountDisplay').textContent = `${rows.length} ${languageData[currentLang].participants}`;
                 
-                let programText = '';
-                if (selectedDepts.size === 0) {
-                    programText = languageData[currentLang].allInstitute;
-                } else {
-                    programText = Array.from(selectedDepts).join('، ');
-                }
-                
+                let programText = selectedDepts.size === 0 ? languageData[currentLang].allInstitute : Array.from(selectedDepts).join('، ');
                 if (selectedCats.size > 0) {
                     programText += ` | الفئة: ${Array.from(selectedCats).join('، ')}`;
                 }
@@ -1594,68 +2358,76 @@
                 document.getElementById('metaInfoDisplay').classList.remove('hidden');
 
                 const headers = rawExcelData[0];
-
+                
                 for (const [domainName, groupData] of identifiedScaleGroups.entries()) {
                     if (groupData.isSuggestion) {
                         for (const col of groupData.cols) {
                             await renderAISuggestionBox(headers[col], rows.map(r => r[col]));
                         }
                     } else if (groupData.isMultiSelect) {
-                        let validRespondents = 0;
-                        const freqs = {};
+                        let validRespondents = 0; 
+                        const freqs = {}; 
+                        
                         groupData.options.forEach(o => freqs[o] = 0);
                         
                         rows.forEach(r => {
                             let answered = false;
                             groupData.cols.forEach(c => {
                                 const val = String(r[c] || "").trim();
-                                if (val) {
-                                    answered = true;
-                                    val.split(/[,،]/).map(p => p.trim()).filter(p => p !== "").forEach(p => {
-                                        if (freqs[p] !== undefined) freqs[p]++;
-                                    });
+                                if (val) { 
+                                    answered = true; 
+                                    val.split(/[,،]/).map(p => p.trim()).filter(p => p !== "").forEach(p => { 
+                                        if (freqs[p] !== undefined) {
+                                            freqs[p]++; 
+                                        }
+                                    }); 
                                 }
                             });
                             if (answered) validRespondents++;
                         });
-
-                        renderMultiSelectTable(domainName, groupData.options, freqs, validRespondents);
+                        
+                        renderMultiSelectTable(domainName, groupData.options, freqs, validRespondents); 
                         renderMultiSelectChart(domainName, groupData.options, freqs, validRespondents);
                         
                     } else {
                         const domainUniqueOpts = new Set();
                         groupData.cols.forEach(col => {
-                            rawExcelData.slice(1).forEach(r => {
-                                const val = String(r[col] || "").trim();
-                                if (val !== "") domainUniqueOpts.add(val);
+                            rawExcelData.slice(1).forEach(r => { 
+                                const val = String(r[col] || "").trim(); 
+                                if (val !== "") domainUniqueOpts.add(val); 
                             });
                         });
                         
                         const finalOpts = groupData.options.filter(opt => domainUniqueOpts.has(opt) || (groupData.userAddedOptions && groupData.userAddedOptions.has(opt)));
-                        if (finalOpts.length === 0) finalOpts.push(...groupData.options);
+                        if (finalOpts.length === 0) {
+                            finalOpts.push(...groupData.options);
+                        }
 
                         const rowsData = groupData.cols.map((col, idx) => {
-                            const rps = rows.map(r => r[col]);
-                            const freqs = {}; finalOpts.forEach(o => freqs[o] = 0);
-                            let posCount = 0;
+                            const rps = rows.map(r => r[col]); 
+                            const freqs = {}; 
+                            finalOpts.forEach(o => freqs[o] = 0);
+                            
+                            let posCount = 0; 
                             let validRespondents = 0;
-
-                            rps.forEach(r => {
-                                const tr = String(r || "").trim();
-                                if (!tr) return;
-                                validRespondents++;
-
-                                if (freqs[tr] !== undefined) freqs[tr]++;
-                                if (groupData.positives.has(tr)) posCount++;
+                            
+                            rps.forEach(r => { 
+                                const tr = String(r || "").trim(); 
+                                if (!tr) return; 
+                                validRespondents++; 
+                                
+                                if (freqs[tr] !== undefined) freqs[tr]++; 
+                                if (groupData.positives.has(tr)) posCount++; 
                             });
-
-                            const res = {
-                                item: groupData.items[idx],
-                                freqs,
-                                total: validRespondents,
-                                posPerc: validRespondents ? (posCount/validRespondents)*100 : 0,
-                                originalIdx: col - startColIdx + 1
+                            
+                            const res = { 
+                                item: groupData.items[idx], 
+                                freqs, 
+                                total: validRespondents, 
+                                posPerc: validRespondents ? (posCount / validRespondents) * 100 : 0, 
+                                originalIdx: col - startColIdx + 1 
                             };
+                            
                             allItemsList.push(res); 
                             return res;
                         });
@@ -1663,80 +2435,79 @@
                         renderTable(domainName, rowsData, finalOpts, groupData.positives);
                         
                         const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
-                        const divC = document.createElement('div');
+                        const divC = document.createElement('div'); 
                         divC.className = 'bg-white p-4 rounded-2xl shadow-xl border border-blue-100 flex flex-col items-center';
                         
-                        divC.innerHTML = `<h3 class="text-lg font-black mb-3 text-center text-indigo-900">${domainName}</h3>
-                                          <div class="w-full relative flex-grow" style="height: 250px; max-height: 250px;">
-                                              <canvas id="${canvasId}"></canvas>
-                                          </div>`;
+                        divC.innerHTML = `
+                            <h3 class="text-lg font-black mb-3 text-center text-indigo-900">${domainName}</h3>
+                            <div class="w-full relative flex-grow" style="height: 250px; max-height: 250px;">
+                                <canvas id="${canvasId}"></canvas>
+                            </div>
+                        `;
+                        
                         document.getElementById('chartContainer').appendChild(divC);
                         
                         const ctx = document.getElementById(canvasId).getContext('2d');
                         const dataVals = finalOpts.map(o => { 
-                             const sum = rowsData.reduce((s, r) => s + r.freqs[o], 0);
-                             const total = rowsData.reduce((s, r) => s + r.total, 0);
-                             return total ? (sum/total*100).toFixed(1) : 0; 
-                         });
+                            const total = rowsData.reduce((s, r) => s + r.total, 0); 
+                            return total ? (rowsData.reduce((s, r) => s + r.freqs[o], 0) / total * 100).toFixed(1) : 0; 
+                        });
                         
                         chartInstances.push(new Chart(ctx, { 
-                             type: 'bar', 
-                             data: {
-                                labels: finalOpts,
-                                datasets: [{
-                                    data: dataVals,
-                                    backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'],
-                                    borderRadius: 4,
-                                    maxBarThickness: 50,
-                                    barPercentage: 0.8
-                                }]
+                            type: 'bar', 
+                            data: { 
+                                labels: finalOpts, 
+                                datasets: [{ 
+                                    data: dataVals, 
+                                    backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], 
+                                    borderRadius: 4, 
+                                    maxBarThickness: 50, 
+                                    barPercentage: 0.8 
+                                }] 
                             },
                             options: {
-                                animation: false,
-                                maintainAspectRatio: false,
-                                responsive: true,
-                                devicePixelRatio: 2,
-                                locale: 'en-US',
-                                rtl: true,
-                                layout: {
-                                    padding: { top: 30, bottom: 10, left: 10, right: 10 }
-                                },
-                                scales: {
+                                animation: false, 
+                                maintainAspectRatio: false, 
+                                responsive: true, 
+                                devicePixelRatio: 2, 
+                                locale: 'en-US', 
+                                rtl: true, 
+                                layout: { padding: { top: 30, bottom: 10, left: 10, right: 10 } },
+                                scales: { 
                                     y: { 
-                                          beginAtZero: true,
-                                          grace: '15%',
-                                          position: 'right',
-                                          ticks: { font: { weight: '900', family: 'Cairo', size: 11 } }
-                                    },
-                                    x: {
+                                        beginAtZero: true, 
+                                        grace: '15%', 
+                                        position: 'right', 
+                                        ticks: { font: { weight: '900', family: 'Cairo', size: 11 } } 
+                                    }, 
+                                    x: { 
                                         grid: { display: false }, 
-                                          ticks: {
-                                            font: { weight: '900', family: 'Cairo', size: 10 },
-                                            autoSkip: false, 
-                                              maxRotation: 0
-                                          }
-                                    }
+                                        ticks: { font: { weight: '900', family: 'Cairo', size: 10 }, autoSkip: false, maxRotation: 0 } 
+                                    } 
                                 },
                                 plugins: { 
-                                        legend: { display: false }, 
-                                        datalabels: {
-                                        anchor: 'end',
-                                        align: 'top',
-                                        font: { weight: '900', size: 11, family: 'Cairo' },
-                                        formatter: v => v+'%'
-                                    }
-                                 } 
-                             } 
-                         }));
+                                    legend: { display: false }, 
+                                    datalabels: { 
+                                        anchor: 'end', 
+                                        align: 'top', 
+                                        font: { weight: '900', size: 11, family: 'Cairo' }, 
+                                        formatter: v => v + '%' 
+                                    } 
+                                } 
+                            } 
+                        }));
                         
                         const dFreqs = {}; 
-                         finalOpts.forEach(o => dFreqs[o] = rowsData.reduce((s, r) => s + r.freqs[o], 0));
+                        finalOpts.forEach(o => {
+                            dFreqs[o] = rowsData.reduce((s, r) => s + r.freqs[o], 0);
+                        });
+                        
                         summaryDataList.push({ 
-                             name: domainName, 
-                             freqs: dFreqs, 
-                             total: rowsData.reduce((s, r) => s + r.total, 0), 
-                             positives: groupData.positives 
-                         });
+                            name: domainName, 
+                            freqs: dFreqs, 
+                            total: rowsData.reduce((s, r) => s + r.total, 0), 
+                            positives: groupData.positives 
+                        });
                     }
                 }
 
@@ -1744,101 +2515,168 @@
                     renderSummaryTable(summaryDataList);
                     allItemsList.sort((a, b) => a.originalIdx - b.originalIdx);
                     renderHighlightLists(allItemsList);
-                    const gTotal = allItemsList.reduce((s, i) => s + i.total, 0);
-                    const gPos = allItemsList.reduce((s, i) => s + (i.posPerc/100 * i.total), 0);
+                    
+                    const gTotal = allItemsList.reduce((s, i) => s + i.total, 0); 
+                    const gPos = allItemsList.reduce((s, i) => s + (i.posPerc / 100 * i.total), 0);
+                    
                     renderFinalRecommendation(gTotal ? (gPos / gTotal * 100) : 0);
                 }
-                resultsContainer.classList.remove('hidden'); document.getElementById('chartContainer').classList.remove('hidden'); 
+                
+                resultsContainer.classList.remove('hidden'); 
+                document.getElementById('chartContainer').classList.remove('hidden'); 
                 document.getElementById('signatureSection').classList.remove('hidden');
                 resultsContainer.scrollIntoView({ behavior: 'smooth' });
             };
 
-            document.getElementById('printButton').onclick = () => { window.print(); };
+            document.getElementById('printButton').onclick = () => { 
+                window.print(); 
+            };
 
             document.getElementById('copyTableButton').onclick = () => {
                 const d = languageData[currentLang];
                 let copyContent = `${d.title}\n${d.devCredit}\n\n`;
                 
-                const programText = document.getElementById('programNameText').textContent;
-                const participantText = document.getElementById('participantCountDisplay').textContent;
-                copyContent += `البرنامج: ${programText}\tالمشاركون: ${participantText}\n\n`;
+                copyContent += `البرنامج: ${document.getElementById('programNameText').textContent}\tالمشاركون: ${document.getElementById('participantCountDisplay').textContent}\n\n`;
                 
                 document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(block => {
-                    const h2 = block.querySelector('h2'); if (h2) copyContent += `\n${h2.innerText}\n`;
+                    const h2 = block.querySelector('h2'); 
+                    if (h2) {
+                        copyContent += `\n${h2.innerText}\n`;
+                    }
+                    
                     const table = block.querySelector('table');
-                    if (table) table.querySelectorAll('tr').forEach(tr => {
-                        let rD = []; 
-                        tr.querySelectorAll('th, td').forEach(c => {
-                                const cs = parseInt(c.getAttribute('colspan') || 1);
-                                let val = c.innerText.trim();
-                            if (['=', '-', '+', '@'].includes(val.charAt(0))) val = "'" + val;
-                            rD.push(val);
-                                for(let k=1; k < cs; k++) rD.push("");
-                            });
-                        copyContent += rD.join('\t') + '\n';
-                    });
-                    const sb = block.querySelector('.suggestion-box'); if (sb) copyContent += sb.innerText + '\n';
+                    if (table) {
+                        table.querySelectorAll('tr').forEach(tr => { 
+                            let rD = []; 
+                            tr.querySelectorAll('th, td').forEach(c => { 
+                                const cs = parseInt(c.getAttribute('colspan') || 1); 
+                                let val = c.innerText.trim(); 
+                                if (['=', '-', '+', '@'].includes(val.charAt(0))) {
+                                    val = "'" + val; 
+                                }
+                                rD.push(val); 
+                                for (let k = 1; k < cs; k++) {
+                                    rD.push(""); 
+                                }
+                            }); 
+                            copyContent += rD.join('\t') + '\n'; 
+                        });
+                    }
+                    
+                    const sb = block.querySelector('.suggestion-box'); 
+                    if (sb) {
+                        copyContent += sb.innerText + '\n';
+                    }
                 });
+                
                 document.querySelectorAll('#positiveNegativeItemsContainer > div').forEach(box => {
-                    const h4 = box.querySelector('h4'); if (h4) {
-                            copyContent += `\n${h4.innerText}\n`;
-                            box.querySelectorAll('li').forEach(li => {
-                            let text = li.innerText.trim();
-                            if (['=', '-', '+', '@'].includes(text.charAt(0))) text = "'" + text;
-                            copyContent += `• ${text}\n`;
-                            });
-                        }
+                    const h4 = box.querySelector('h4'); 
+                    if (h4) { 
+                        copyContent += `\n${h4.innerText}\n`; 
+                        box.querySelectorAll('li').forEach(li => { 
+                            let text = li.innerText.trim(); 
+                            if (['=', '-', '+', '@'].includes(text.charAt(0))) {
+                                text = "'" + text; 
+                            }
+                            copyContent += `• ${text}\n`; 
+                        }); 
+                    }
                 });
+                
                 const rec = document.querySelector('#finalRecommendationContainer div');
                 if (rec) {
-                    const h2 = rec.querySelector('h2'); if (h2) copyContent += `\n${h2.innerText}\n`;
-                    const stats = rec.querySelectorAll('.text-6xl, .text-5xl'); const lbls = rec.querySelectorAll('.text-xs');
-                    stats.forEach((stat, i) => { copyContent += `${lbls[i].innerText}:\t${stat.innerText}\n`; });
+                    const h2 = rec.querySelector('h2'); 
+                    if (h2) {
+                        copyContent += `\n${h2.innerText}\n`;
+                    }
+                    
+                    const stats = rec.querySelectorAll('.text-6xl, .text-5xl'); 
+                    const lbls = rec.querySelectorAll('.text-xs');
+                    
+                    stats.forEach((stat, i) => { 
+                        copyContent += `${lbls[i].innerText}:\t${stat.innerText}\n`; 
+                    });
                 }
-                if (copyToClipboard(copyContent)) { showStatus(document.getElementById('copyTableButton')); }
+                
+                if (copyToClipboard(copyContent)) { 
+                    showStatus(document.getElementById('copyTableButton')); 
+                }
             };
 
             document.getElementById('exportButton').onclick = () => {
                 const d = languageData[currentLang];
-                const programText = document.getElementById('programNameText').textContent;
-                const participantText = document.getElementById('participantCountDisplay').textContent;
-                
                 const wb = XLSX.utils.book_new(); 
-                let allD = [
+                
+                let allD = [ 
                     [d.title], 
                     [d.devCredit], 
-                    [`البرنامج: ${programText}`, `المشاركون: ${participantText}`],
-                    []
+                    [`البرنامج: ${document.getElementById('programNameText').textContent}`, `المشاركون: ${document.getElementById('participantCountDisplay').textContent}`], 
+                    [] 
                 ];
                 
                 document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(s => {
                     allD.push([sanitizeValue(s.querySelector('h2').innerText)]);
                     const tbl = s.querySelector('table');
-                    if (tbl) tbl.querySelectorAll('tr').forEach(tr => {
-                        let r = []; tr.querySelectorAll('th, td').forEach(c => { const cs = parseInt(c.getAttribute('colspan') || 1); let val = c.innerText.trim(); if (val.endsWith('%')) { let num = parseFloat(val.replace('%', '')); r.push(isNaN(num) ? val : num); } else { r.push(sanitizeValue(val)); } for(let k=1; k < cs; k++) r.push(""); });
-                        allD.push(r);
-                    });
-                    const box = s.querySelector('.suggestion-box'); if (box) allD.push([sanitizeValue(box.innerText)]);
+                    
+                    if (tbl) {
+                        tbl.querySelectorAll('tr').forEach(tr => { 
+                            let r = []; 
+                            tr.querySelectorAll('th, td').forEach(c => { 
+                                const cs = parseInt(c.getAttribute('colspan') || 1); 
+                                let val = c.innerText.trim(); 
+                                if (val.endsWith('%')) { 
+                                    let num = parseFloat(val.replace('%', '')); 
+                                    r.push(isNaN(num) ? val : num); 
+                                } else { 
+                                    r.push(sanitizeValue(val)); 
+                                } 
+                                for (let k = 1; k < cs; k++) {
+                                    r.push(""); 
+                                }
+                            }); 
+                            allD.push(r); 
+                        });
+                    }
+                    
+                    const box = s.querySelector('.suggestion-box'); 
+                    if (box) {
+                        allD.push([sanitizeValue(box.innerText)]);
+                    }
                     allD.push([]);
                 });
+                
                 document.querySelectorAll('#positiveNegativeItemsContainer > div').forEach(box => {
-                    const h4 = box.querySelector('h4'); if (h4) { allD.push([sanitizeValue(h4.innerText)]); box.querySelectorAll('li').forEach(li => allD.push(["• " + sanitizeValue(li.innerText)])); allD.push([]); }
+                    const h4 = box.querySelector('h4'); 
+                    if (h4) { 
+                        allD.push([sanitizeValue(h4.innerText)]); 
+                        box.querySelectorAll('li').forEach(li => {
+                            allD.push(["• " + sanitizeValue(li.innerText)]);
+                        }); 
+                        allD.push([]); 
+                    }
                 });
+                
                 const rec = document.querySelector('#finalRecommendationContainer div');
                 if (rec) {
-                    const h2 = rec.querySelector('h2'); if (h2) allD.push([sanitizeValue(h2.innerText)]);
-                    const stats = rec.querySelectorAll('.text-6xl, .text-5xl'); const lbls = rec.querySelectorAll('.text-xs');
-                    stats.forEach((stat, i) => { let val = stat.innerText.replace('%', ''); allD.push([sanitizeValue(lbls[i].innerText), isNaN(parseFloat(val)) ? val : parseFloat(val)]); });
+                    const h2 = rec.querySelector('h2'); 
+                    if (h2) {
+                        allD.push([sanitizeValue(h2.innerText)]);
+                    }
+                    const stats = rec.querySelectorAll('.text-6xl, .text-5xl'); 
+                    const lbls = rec.querySelectorAll('.text-xs');
+                    
+                    stats.forEach((stat, i) => { 
+                        let val = stat.innerText.replace('%', ''); 
+                        allD.push([sanitizeValue(lbls[i].innerText), isNaN(parseFloat(val)) ? val : parseFloat(val)]); 
+                    });
                 }
                 
-                let baseName = document.getElementById('fileNameDisplay').textContent.trim();
-                if (!baseName) baseName = "Survey_Report";
-                const now = new Date();
-                const dateStr = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0') + "_" + String(now.getHours()).padStart(2,'0') + "-" + String(now.getMinutes()).padStart(2,'0');
-                const exportName = `${baseName}_${dateStr}.xlsx`;
-
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(allD), "Analysis");
-                XLSX.writeFile(wb, exportName);
+                let baseName = document.getElementById('fileNameDisplay').textContent.trim() || "Survey_Report";
+                const now = new Date(); 
+                const dateStr = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + String(now.getDate()).padStart(2, '0') + "_" + String(now.getHours()).padStart(2, '0') + "-" + String(now.getMinutes()).padStart(2, '0');
+                
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(allD), "Analysis"); 
+                XLSX.writeFile(wb, `${baseName}_${dateStr}.xlsx`);
             };
 
             updateUI();
