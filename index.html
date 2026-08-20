@@ -784,13 +784,13 @@
             </div>
         </div>
 
-        <!-- NEW: MANUAL GROUPING SECTION -->
+        <!-- NEW: MANUAL GROUPING SECTION (SCALES ONLY) -->
         <div id="manualGroupSection" class="hidden mb-10 input-card bg-purple-50/40 border-2 border-purple-200">
             <h2 class="text-3xl font-black text-purple-900 mb-2 text-center thin-title">التجميع والتصنيف اليدوي</h2>
             <p class="text-center text-slate-500 font-bold mb-8 text-sm leading-relaxed">
-                أضف مجموعات وحدد الأسئلة التي تنتمي لكل مجموعة (سيتم حجب الأسئلة المختارة من باقي المجموعات لمنع التكرار). 
+                أضف مجموعات المقاييس واختر الأسئلة التي تنتمي لها.
                 <br>
-                <span class="text-purple-700 font-black">ملاحظة:</span> سيقوم النظام تلقائياً باكتشاف نوع البيانات (مقياس، تكرارات، نصوص مفتوحة) لكل مجموعة يدوية تصنعها، وكذلك لأي أسئلة تتركها بدون تحديد!
+                <span class="text-purple-700 font-black">ملاحظة الذكاء الاصطناعي:</span> لن تظهر هنا أسئلة "التكرارات" أو "المقترحات المفتوحة"؛ حيث تم فصلها ليتم التعامل معها تلقائياً خلف الكواليس لتوفير وقتك.
             </p>
             
             <div id="manualGroupsContainer" class="space-y-6 mb-8"></div>
@@ -926,6 +926,9 @@
         let chartInstances = [];
         let selectedDepts = new Set();
         let selectedCats = new Set();
+        
+        // NEW STATE FOR MANUAL MODE
+        let manualAvailableCols = [];
 
         const languageData = {
             ar: {
@@ -2025,7 +2028,6 @@
                 document.getElementById('filterSection').classList.remove('hidden'); 
                 renderScaleGroups();
                 
-                // Hide Step 3 if there are no scale groups to configure
                 let hasScaleGroups = false;
                 identifiedScaleGroups.forEach((group) => {
                     if (!group.isSuggestion && !group.isMultiSelect) {
@@ -2046,18 +2048,7 @@
             /* ========================================================= */
             /* --- MANUAL GROUPING LOGIC WITH EXCLUSION & AUTO-FALLBACK  */
             /* ========================================================= */
-            function getAllAvailableColumns() {
-                const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
-                const endColVal = document.getElementById('analysisEndColSelect').value;
-                const headers = rawExcelData[0];
-                const endColIdx = endColVal !== "" ? parseInt(endColVal) : headers.length - 1;
-                let cols = [];
-                for (let i = startColIdx; i <= endColIdx; i++) {
-                    cols.push({ idx: i, name: headers[i] || `Column ${i}` });
-                }
-                return cols;
-            }
-
+            
             function updateManualGroupCheckboxes() {
                 const groups = document.querySelectorAll('.manual-group-item');
                 const selectedColMap = new Map();
@@ -2101,31 +2092,21 @@
             }
 
             function createManualGroupItem() {
+                if (manualAvailableCols.length === 0) return;
+                
                 const groupDiv = document.createElement('div');
                 groupDiv.className = 'manual-group-item bg-white p-6 rounded-2xl border-2 border-purple-100 shadow-lg flex flex-col gap-4 relative animate-in zoom-in duration-300';
-                const allCols = getAllAvailableColumns();
                 
-                // Restored the exact manual assignment options: scale, multi, and open
                 groupDiv.innerHTML = `
                     <button class="absolute top-4 left-4 w-8 h-8 flex items-center justify-center rounded-full btn-delete shadow-md font-black text-sm z-10 delete-group-btn" title="حذف المجموعة">✖</button>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-black text-purple-800 mb-1">اسم المجموعة (المحور)</label>
-                            <input type="text" autocomplete="on" class="w-full p-3 border border-purple-200 focus:border-purple-500 rounded-xl font-bold group-name-input outline-none transition-all" placeholder="مثال: تقييم المقرر...">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-black text-purple-800 mb-1">نوع البيانات</label>
-                            <select class="w-full p-3 border border-purple-200 focus:border-purple-500 rounded-xl font-bold group-type-select outline-none transition-all text-purple-900">
-                                <option value="scale">مقياس متدرج (Scale)</option>
-                                <option value="multi">تكرارات / اختيار متعدد (Multi-select)</option>
-                                <option value="open">نصوص مفتوحة (Suggestions)</option>
-                            </select>
-                        </div>
+                    <div>
+                        <label class="block text-xs font-black text-purple-800 mb-1">اسم المجموعة (المحور)</label>
+                        <input type="text" autocomplete="on" class="w-full p-3 border border-purple-200 focus:border-purple-500 rounded-xl font-bold group-name-input outline-none transition-all" placeholder="مثال: تقييم المقرر...">
                     </div>
                     <div>
                         <label class="block text-xs font-black text-purple-800 mb-2">اختر البنود (الأسئلة)</label>
                         <div class="border border-purple-100 rounded-xl p-3 max-h-48 overflow-y-auto bg-slate-50 columns-checkboxes custom-scrollbar grid grid-cols-1 md:grid-cols-2 gap-2">
-                            ${allCols.map(c => `<label class="flex items-center gap-2 font-bold cursor-pointer p-2 hover:bg-white rounded-lg border border-transparent hover:border-purple-100 transition-all text-sm leading-tight"><input type="checkbox" value="${c.idx}" class="w-4 h-4 text-purple-600 rounded group-col-checkbox"> <span>${c.name}</span></label>`).join('')}
+                            ${manualAvailableCols.map(c => `<label class="flex items-center gap-2 font-bold cursor-pointer p-2 hover:bg-white rounded-lg border border-transparent hover:border-purple-100 transition-all text-sm leading-tight"><input type="checkbox" value="${c.idx}" class="w-4 h-4 text-purple-600 rounded group-col-checkbox"> <span>${c.name}</span></label>`).join('')}
                         </div>
                     </div>
                 `;
@@ -2147,9 +2128,81 @@
                 if (!rawExcelData) return;
                 setupFilters();
                 
+                identifiedScaleGroups.clear();
+                manualAvailableCols = [];
+                
+                const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
+                const endColVal = document.getElementById('analysisEndColSelect').value;
+                const headers = rawExcelData[0];
+                const endColIdx = endColVal !== "" ? parseInt(endColVal) : headers.length - 1;
+                
+                // PRE-PROCESS ALL COLUMNS TO FILTER OUT FREQUENCIES AND SUGGESTIONS
+                for (let col = startColIdx; col <= endColIdx; col++) {
+                    const headerStr = String(headers[col] || "").trim();
+                    const matchFull = headerStr.match(/(.+) \[(.+)\]/);
+                    const matchBracket = headerStr.match(/^\[(.+)\]$/);
+
+                    let dName = ""; let iName = "";
+                    if (matchFull) { dName = matchFull[1].trim(); iName = matchFull[2].trim(); } 
+                    else if (matchBracket) { dName = "الأسئلة المستقلة"; iName = matchBracket[1].trim(); } 
+                    else { dName = headerStr; iName = headerStr; }
+
+                    const colVals = [];
+                    for (let r = 1; r < rawExcelData.length; r++) { 
+                        const val = String(rawExcelData[r][col] || "").trim(); 
+                        if (val !== "") colVals.push(val); 
+                    }
+
+                    let isColMultiSelect = false; 
+                    let splitTokens = [];
+                    const hasCommas = colVals.some(v => v.includes(',') || v.includes('،'));
+                    
+                    if (hasCommas) {
+                        let totalTokenLen = 0;
+                        colVals.forEach(v => { v.split(/[,،]/).forEach(t => { let trimmed = t.trim(); if (trimmed) { splitTokens.push(trimmed); totalTokenLen += trimmed.length; } }); });
+                        const uniqueTokens = new Set(splitTokens);
+                        if (uniqueTokens.size <= 80 && (splitTokens.length > 0 ? (totalTokenLen / splitTokens.length) : 0) < 35) {
+                            isColMultiSelect = true;
+                        }
+                    }
+
+                    let isColSuggestion = false;
+                    if (!isColMultiSelect) {
+                        let totalStrLen = 0;
+                        colVals.forEach(val => { totalStrLen += val.length; });
+                        if ((colVals.length > 0 ? (totalStrLen / colVals.length) : 0) > 35) {
+                            isColSuggestion = true;
+                        }
+                    }
+
+                    if (isColMultiSelect || isColSuggestion) {
+                        // IT'S A FREQUENCY OR SUGGESTION - PROCESS IMMEDIATELY BEHIND THE SCENES
+                        if (!identifiedScaleGroups.has(dName)) {
+                            identifiedScaleGroups.set(dName, { options: new Set(), positives: new Set(), cols: [], items: [], isSuggestion: isColSuggestion, isMultiSelect: isColMultiSelect, userAddedOptions: new Set(), frequencies: new Map() });
+                        }
+                        const group = identifiedScaleGroups.get(dName);
+                        group.cols.push(col); group.items.push(iName);
+                        
+                        if (isColMultiSelect) {
+                            splitTokens.forEach(t => { group.options.add(t); group.frequencies.set(t, (group.frequencies.get(t) || 0) + 1); });
+                        } else {
+                            colVals.forEach(val => { group.options.add(val); group.frequencies.set(val, (group.frequencies.get(val) || 0) + 1); });
+                        }
+                    } else {
+                        // IT'S A SCALE ITEM - ADD TO MANUAL UI POOL
+                        manualAvailableCols.push({ idx: col, name: headerStr, dNameAuto: dName, iNameAuto: iName });
+                    }
+                }
+                
                 document.getElementById('manualGroupSection').classList.remove('hidden');
                 document.getElementById('manualGroupsContainer').innerHTML = '';
-                createManualGroupItem();
+                
+                if (manualAvailableCols.length > 0) {
+                    createManualGroupItem();
+                } else {
+                    document.getElementById('manualGroupsContainer').innerHTML = '<p class="text-center text-red-500 font-bold p-4">لا توجد أسئلة مقاييس (Scale) للترتيب اليدوي. جميع الأسئلة تم التعرف عليها تلقائياً كمقترحات أو تكرارات.</p>';
+                }
+                
                 document.getElementById('manualGroupSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
             };
 
@@ -2158,14 +2211,12 @@
             };
 
             document.getElementById('applyManualGroupsBtn').onclick = () => {
-                identifiedScaleGroups.clear();
                 const groups = document.querySelectorAll('.manual-group-item');
                 const manuallyAssignedCols = new Set();
                 
-                // 1. Process Manually Assigend Groups
+                // 1. Process Manually Assigend Groups (Which are strictly Scales now)
                 groups.forEach(g => {
                     const dName = g.querySelector('.group-name-input').value.trim() || 'مجموعة بدون اسم';
-                    const type = g.querySelector('.group-type-select').value;
                     const checkedCols = Array.from(g.querySelectorAll('.group-col-checkbox:checked')).map(cb => parseInt(cb.value));
                     
                     if (checkedCols.length === 0) return;
@@ -2176,142 +2227,68 @@
                             positives: new Set(), 
                             cols: [], 
                             items: [], 
-                            isSuggestion: type === 'open', 
-                            isMultiSelect: type === 'multi', 
+                            isSuggestion: false, 
+                            isMultiSelect: false, 
                             userAddedOptions: new Set(), 
-                            frequencies: new Map(),
-                            isManual: true 
+                            frequencies: new Map()
                         });
                     }
                     
                     const group = identifiedScaleGroups.get(dName);
                     
-                    checkedCols.forEach(col => {
-                        manuallyAssignedCols.add(col);
-                        group.cols.push(col);
-                        group.items.push(rawExcelData[0][col]);
+                    checkedCols.forEach(colIdx => {
+                        manuallyAssignedCols.add(colIdx);
+                        const colDef = manualAvailableCols.find(c => c.idx === colIdx);
+                        
+                        group.cols.push(colIdx);
+                        group.items.push(colDef.iNameAuto); // Use auto-detected item name
                         
                         for (let r = 1; r < rawExcelData.length; r++) {
-                            const val = String(rawExcelData[r][col] || "").trim();
+                            const val = String(rawExcelData[r][colIdx] || "").trim();
                             if (val !== "") {
-                                if (type === 'multi') {
-                                    val.split(/[,،]/).forEach(t => { 
-                                        let trim = t.trim(); 
-                                        if (trim) { 
-                                            group.options.add(trim); 
-                                            group.frequencies.set(trim, (group.frequencies.get(trim) || 0) + 1); 
-                                        } 
-                                    });
-                                } else {
-                                    group.options.add(val); 
-                                    group.frequencies.set(val, (group.frequencies.get(val) || 0) + 1);
-                                }
+                                group.options.add(val); 
+                                group.frequencies.set(val, (group.frequencies.get(val) || 0) + 1);
                             }
                         }
                     });
                 });
 
-                // 2. Process Remaining unassigned columns AUTOMATICALLY
-                const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
-                const endColVal = document.getElementById('analysisEndColSelect').value;
-                const headers = rawExcelData[0];
-                const endColIdx = endColVal !== "" ? parseInt(endColVal) : headers.length - 1;
-                
-                for (let col = startColIdx; col <= endColIdx; col++) {
-                    if (manuallyAssignedCols.has(col)) continue; // Skip handled columns
-
-                    const headerStr = String(headers[col] || "").trim();
-                    const matchFull = headerStr.match(/(.+) \[(.+)\]/);
-                    const matchBracket = headerStr.match(/^\[(.+)\]$/);
-
-                    let dName = ""; 
-                    let iName = "";
-                    
-                    if (matchFull) { 
-                        dName = matchFull[1].trim(); 
-                        iName = matchFull[2].trim(); 
-                    } else if (matchBracket) { 
-                        dName = "الأسئلة المستقلة"; 
-                        iName = matchBracket[1].trim(); 
-                    } else { 
-                        dName = headerStr; 
-                        iName = headerStr; 
-                    }
-
-                    if (!identifiedScaleGroups.has(dName)) {
-                        identifiedScaleGroups.set(dName, { 
-                            options: new Set(), 
-                            positives: new Set(), 
-                            cols: [], 
-                            items: [], 
-                            isSuggestion: false, 
-                            isMultiSelect: false, 
-                            userAddedOptions: new Set(), 
-                            frequencies: new Map(), 
-                            isManual: false 
-                        });
-                    }
-                    
-                    const group = identifiedScaleGroups.get(dName);
-                    group.cols.push(col); 
-                    group.items.push(iName);
-
-                    const colVals = [];
-                    for (let r = 1; r < rawExcelData.length; r++) { 
-                        const val = String(rawExcelData[r][col] || "").trim(); 
-                        if (val !== "") {
-                            colVals.push(val); 
+                // 2. Process Remaining unassigned SCALE columns automatically (Fallback)
+                manualAvailableCols.forEach(colDef => {
+                    if (!manuallyAssignedCols.has(colDef.idx)) {
+                        if (!identifiedScaleGroups.has(colDef.dNameAuto)) {
+                            identifiedScaleGroups.set(colDef.dNameAuto, { 
+                                options: new Set(), 
+                                positives: new Set(), 
+                                cols: [], 
+                                items: [], 
+                                isSuggestion: false, 
+                                isMultiSelect: false, 
+                                userAddedOptions: new Set(), 
+                                frequencies: new Map() 
+                            });
                         }
-                    }
-
-                    let isColMultiSelect = false; 
-                    let splitTokens = [];
-                    const hasCommas = colVals.some(v => v.includes(',') || v.includes('،'));
-                    
-                    if (hasCommas) {
-                        let totalTokenLen = 0;
-                        colVals.forEach(v => { 
-                            v.split(/[,،]/).forEach(t => { 
-                                let trimmed = t.trim(); 
-                                if (trimmed) { 
-                                    splitTokens.push(trimmed); 
-                                    totalTokenLen += trimmed.length; 
-                                } 
-                            }); 
-                        });
                         
-                        const uniqueTokens = new Set(splitTokens);
-                        if (uniqueTokens.size <= 80 && (splitTokens.length > 0 ? (totalTokenLen / splitTokens.length) : 0) < 35) {
-                            isColMultiSelect = true;
+                        const group = identifiedScaleGroups.get(colDef.dNameAuto);
+                        group.cols.push(colDef.idx);
+                        group.items.push(colDef.iNameAuto);
+                        
+                        for (let r = 1; r < rawExcelData.length; r++) {
+                            const val = String(rawExcelData[r][colDef.idx] || "").trim();
+                            if (val !== "") {
+                                group.options.add(val); 
+                                group.frequencies.set(val, (group.frequencies.get(val) || 0) + 1);
+                            }
                         }
                     }
-
-                    if (isColMultiSelect) {
-                        group.isMultiSelect = true;
-                        splitTokens.forEach(t => { 
-                            group.options.add(t); 
-                            group.frequencies.set(t, (group.frequencies.get(t) || 0) + 1); 
-                        });
-                    } else {
-                        let totalStrLen = 0;
-                        colVals.forEach(val => { 
-                            totalStrLen += val.length; 
-                            group.options.add(val); 
-                            group.frequencies.set(val, (group.frequencies.get(val) || 0) + 1); 
-                        });
-                        if ((colVals.length > 0 ? (totalStrLen / colVals.length) : 0) > 35) {
-                            group.isSuggestion = true;
-                        }
-                    }
-                }
+                });
 
                 // 3. Finalize all groups
                 for (const [dName, group] of identifiedScaleGroups.entries()) {
                     group.options = Array.from(group.options);
                     group.options.sort((a, b) => (group.frequencies.get(b) || 0) - (group.frequencies.get(a) || 0));
                     
-                    // Apply heuristic to automatic groups, and ALSO to manual groups
-                    // that were explicitly set to scale but look like suggestions.
+                    // Only apply scale heuristic check to scale groups
                     if (!group.isMultiSelect && !group.isSuggestion) {
                         if (group.options.length > 12 || (group.cols.length === 1 && group.options.length > 6)) {
                             group.isSuggestion = true;
@@ -2328,7 +2305,7 @@
                 
                 renderScaleGroups();
                 
-                // FIX: Hide Step 3 if there are no scale groups to configure
+                // Show Step 3 only if there is at least one scale group
                 let hasScaleGroups = false;
                 identifiedScaleGroups.forEach((group) => {
                     if (!group.isSuggestion && !group.isMultiSelect) {
