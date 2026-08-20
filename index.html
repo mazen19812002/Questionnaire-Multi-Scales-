@@ -788,9 +788,9 @@
         <div id="manualGroupSection" class="hidden mb-10 input-card bg-purple-50/40 border-2 border-purple-200">
             <h2 class="text-3xl font-black text-purple-900 mb-2 text-center thin-title">التجميع والتصنيف اليدوي</h2>
             <p class="text-center text-slate-500 font-bold mb-8 text-sm leading-relaxed">
-                أضف مجموعات وحدد نوعها، ثم اختر الأسئلة التي تنتمي لكل مجموعة (سيتم حجب الأسئلة المختارة لمنع التكرار).
+                أضف مجموعات وحدد نوعها (مقياس، تكرارات، أو نصوص مفتوحة)، ثم اختر الأسئلة التي تنتمي لكل مجموعة (سيتم حجب الأسئلة المختارة من باقي المجموعات لمنع التكرار). 
                 <br>
-                <span class="text-purple-700 font-black">ملاحظة الذكاء الاصطناعي:</span> اترك أسئلة "النصوص المفتوحة/المقترحات" بدون تحديد، وسيتكفل النظام تلقائياً باكتشافها وتلخيصها لك!
+                <span class="text-purple-700 font-black">ملاحظة:</span> أي أسئلة تتركها بدون تحديد، سيقوم النظام تلقائياً باكتشافها وتصنيفها بالطريقة العادية، لتوفير وقتك.
             </p>
             
             <div id="manualGroupsContainer" class="space-y-6 mb-8"></div>
@@ -2102,7 +2102,7 @@
                             <select class="w-full p-3 border border-purple-200 focus:border-purple-500 rounded-xl font-bold group-type-select outline-none transition-all text-purple-900">
                                 <option value="scale">مقياس متدرج (Scale)</option>
                                 <option value="multi">تكرارات / اختيار متعدد (Multi-select)</option>
-                                <!-- Suggestions removed here to be treated automatically as requested -->
+                                <option value="open">نصوص مفتوحة (Suggestions)</option>
                             </select>
                         </div>
                     </div>
@@ -2160,7 +2160,7 @@
                             positives: new Set(), 
                             cols: [], 
                             items: [], 
-                            isSuggestion: false, // Suggestions are automatic
+                            isSuggestion: type === 'open', 
                             isMultiSelect: type === 'multi', 
                             userAddedOptions: new Set(), 
                             frequencies: new Map(),
@@ -2536,7 +2536,9 @@
                 const d = languageData[currentLang];
                 let copyContent = `${d.title}\n${d.devCredit}\n\n`;
                 
-                copyContent += `البرنامج: ${document.getElementById('programNameText').textContent}\tالمشاركون: ${document.getElementById('participantCountDisplay').textContent}\n\n`;
+                const programText = document.getElementById('programNameText').textContent;
+                const participantText = document.getElementById('participantCountDisplay').textContent;
+                copyContent += `البرنامج: ${programText}\tالمشاركون: ${participantText}\n\n`;
                 
                 document.querySelectorAll('.domain-result-wrapper, .summary-table-wrapper, .suggestion-wrapper').forEach(block => {
                     const h2 = block.querySelector('h2'); 
@@ -2605,12 +2607,14 @@
 
             document.getElementById('exportButton').onclick = () => {
                 const d = languageData[currentLang];
-                const wb = XLSX.utils.book_new(); 
+                const programText = document.getElementById('programNameText').textContent;
+                const participantText = document.getElementById('participantCountDisplay').textContent;
                 
+                const wb = XLSX.utils.book_new(); 
                 let allD = [ 
                     [d.title], 
                     [d.devCredit], 
-                    [`البرنامج: ${document.getElementById('programNameText').textContent}`, `المشاركون: ${document.getElementById('participantCountDisplay').textContent}`], 
+                    [`البرنامج: ${programText}`, `المشاركون: ${participantText}`], 
                     [] 
                 ];
                 
