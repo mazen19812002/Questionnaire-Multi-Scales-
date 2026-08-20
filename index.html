@@ -47,7 +47,7 @@
         .nav-tooltip { position: absolute; white-space: nowrap; background: #1e293b; color: white; padding: 6px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 900; opacity: 0; pointer-events: none; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); left: 55px; }
         .nav-dot:hover .nav-tooltip { opacity: 1; }
         
-        /* NEW STYLES FOR MANUAL GROUPING */
+        /* Styles for Manual Grouping */
         .btn-delete { background-color: #ef4444; color: white; transition: all 0.2s; }
         .btn-delete:hover { background-color: #dc2626; transform: scale(1.1); }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -357,10 +357,10 @@
             </div>
         </div>
 
-        <!-- NEW MANUAL GROUPING SECTION -->
+        <!-- MANUAL GROUPING SECTION -->
         <div id="manualGroupSection" class="hidden mb-10 input-card bg-purple-50/40 border-2 border-purple-200">
             <h2 class="text-3xl font-black text-purple-900 mb-2 text-center thin-title">التجميع والتصنيف اليدوي</h2>
-            <p class="text-center text-slate-500 font-bold mb-8 text-sm">أضف مجموعات وحدد نوعها، ثم اختر الأسئلة التي تنتمي لكل مجموعة.</p>
+            <p class="text-center text-slate-500 font-bold mb-8 text-sm">أضف مجموعات وحدد نوعها، ثم اختر الأسئلة التي تنتمي لكل مجموعة (سيتم حجب الأسئلة المختارة من باقي المجموعات لمنع التكرار).</p>
             
             <div id="manualGroupsContainer" class="space-y-6 mb-8"></div>
             
@@ -780,7 +780,6 @@
         function renderMultiSelectChart(title, options, freqs, totalRespondents) {
             const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
             const divC = document.createElement('div');
-            // Full width for multi-select as texts are often long
             divC.className = 'bg-white p-4 rounded-2xl shadow-xl border border-blue-100 flex flex-col items-center lg:col-span-2';
             
             divC.innerHTML = `<h3 class="text-lg font-black mb-3 text-center text-indigo-900">${title}</h3>
@@ -798,7 +797,7 @@
                     labels: options,
                     datasets: [{
                         data: dataVals,
-                        backgroundColor: '#10b981', // green for standard frequencies
+                        backgroundColor: '#10b981',
                         borderRadius: 4,
                         maxBarThickness: 60,
                         barPercentage: 0.8
@@ -826,7 +825,7 @@
                             ticks: {
                                 font: { weight: '900', family: 'Cairo', size: 11 },
                                 autoSkip: false, 
-                                maxRotation: 45, // Angle for better readability
+                                maxRotation: 45,
                                 minRotation: 45
                             }
                         }
@@ -1382,7 +1381,7 @@
             };
 
             /* ========================================================= */
-            /* --- MANUAL GROUPING LOGIC --- */
+            /* --- MANUAL GROUPING LOGIC WITH EXCLUSION OF SELECTED ITEMS --- */
             /* ========================================================= */
             function getAllAvailableColumns() {
                 const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
@@ -1394,6 +1393,48 @@
                     cols.push({ idx: i, name: headers[i] || `Column ${i}` });
                 }
                 return cols;
+            }
+
+            function updateManualGroupCheckboxes() {
+                const groups = document.querySelectorAll('.manual-group-item');
+                const selectedColMap = new Map(); // colIdx -> groupElement
+
+                // Collect all currently checked columns and in which group
+                groups.forEach(g => {
+                    const checkedBoxes = g.querySelectorAll('.group-col-checkbox:checked');
+                    checkedBoxes.forEach(cb => {
+                        selectedColMap.set(cb.value, g);
+                    });
+                });
+
+                // Update state of all checkboxes in all groups
+                groups.forEach(g => {
+                    const allCheckboxes = g.querySelectorAll('.group-col-checkbox');
+                    allCheckboxes.forEach(cb => {
+                        const isSelectedInOtherGroup = selectedColMap.has(cb.value) && selectedColMap.get(cb.value) !== g;
+                        const parentLabel = cb.closest('label');
+                        const badge = parentLabel.querySelector('.selected-badge');
+
+                        if (isSelectedInOtherGroup) {
+                            cb.disabled = true;
+                            parentLabel.classList.add('opacity-40', 'bg-slate-100', 'cursor-not-allowed');
+                            parentLabel.classList.remove('hover:bg-white');
+                            if (!badge) {
+                                const spanBadge = document.createElement('span');
+                                spanBadge.className = 'selected-badge text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-black mr-auto';
+                                spanBadge.innerText = 'تم اختياره';
+                                parentLabel.appendChild(spanBadge);
+                            }
+                        } else {
+                            if (!cb.checked) {
+                                cb.disabled = false;
+                                parentLabel.classList.remove('opacity-40', 'bg-slate-100', 'cursor-not-allowed');
+                                parentLabel.classList.add('hover:bg-white');
+                            }
+                            if (badge) badge.remove();
+                        }
+                    });
+                });
             }
 
             function createManualGroupItem() {
@@ -1420,12 +1461,22 @@
                     <div>
                         <label class="block text-xs font-black text-purple-800 mb-2">اختر البنود (الأسئلة)</label>
                         <div class="border border-purple-100 rounded-xl p-3 max-h-48 overflow-y-auto bg-slate-50 columns-checkboxes custom-scrollbar grid grid-cols-1 md:grid-cols-2 gap-2">
-                            ${allCols.map(c => `<label class="flex items-start gap-2 font-bold cursor-pointer p-2 hover:bg-white rounded-lg border border-transparent hover:border-purple-100 transition-all text-sm leading-tight"><input type="checkbox" value="${c.idx}" class="mt-1 w-4 h-4 text-purple-600 rounded group-col-checkbox"> <span>${c.name}</span></label>`).join('')}
+                            ${allCols.map(c => `<label class="flex items-center gap-2 font-bold cursor-pointer p-2 hover:bg-white rounded-lg border border-transparent hover:border-purple-100 transition-all text-sm leading-tight"><input type="checkbox" value="${c.idx}" class="w-4 h-4 text-purple-600 rounded group-col-checkbox"> <span>${c.name}</span></label>`).join('')}
                         </div>
                     </div>
                 `;
-                groupDiv.querySelector('.delete-group-btn').onclick = () => groupDiv.remove();
+                
+                groupDiv.querySelectorAll('.group-col-checkbox').forEach(cb => {
+                    cb.onchange = () => updateManualGroupCheckboxes();
+                });
+
+                groupDiv.querySelector('.delete-group-btn').onclick = () => {
+                    groupDiv.remove();
+                    updateManualGroupCheckboxes();
+                };
+
                 document.getElementById('manualGroupsContainer').appendChild(groupDiv);
+                updateManualGroupCheckboxes();
             }
 
             document.getElementById('manualGroupingBtn').onclick = () => {
@@ -1651,23 +1702,23 @@
                                     padding: { top: 30, bottom: 10, left: 10, right: 10 }
                                 },
                                 scales: {
-                                    y: {
-                                            beginAtZero: true,
+                                    y: { 
+                                          beginAtZero: true,
                                           grace: '15%',
                                           position: 'right',
                                           ticks: { font: { weight: '900', family: 'Cairo', size: 11 } }
                                     },
                                     x: {
-                                        grid: { display: false },
+                                        grid: { display: false }, 
                                           ticks: {
                                             font: { weight: '900', family: 'Cairo', size: 10 },
-                                            autoSkip: false,
+                                            autoSkip: false, 
                                               maxRotation: 0
                                           }
                                     }
                                 },
-                                plugins: {
-                                        legend: { display: false },
+                                plugins: { 
+                                        legend: { display: false }, 
                                         datalabels: {
                                         anchor: 'end',
                                         align: 'top',
