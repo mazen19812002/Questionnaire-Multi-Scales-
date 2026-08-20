@@ -315,7 +315,8 @@
                                 values: itemValues,
                                 isMultiSelect: true
                             }],
-                            scales: newScales
+                            scales: newScales,
+                            firstColIndex: i
                         });
                         continue;
                     }
@@ -332,7 +333,7 @@
                     }
 
                     if (!gridGroups.has(domainName)) {
-                        gridGroups.set(domainName, { items: [], colIndices: [] });
+                        gridGroups.set(domainName, { items: [], colIndices: [], firstColIndex: i });
                     }
                     gridGroups.get(domainName).items.push({ name: itemName, colIndex: i });
                     gridGroups.get(domainName).colIndices.push(i);
@@ -407,10 +408,14 @@
                             name: domainName,
                             isFrequencyQuestion: false,
                             items: parsedItems,
-                            scales: newScales
+                            scales: newScales,
+                            firstColIndex: domainData.firstColIndex
                         });
                     }
                 });
+                
+                // Sort domains by their original column index in the Excel file
+                newDomains.sort((a, b) => a.firstColIndex - b.firstColIndex);
                 
                 setDomains(prev => [...prev, ...newDomains]);
                 setParticipantsCount(rawResponses.length);
