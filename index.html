@@ -24,604 +24,105 @@
             scroll-behavior: smooth;
             line-height: 1.3;
         }
-
-        .thin-title { 
-            font-weight: 300; 
-            letter-spacing: -0.01em; 
-        }
-
-        .hover-zoom { 
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; 
-        }
-
-        .hover-zoom:hover { 
-            transform: scale(1.03); 
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); 
-        }
-
-        .btn-execute { 
-            background-color: #22c55e; 
-            color: white; 
-            font-weight: 700; 
-            transition: all 0.2s; 
-            padding: 1rem 2rem; 
-            border-radius: 1.5rem; 
-        }
-
-        .btn-execute:hover { 
-            background-color: #16a34a; 
-            transform: scale(1.05); 
-        }
-
-        .copy-btn-wrapper { 
-            position: absolute; 
-            top: 1rem; 
-            z-index: 30; 
-            left: 1rem; 
-        }
-
-        .copy-btn-inner { 
-            opacity: 0.4; 
-            transition: opacity 0.2s, transform 0.2s; 
-            cursor: pointer; 
-            padding: 10px; 
-            border-radius: 10px; 
-            background-color: rgba(255, 255, 255, 0.9); 
-            border: 1px solid #cbd5e1; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: #475569; 
-        }
-
-        .copy-btn-inner:hover { 
-            opacity: 1; 
-            background-color: #ffffff; 
-            transform: scale(1.1); 
-            border-color: #22c55e; 
-            color: #22c55e; 
-        }
-
-        .input-card { 
-            background: white; 
-            padding: 2.5rem; 
-            border-radius: 2.5rem; 
-            border: 1px solid #bae6fd; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
-        }
+        .thin-title { font-weight: 300; letter-spacing: -0.01em; }
+        .hover-zoom { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+        .hover-zoom:hover { transform: scale(1.03); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        .btn-execute { background-color: #22c55e; color: white; font-weight: 700; transition: all 0.2s; padding: 1rem 2rem; border-radius: 1.5rem; }
+        .btn-execute:hover { background-color: #16a34a; transform: scale(1.05); }
+        .copy-btn-wrapper { position: absolute; top: 1rem; z-index: 30; left: 1rem; }
+        .copy-btn-inner { opacity: 0.4; transition: opacity 0.2s, transform 0.2s; cursor: pointer; padding: 10px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.9); border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; color: #475569; }
+        .copy-btn-inner:hover { opacity: 1; background-color: #ffffff; transform: scale(1.1); border-color: #22c55e; color: #22c55e; }
+        .input-card { background: white; padding: 2.5rem; border-radius: 2.5rem; border: 1px solid #bae6fd; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
         
         /* Custom Multi-select styles */
-        .multi-select-container { 
-            position: relative; 
-            width: 100%; 
-        }
-
-        .multi-select-trigger { 
-            background-color: white; 
-            border: 1px solid #cbd5e1; 
-            padding: 1rem; 
-            border-radius: 1rem; 
-            cursor: pointer; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            font-weight: 600; 
-            min-height: 3.5rem; 
-        }
-
-        .multi-select-dropdown { 
-            position: absolute; 
-            top: 100%; 
-            left: 0; 
-            right: 0; 
-            background: white; 
-            border: 1px solid #cbd5e1; 
-            border-radius: 1rem; 
-            margin-top: 5px; 
-            max-height: 250px; 
-            overflow-y: auto; 
-            z-index: 50; 
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
-            display: none; 
-        }
-
-        .multi-select-dropdown.active { 
-            display: block; 
-        }
-
-        .multi-select-item { 
-            padding: 0.75rem 1rem; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            cursor: pointer; 
-            transition: background 0.2s; 
-        }
-
-        .multi-select-item:hover { 
-            background-color: #f1f5f9; 
-        }
-
-        .multi-select-item input { 
-            width: 1.2rem; 
-            height: 1.2rem; 
-            cursor: pointer; 
-        }
-
-        .suggestion-box { 
-            background-color: #f8fafc; 
-            border: 2px solid #e2e8f0; 
-            border-radius: 1.5rem; 
-            padding: 2rem; 
-            line-height: 1.8; 
-            color: #1e293b; 
-            min-height: 80px; 
-            max-height: 600px; 
-            overflow-y: auto; 
-            white-space: pre-wrap; 
-            font-weight: 500; 
-            font-size: 1.1rem; 
-            box-shadow: inset 0 2px 8px 0 rgba(0,0,0,0.03); 
-        }
+        .multi-select-container { position: relative; width: 100%; }
+        .multi-select-trigger { background-color: white; border: 1px solid #cbd5e1; padding: 1rem; border-radius: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; min-height: 3.5rem; }
+        .multi-select-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; border-radius: 1rem; margin-top: 5px; max-height: 250px; overflow-y: auto; z-index: 50; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); display: none; }
+        .multi-select-dropdown.active { display: block; }
+        .multi-select-item { padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.2s; }
+        .multi-select-item:hover { background-color: #f1f5f9; }
+        .multi-select-item input { width: 1.2rem; height: 1.2rem; cursor: pointer; }
+        .suggestion-box { background-color: #f8fafc; border: 2px solid #e2e8f0; border-radius: 1.5rem; padding: 2rem; line-height: 1.8; color: #1e293b; min-height: 80px; max-height: 600px; overflow-y: auto; white-space: pre-wrap; font-weight: 500; font-size: 1.1rem; box-shadow: inset 0 2px 8px 0 rgba(0,0,0,0.03); }
         
         /* Floating Nav */
-        .floating-nav { 
-            position: fixed; 
-            top: 50%; 
-            transform: translateY(-50%); 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-            z-index: 100; 
-            padding: 12px; 
-            background: rgba(255, 255, 255, 0.5); 
-            backdrop-filter: blur(10px); 
-            border-radius: 2rem; 
-            border: 1px solid rgba(255, 255, 255, 0.6); 
-            box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.15); 
-            left: 1rem; 
-        }
-
-        .nav-dot { 
-            width: 44px; 
-            height: 44px; 
-            background: white; 
-            border: 2px solid #4f46e5; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            cursor: pointer; 
-            transition: all 0.3s; 
-            position: relative; 
-            color: #4f46e5; 
-        }
-
-        .nav-dot:hover { 
-            background: #4f46e5; 
-            color: white; 
-            transform: scale(1.15); 
-        }
-
-        .nav-tooltip { 
-            position: absolute; 
-            white-space: nowrap; 
-            background: #1e293b; 
-            color: white; 
-            padding: 6px 14px; 
-            border-radius: 10px; 
-            font-size: 0.85rem; 
-            font-weight: 900; 
-            opacity: 0; 
-            pointer-events: none; 
-            transition: all 0.3s; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-            left: 55px; 
-        }
-
-        .nav-dot:hover .nav-tooltip { 
-            opacity: 1; 
-        }
+        .floating-nav { position: fixed; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 100; padding: 12px; background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); border-radius: 2rem; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.15); left: 1rem; }
+        .nav-dot { width: 44px; height: 44px; background: white; border: 2px solid #4f46e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; position: relative; color: #4f46e5; }
+        .nav-dot:hover { background: #4f46e5; color: white; transform: scale(1.15); }
+        .nav-tooltip { position: absolute; white-space: nowrap; background: #1e293b; color: white; padding: 6px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 900; opacity: 0; pointer-events: none; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); left: 55px; }
+        .nav-dot:hover .nav-tooltip { opacity: 1; }
         
         /* Styles for Manual Grouping */
-        .btn-delete { 
-            background-color: #ef4444; 
-            color: white; 
-            transition: all 0.2s; 
-        }
-
-        .btn-delete:hover { 
-            background-color: #dc2626; 
-            transform: scale(1.1); 
-        }
-
-        .custom-scrollbar::-webkit-scrollbar { 
-            width: 6px; 
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track { 
-            background: #f1f5f9; 
-            border-radius: 4px; 
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb { 
-            background: #cbd5e1; 
-            border-radius: 4px; 
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { 
-            background: #94a3b8; 
-        }
-
+        .btn-delete { background-color: #ef4444; color: white; transition: all 0.2s; }
+        .btn-delete:hover { background-color: #dc2626; transform: scale(1.1); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
         /* ------------------------------------------------------------- */
         /* --- OPTIMIZED PRINT MEDIA QUERY FOR FITTING EVERYTHING --- */
         /* ------------------------------------------------------------- */
         @media print {
-            @page { 
-                size: A4 portrait; 
-                margin: 5mm; 
-            } 
-            
-            body { 
-                background-color: white !important; 
-                padding: 0 !important; 
-                color: black !important; 
-                font-size: 8pt !important; 
-                line-height: 1.1 !important; 
-            }
-            
-            .max-w-4xl, #dataConfigSection, #filterSection, #scaleOrderSection, #actionButtons, footer, .floating-nav, .copy-btn-wrapper, #messageBoxModal, #manualGroupSection { 
-                display: none !important; 
-            }
-            
-            main { 
-                box-shadow: none !important; 
-                padding: 0 !important; 
-                background-color: transparent !important; 
-                max-width: 100% !important; 
-                margin: 0 !important; 
-                border: none !important; 
-            }
-            
-            .flex.justify-between.items-start.mb-8 { 
-                display: flex !important; 
-                position: absolute !important; 
-                top: 0 !important; 
-                left: 0 !important; 
-                right: 0 !important; 
-                align-items: flex-start !important; 
-                margin-bottom: 0 !important; 
-            }
-
-            .flex.justify-between.items-start.mb-8 img { 
-                height: 105px !important; 
-                width: 105px !important; 
-                box-shadow: none !important; 
-                border: none !important; 
-                padding: 0 !important; 
-                display: block !important; 
-                background: transparent !important;
-            }
-
-            .mb-6.relative { 
-                margin-bottom: 1mm !important; 
-            }
-
-            #mainTitle { 
-                font-size: 22pt !important; 
-                font-weight: 900 !important; 
-                margin-bottom: 2mm !important; 
-                text-align: center !important; 
-                line-height: 1.2 !important; 
-                padding-top: 6mm !important; 
-                margin-top: 0 !important;
-            }
-
-            #instituteTitle { 
-                font-size: 13pt !important; 
-                text-align: center !important; 
-                margin-bottom: 12mm !important; 
-                line-height: 1.4 !important; 
-            }
-
-            #fileNameDisplay { 
-                font-size: 11pt !important; 
-                display: block !important; 
-                margin-bottom: 2mm !important; 
-                text-align: center !important; 
-                line-height: 1 !important; 
-            }
-            
-            #metaInfoDisplay { 
-                display: flex !important; 
-                justify-content: flex-end !important; 
-                gap: 2mm !important; 
-                margin-top: 1mm !important; 
-                margin-bottom: 2mm !important;
-                flex-wrap: nowrap !important;
-            }
-
-            #metaInfoDisplay > div {
-                padding: 1.5mm 3mm !important;
-                border: 1pt solid #cbd5e1 !important;
-                border-radius: 4pt !important;
-                background-color: #f8fafc !important;
-                font-size: 9pt !important;
-                display: flex !important;
-                align-items: center !important;
-                white-space: nowrap !important;
-            }
-
-            #metaInfoDisplay > div.min-w-0 {
-                flex-shrink: 1 !important;
-                overflow: hidden !important;
-            }
-
-            #metaInfoDisplay span { 
-                line-height: 1 !important; 
-            }
-
-            #programNameText {
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-                white-space: nowrap !important;
-            }
-            
-            h2 { 
-                font-size: 10pt !important; 
-                padding: 1mm 2mm !important; 
-                margin-bottom: 0 !important; 
-                border: none !important; 
-                background-color: transparent !important; 
-            }
-
-            h3, h4 { 
-                font-size: 9pt !important; 
-                margin-bottom: 1mm !important; 
-            }
-
-            #reportPrintScope .space-y-8 > div { 
-                margin-bottom: 2mm !important; 
-                margin-top: 0 !important; 
-            }
-
-            #reportPrintScope .mt-8, #reportPrintScope .mt-10, #reportPrintScope .mt-12 { 
-                margin-top: 2mm !important; 
-            }
-
-            .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper {
-                margin-bottom: 2mm !important;
-                border: 1pt solid #cbd5e1 !important;
-                border-radius: 4pt !important;
-                box-shadow: none !important;
-                padding: 0 !important; 
-                background-color: white !important;
-                overflow: visible !important; 
-                page-break-inside: auto !important; 
-            }
-
-            .domain-result-wrapper h2, .summary-table-wrapper h2, .suggestion-wrapper h2 { 
-                padding: 1mm 2mm !important; 
-                background-color: #f8fafc !important; 
-                border-bottom: 1pt solid #cbd5e1 !important; 
-                margin: 0 !important; 
-                border-top-left-radius: 4pt !important; 
-                border-top-right-radius: 4pt !important; 
-            }
-
-            .suggestion-wrapper .p-4 { 
-                padding: 1mm !important; 
-            }
-
-            .suggestion-box { 
-                min-height: auto !important; 
-                padding: 1mm !important; 
-            }
-
-            .suggestion-wrapper, .summary-table-wrapper { 
-                page-break-inside: avoid !important; 
-                break-inside: avoid !important; 
-            }
-
-            #positiveNegativeItemsContainer { 
-                display: flex !important; 
-                flex-direction: row !important; 
-                flex-wrap: wrap !important; 
-                gap: 2% !important; 
-                justify-content: space-between !important; 
-                align-items: stretch !important; 
-                page-break-inside: avoid !important; 
-            }
-
-            #positiveNegativeItemsContainer > div { 
-                width: 49% !important; 
-                box-sizing: border-box !important; 
-                margin-bottom: 2mm !important; 
-                border: 1pt solid #cbd5e1 !important; 
-                padding: 2mm !important; 
-                border-radius: 4pt !important; 
-                background-color: #f8fafc !important; 
-            }
-
-            #positiveNegativeItemsContainer ul.space-y-3 > li { 
-                margin-bottom: 0 !important; 
-                padding: 1mm !important; 
-                font-size: 8pt !important; 
-            }
-            
-            #chartContainer { 
-                display: flex !important; 
-                flex-wrap: wrap !important; 
-                gap: 2% !important; 
-                justify-content: space-between !important; 
-            }
-
-            #chartContainer > div { 
-                width: 48% !important; 
-                min-width: 300px !important; 
-                page-break-inside: avoid !important; 
-                break-inside: avoid !important; 
-                border: 1pt solid #cbd5e1 !important; 
-                padding: 2mm !important; 
-                border-radius: 4pt !important; 
-                margin-bottom: 2mm !important;
-                background-color: white !important;
-            }
-            
-            #chartContainer > div.lg\\:col-span-2 {
-                width: 100% !important;
-            }
-            
-            #chartContainer .relative {
-                height: 160px !important;
-                max-height: 160px !important;
-                width: 100% !important;
-            }
-
-            canvas {
-                max-width: 100% !important;
-                height: 100% !important;
-            }
-            
-            #finalRecommendationContainer { 
-                page-break-inside: avoid !important; 
-                break-inside: avoid !important; 
-            }
-
-            #finalRecommendationContainer > div { 
-                padding: 2mm !important; 
-                border: 1pt solid #818cf8 !important; 
-                border-radius: 6pt !important; 
-                box-shadow: none !important; 
-                background-color: white !important; 
-                margin-bottom: 2mm !important;
-            }
-
-            #finalRecommendationContainer h2 { 
-                font-size: 12pt !important; 
-                margin-bottom: 1mm !important; 
-                border-bottom: 1pt solid #e0e7ff !important; 
-                padding-bottom: 1mm !important; 
-                background-color: transparent !important; 
-            }
-
-            #finalRecommendationContainer > div > .grid { 
-                display: flex !important; 
-                flex-direction: row !important; 
-                gap: 2% !important; 
-                justify-content: center !important; 
-            }
-
-            #finalRecommendationContainer > div > .grid > div { 
-                width: 48% !important; 
-                padding: 1mm !important; 
-                border-radius: 4pt !important; 
-                border: 1pt solid #cbd5e1 !important; 
-                display: flex !important; 
-                flex-direction: column !important; 
-                align-items: center !important; 
-                justify-content: center !important; 
-                background-color: #f8fafc !important; 
-            }
-
-            #finalRecommendationContainer .text-5xl { 
-                font-size: 16pt !important; 
-                line-height: 1 !important; 
-                margin-top: 1mm !important; 
-            } 
-
-            #finalRecommendationContainer .text-xs { 
-                font-size: 8pt !important; 
-            }
-            
-            .overflow-x-auto { 
-                overflow: visible !important; 
-            } 
-
-            table { 
-                width: 100% !important; 
-                border-collapse: collapse !important; 
-                table-layout: fixed !important; 
-                margin: 0 !important; 
-                background-color: white !important; 
-            }
-
-            thead { 
-                display: table-header-group !important; 
-            } 
-
-            tfoot { 
-                display: table-row-group !important; 
-            } 
-
-            tr { 
-                page-break-inside: avoid !important; 
-                break-inside: avoid !important; 
-            } 
-            
-            th, td { 
-                border: 1pt solid #cbd5e1 !important; 
-                padding: 1.5pt 2pt !important; 
-                font-size: 7.5pt !important; 
-                word-wrap: break-word !important; 
-                overflow-wrap: break-word !important; 
-                white-space: normal !important; 
-                vertical-align: middle !important; 
-            }
-
-            th { 
-                background-color: #f1f5f9 !important; 
-                font-weight: 900 !important; 
-                color: #1e293b !important; 
-            }
-            
-            table th:nth-child(1), table td:nth-child(1) { width: 5% !important; text-align: center !important; } 
-            table th:nth-child(2), table td:nth-child(2) { width: 35% !important; text-align: right !important; } 
-            table th:nth-last-child(2), table td:nth-last-child(2) { width: 10% !important; text-align: center !important; } 
-            table th:nth-last-child(1), table td:nth-last-child(1) { width: 10% !important; text-align: center !important; } 
-            
-            #signatureSection { 
-                page-break-inside: avoid !important; 
-                display: flex !important; 
-                flex-direction: row !important; 
-                justify-content: space-between !important; 
-                margin-top: 5mm !important; 
-                border-top: 1pt solid #cbd5e1 !important; 
-                padding-top: 3mm !important;
-                padding-left: 10mm !important;
-                padding-right: 10mm !important;
-                padding-bottom: 10mm !important; 
-                font-size: 11pt !important;
-            }
-
-            #signatureSection .text-center { 
-                display: flex !important; 
-                flex-direction: column !important; 
-                align-items: center !important; 
-            }
-
-            #signatureSection .sig-space { 
-                height: 12mm !important; 
-                width: 100% !important; 
-                display: block !important; 
-            } 
-
-            #signatureSection p { 
-                margin-bottom: 0 !important; 
-                display: block !important; 
-                color: black !important; 
-            }
-            
-            * { 
-                -webkit-print-color-adjust: exact !important; 
-                print-color-adjust: exact !important; 
-                color-adjust: exact !important; 
-            }
+            @page { size: A4 portrait; margin: 5mm; }
+            body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 8pt !important; line-height: 1.1 !important; }
+            .max-w-4xl, #dataConfigSection, #filterSection, #scaleOrderSection, #visualDomainSection, #actionButtons, footer, .floating-nav, .copy-btn-wrapper, #messageBoxModal, #manualGroupSection { display: none !important; }
+            main { box-shadow: none !important; padding: 0 !important; background-color: transparent !important; max-width: 100% !important; margin: 0 !important; border: none !important; }
+            .flex.justify-between.items-start.mb-8 { display: flex !important; position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; align-items: flex-start !important; margin-bottom: 0 !important; }
+            .flex.justify-between.items-start.mb-8 img { height: 105px !important; width: 105px !important; box-shadow: none !important; border: none !important; padding: 0 !important; display: block !important; background: transparent !important; }
+            .mb-6.relative { margin-bottom: 1mm !important; }
+            #mainTitle { font-size: 22pt !important; font-weight: 900 !important; margin-bottom: 2mm !important; text-align: center !important; line-height: 1.2 !important; padding-top: 6mm !important; margin-top: 0 !important; }
+            #instituteTitle { font-size: 13pt !important; text-align: center !important; margin-bottom: 12mm !important; line-height: 1.4 !important; }
+            #fileNameDisplay { font-size: 11pt !important; display: block !important; margin-bottom: 2mm !important; text-align: center !important; line-height: 1 !important; }
+            #metaInfoDisplay { display: flex !important; justify-content: flex-end !important; gap: 2mm !important; margin-top: 1mm !important; margin-bottom: 2mm !important; flex-wrap: nowrap !important; }
+            #metaInfoDisplay > div { padding: 1.5mm 3mm !important; border: 1pt solid #cbd5e1 !important; border-radius: 4pt !important; background-color: #f8fafc !important; font-size: 9pt !important; display: flex !important; align-items: center !important; white-space: nowrap !important; }
+            #metaInfoDisplay > div.min-w-0 { flex-shrink: 1 !important; overflow: hidden !important; }
+            #metaInfoDisplay span { line-height: 1 !important; }
+            #programNameText { overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+            h2 { font-size: 10pt !important; padding: 1mm 2mm !important; margin-bottom: 0 !important; border: none !important; background-color: transparent !important; }
+            h3, h4 { font-size: 9pt !important; margin-bottom: 1mm !important; }
+            #reportPrintScope .space-y-8 > div { margin-bottom: 2mm !important; margin-top: 0 !important; }
+            #reportPrintScope .mt-8, #reportPrintScope .mt-10, #reportPrintScope .mt-12 { margin-top: 2mm !important; }
+            .domain-result-wrapper, .suggestion-wrapper, .summary-table-wrapper { margin-bottom: 2mm !important; border: 1pt solid #cbd5e1 !important; border-radius: 4pt !important; box-shadow: none !important; padding: 0 !important; background-color: white !important; overflow: visible !important; page-break-inside: auto !important; }
+            .domain-result-wrapper h2, .summary-table-wrapper h2, .suggestion-wrapper h2 { padding: 1mm 2mm !important; background-color: #f8fafc !important; border-bottom: 1pt solid #cbd5e1 !important; margin: 0 !important; border-top-left-radius: 4pt !important; border-top-right-radius: 4pt !important; }
+            .suggestion-wrapper .p-4 { padding: 1mm !important; }
+            .suggestion-box { min-height: auto !important; padding: 1mm !important; }
+            .suggestion-wrapper, .summary-table-wrapper { page-break-inside: avoid !important; break-inside: avoid !important; }
+            #positiveNegativeItemsContainer { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 2% !important; justify-content: space-between !important; align-items: stretch !important; page-break-inside: avoid !important; }
+            #positiveNegativeItemsContainer > div { width: 49% !important; box-sizing: border-box !important; margin-bottom: 2mm !important; border: 1pt solid #cbd5e1 !important; padding: 2mm !important; border-radius: 4pt !important; background-color: #f8fafc !important; }
+            #positiveNegativeItemsContainer ul.space-y-3 > li { margin-bottom: 0 !important; padding: 1mm !important; font-size: 8pt !important; }
+            #chartContainer { display: flex !important; flex-wrap: wrap !important; gap: 2% !important; justify-content: space-between !important; }
+            #chartContainer > div { width: 48% !important; min-width: 300px !important; page-break-inside: avoid !important; break-inside: avoid !important; border: 1pt solid #cbd5e1 !important; padding: 2mm !important; border-radius: 4pt !important; margin-bottom: 2mm !important; background-color: white !important; }
+            #chartContainer > div.lg\\:col-span-2 { width: 100% !important; }
+            #chartContainer .relative { height: 160px !important; max-height: 160px !important; width: 100% !important; }
+            canvas { max-width: 100% !important; height: 100% !important; }
+            #finalRecommendationContainer { page-break-inside: avoid !important; break-inside: avoid !important; }
+            #finalRecommendationContainer > div { padding: 2mm !important; border: 1pt solid #818cf8 !important; border-radius: 6pt !important; box-shadow: none !important; background-color: white !important; margin-bottom: 2mm !important; }
+            #finalRecommendationContainer h2 { font-size: 12pt !important; margin-bottom: 1mm !important; border-bottom: 1pt solid #e0e7ff !important; padding-bottom: 1mm !important; background-color: transparent !important; }
+            #finalRecommendationContainer > div > .grid { display: flex !important; flex-direction: row !important; gap: 2% !important; justify-content: center !important; }
+            #finalRecommendationContainer > div > .grid > div { width: 48% !important; padding: 1mm !important; border-radius: 4pt !important; border: 1pt solid #cbd5e1 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; background-color: #f8fafc !important; }
+            #finalRecommendationContainer .text-5xl { font-size: 16pt !important; line-height: 1 !important; margin-top: 1mm !important; }
+            #finalRecommendationContainer .text-xs { font-size: 8pt !important; }
+            .overflow-x-auto { overflow: visible !important; }
+            table { width: 100% !important; border-collapse: collapse !important; table-layout: fixed !important; margin: 0 !important; background-color: white !important; }
+            thead { display: table-header-group !important; }
+            tfoot { display: table-row-group !important; }
+            tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+            th, td { border: 1pt solid #cbd5e1 !important; padding: 1.5pt 2pt !important; font-size: 7.5pt !important; word-wrap: break-word !important; overflow-wrap: break-word !important; white-space: normal !important; vertical-align: middle !important; }
+            th { background-color: #f1f5f9 !important; font-weight: 900 !important; color: #1e293b !important; }
+            table th:nth-child(1), table td:nth-child(1) { width: 5% !important; text-align: center !important; }
+            table th:nth-child(2), table td:nth-child(2) { width: 35% !important; text-align: right !important; }
+            table th:nth-last-child(2), table td:nth-last-child(2) { width: 10% !important; text-align: center !important; }
+            table th:nth-last-child(1), table td:nth-last-child(1) { width: 10% !important; text-align: center !important; }
+            #signatureSection { page-break-inside: avoid !important; display: flex !important; flex-direction: row !important; justify-content: space-between !important; margin-top: 5mm !important; border-top: 1pt solid #cbd5e1 !important; padding-top: 3mm !important; padding-left: 10mm !important; padding-right: 10mm !important; padding-bottom: 10mm !important; font-size: 11pt !important; }
+            #signatureSection .text-center { display: flex !important; flex-direction: column !important; align-items: center !important; }
+            #signatureSection .sig-space { height: 12mm !important; width: 100% !important; display: block !important; }
+            #signatureSection p { margin-bottom: 0 !important; display: block !important; color: black !important; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
         }
     </style>
 </head>
 <body class="p-4 md:p-12 text-right" dir="rtl">
-    
+
     <!-- Floating Navigation -->
     <nav class="floating-nav" id="floatingNav">
         <a href="#step1Title" class="nav-dot hover-zoom">
@@ -784,7 +285,7 @@
             </div>
         </div>
 
-        <!-- NEW: MANUAL GROUPING SECTION (SCALES ONLY) -->
+        <!-- MANUAL GROUPING SECTION (SCALES ONLY) -->
         <div id="manualGroupSection" class="hidden mb-10 input-card bg-purple-50/40 border-2 border-purple-200">
             <h2 class="text-3xl font-black text-purple-900 mb-2 text-center thin-title">التجميع والتصنيف اليدوي</h2>
             <p class="text-center text-slate-500 font-bold mb-8 text-sm leading-relaxed">
@@ -860,6 +361,49 @@
             <div id="scaleGroupsContainer" class="space-y-10"></div>
         </div>
 
+        <!-- NEW: VISUAL DOMAIN RANGE SPLITTER (OPTIONAL TOOL) -->
+        <div id="visualDomainSection" class="hidden mb-10 input-card bg-gradient-to-br from-indigo-50/70 to-blue-50/50 border-2 border-indigo-200">
+            <div class="flex flex-col md:flex-row justify-between items-center border-b border-indigo-100 pb-4 mb-6 gap-4">
+                <div>
+                    <h2 class="text-2xl font-black text-indigo-900 thin-title flex items-center gap-3">
+                        <span>🎯</span> تحديد وتقسيم المجالات / المحاور (اختياري)
+                    </h2>
+                    <p class="text-slate-500 font-bold text-xs mt-1">
+                        يمكنك تحديد نطاق البنود لكل محور بصرياً (من بند كذا إلى بند كذا) وتخصيص اسمها
+                    </p>
+                </div>
+                <!-- Toggle switch -->
+                <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-2xl border border-indigo-200 shadow-sm">
+                    <span class="text-sm font-black text-slate-700">تفعيل التقسيم المرئي:</span>
+                    <label class="relative inline-block w-12 h-6 cursor-pointer">
+                        <input type="checkbox" id="enableVisualDomainToggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    </label>
+                </div>
+            </div>
+
+            <div id="visualDomainControls" class="opacity-50 pointer-events-none transition-all duration-300 space-y-6">
+                <!-- Visual Summary Strip -->
+                <div class="bg-white p-4 rounded-2xl border border-indigo-100 shadow-inner">
+                    <div class="flex justify-between items-center mb-2 font-black text-xs text-indigo-900">
+                        <span>شريط التوزيع البصري للبنود:</span>
+                        <span id="visualDomainTotalStatus" class="text-indigo-600 font-bold"></span>
+                    </div>
+                    <div id="visualRangesProgressBar" class="h-6 w-full rounded-xl bg-slate-100 flex overflow-hidden border border-slate-200"></div>
+                </div>
+
+                <!-- Domain Cards Container -->
+                <div id="visualDomainListContainer" class="space-y-4"></div>
+
+                <!-- Add Domain Button -->
+                <div class="flex justify-center pt-2">
+                    <button id="addVisualDomainBtn" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-md hover-zoom transition-all text-sm flex items-center gap-2">
+                        <span>➕</span> إضافة مجال / محور جديد
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Action Buttons -->
         <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
             <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase text-white">
@@ -930,6 +474,11 @@
         // NEW STATE FOR MANUAL MODE
         let manualAvailableCols = [];
 
+        // NEW STATE FOR VISUAL RANGE TOOL
+        let visualScaleCols = [];
+        let visualDomains = [];
+        const domainColorPalette = ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#f97316'];
+
         const languageData = {
             ar: {
                 title: 'تحليل نتائج الاستبيان',
@@ -999,8 +548,7 @@
         /* --- 2. AI Summarization --- */
         async function summarizeWithAI(text) {
             const apiKey = "AQ.Ab8RN6JplE3DZVQudKfYkN13PedZrPJ3FsIsvEaVZeGapMBjGA"; 
-            const modelName = "gemini-1.5-flash";             
-            
+            const modelName = "gemini-1.5-flash";                         
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
             const systemPrompt = "أنت خبير في تحليل البيانات التعليمية. لديك مجموعة من الملاحظات والاستجابات المفتوحة. يرجى قراءتها بعناية واستخلاص الأفكار الرئيسية والاتجاهات العامة، وتقديم ملخص شامل وموجز يعبر عن جوهر الملاحظات بدلاً من سردها أو تكرارها. اكتب الملخص في نقاط واضحة ومهنية باللغة العربية، وابدأ مباشرة بالنقاط دون مقدمات.";
             const payload = { 
@@ -1095,7 +643,7 @@
             container.innerHTML = '';
             
             identifiedScaleGroups.forEach((group, domainName) => {
-                if (group.isSuggestion || group.isMultiSelect) return; 
+                if (group.isSuggestion || group.isMultiSelect) return;
                 
                 const wrap = document.createElement('div');
                 wrap.className = 'bg-white p-4 rounded-2xl border-2 border-blue-200 shadow-md transition-all';
@@ -1173,6 +721,234 @@
             });
         }
 
+        /* --- VISUAL DOMAIN RANGE SPLITTER LOGIC --- */
+        function initVisualDomainSection() {
+            const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
+            const endColVal = document.getElementById('analysisEndColSelect').value;
+            const headers = rawExcelData[0];
+            const endColIdx = endColVal !== "" ? parseInt(endColVal) : headers.length - 1;
+
+            visualScaleCols = [];
+            
+            for (let col = startColIdx; col <= endColIdx; col++) {
+                const headerStr = String(headers[col] || "").trim();
+                const colVals = [];
+                for (let r = 1; r < rawExcelData.length; r++) {
+                    const val = String(rawExcelData[r][col] || "").trim();
+                    if (val !== "") colVals.push(val);
+                }
+
+                let isMulti = false;
+                let splitTokens = [];
+                if (colVals.some(v => v.includes(',') || v.includes('،'))) {
+                    let tokenLen = 0;
+                    colVals.forEach(v => {
+                        v.split(/[,،]/).forEach(t => {
+                            let tr = t.trim();
+                            if (tr) { splitTokens.push(tr); tokenLen += tr.length; }
+                        });
+                    });
+                    if (new Set(splitTokens).size <= 80 && (tokenLen / (splitTokens.length || 1)) < 35) isMulti = true;
+                }
+
+                let isSugg = false;
+                if (!isMulti) {
+                    let totalLen = 0;
+                    colVals.forEach(v => { totalLen += v.length; });
+                    if ((totalLen / (colVals.length || 1)) > 35) isSugg = true;
+                }
+
+                if (!isMulti && !isSugg) {
+                    let itemClean = headerStr;
+                    const matchFull = headerStr.match(/(.+) \[(.+)\]/);
+                    const matchBracket = headerStr.match(/^\[(.+)\]$/);
+                    if (matchFull) itemClean = matchFull[2].trim();
+                    else if (matchBracket) itemClean = matchBracket[1].trim();
+
+                    visualScaleCols.push({
+                        colIdx: col,
+                        fullHeader: headerStr,
+                        itemClean: itemClean,
+                        itemNumber: visualScaleCols.length + 1
+                    });
+                }
+            }
+
+            if (visualScaleCols.length === 0) {
+                document.getElementById('visualDomainSection').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('visualDomainSection').classList.remove('hidden');
+
+            if (visualDomains.length === 0) {
+                visualDomains = [
+                    { name: 'المجال الأول', startIdx: 1, endIdx: Math.min(5, visualScaleCols.length) }
+                ];
+                if (visualScaleCols.length > 5) {
+                    visualDomains.push({ name: 'المجال الثاني', startIdx: 6, endIdx: visualScaleCols.length });
+                }
+            }
+
+            renderVisualDomainsUI();
+        }
+
+        function renderVisualDomainsUI() {
+            const container = document.getElementById('visualDomainListContainer');
+            const progBar = document.getElementById('visualRangesProgressBar');
+            const totalStatus = document.getElementById('visualDomainTotalStatus');
+            const totalItems = visualScaleCols.length;
+            
+            container.innerHTML = '';
+            progBar.innerHTML = '';
+
+            totalStatus.textContent = `إجمالي البنود المتاحة للمقاييس: ${totalItems} بند`;
+
+            visualDomains.forEach((domain, idx) => {
+                const color = domainColorPalette[idx % domainColorPalette.length];
+                const count = Math.max(0, domain.endIdx - domain.startIdx + 1);
+                const perc = totalItems > 0 ? (count / totalItems) * 100 : 0;
+
+                const seg = document.createElement('div');
+                seg.style.width = `${perc}%`;
+                seg.style.backgroundColor = color;
+                seg.className = 'h-full transition-all flex items-center justify-center text-[10px] text-white font-bold overflow-hidden px-1';
+                seg.title = `${domain.name}: من بند ${domain.startIdx} إلى ${domain.endIdx} (${count} بنود)`;
+                seg.textContent = count > 0 ? `${domain.name} (${count})` : '';
+                progBar.appendChild(seg);
+
+                const card = document.createElement('div');
+                card.className = 'bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm flex flex-col md:flex-row items-center gap-4 transition-all hover:border-indigo-300';
+                card.innerHTML = `
+                    <div class="w-4 h-10 rounded-lg shrink-0 hidden md:block" style="background-color: ${color}"></div>
+                    <div class="flex-1 w-full md:w-auto">
+                        <label class="block text-[11px] font-black text-indigo-900 mb-1">اسم المحور / المجال:</label>
+                        <input type="text" value="${domain.name}" class="w-full p-2.5 border border-slate-200 rounded-xl font-bold text-slate-800 focus:border-indigo-500 outline-none domain-name-inp">
+                    </div>
+                    <div class="flex items-center gap-2 w-full md:w-auto justify-between md:justify-start">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-600 mb-1">من بند:</label>
+                            <input type="number" min="1" max="${totalItems}" value="${domain.startIdx}" class="w-20 p-2.5 border border-slate-200 rounded-xl font-black text-center text-indigo-700 start-inp">
+                        </div>
+                        <span class="text-slate-400 font-black mt-5">←</span>
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-600 mb-1">إلى بند:</label>
+                            <input type="number" min="1" max="${totalItems}" value="${domain.endIdx}" class="w-20 p-2.5 border border-slate-200 rounded-xl font-black text-center text-indigo-700 end-inp">
+                        </div>
+                        <div class="text-xs font-black text-indigo-900 bg-indigo-50 px-3 py-2.5 rounded-xl mt-5 border border-indigo-100 shrink-0">
+                            ${count} بنود
+                        </div>
+                    </div>
+                    <div class="mt-2 md:mt-5 flex gap-2 w-full md:w-auto justify-end">
+                        <button class="p-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-black text-sm transition-all remove-domain-btn" title="حذف المحور">🗑️</button>
+                    </div>
+                `;
+
+                card.querySelector('.domain-name-inp').oninput = (e) => {
+                    domain.name = e.target.value;
+                };
+
+                const startInp = card.querySelector('.start-inp');
+                const endInp = card.querySelector('.end-inp');
+
+                startInp.onchange = (e) => {
+                    let val = parseInt(e.target.value) || 1;
+                    val = Math.max(1, Math.min(val, totalItems));
+                    domain.startIdx = val;
+                    if (domain.endIdx < domain.startIdx) domain.endIdx = domain.startIdx;
+                    renderVisualDomainsUI();
+                };
+
+                endInp.onchange = (e) => {
+                    let val = parseInt(e.target.value) || totalItems;
+                    val = Math.max(domain.startIdx, Math.min(val, totalItems));
+                    domain.endIdx = val;
+                    renderVisualDomainsUI();
+                };
+
+                card.querySelector('.remove-domain-btn').onclick = () => {
+                    if (visualDomains.length <= 1) {
+                        showMessage("تنبيه", "يجب الإبقاء على مجال واحد على الأقل.");
+                        return;
+                    }
+                    visualDomains.splice(idx, 1);
+                    renderVisualDomainsUI();
+                };
+
+                container.appendChild(card);
+            });
+        }
+
+        function applyVisualDomainsToIdentifiedGroups() {
+            if (!document.getElementById('enableVisualDomainToggle').checked) return;
+
+            const nonScaleGroups = new Map();
+            identifiedScaleGroups.forEach((g, k) => {
+                if (g.isSuggestion || g.isMultiSelect) {
+                    nonScaleGroups.set(k, g);
+                }
+            });
+
+            let combinedOptions = new Set();
+            let combinedPositives = new Set();
+            
+            identifiedScaleGroups.forEach((g) => {
+                if (!g.isSuggestion && !g.isMultiSelect) {
+                    (g.options || []).forEach(o => combinedOptions.add(o));
+                    (g.positives || []).forEach(p => combinedPositives.add(p));
+                }
+            });
+
+            identifiedScaleGroups.clear();
+
+            visualDomains.forEach(domain => {
+                const dName = domain.name.trim() || 'محور بدون اسم';
+                const dCols = [];
+                const dItems = [];
+                const dOptions = new Set(combinedOptions);
+                const dFrequencies = new Map();
+
+                for (let i = domain.startIdx - 1; i <= domain.endIdx - 1; i++) {
+                    if (visualScaleCols[i]) {
+                        const colItem = visualScaleCols[i];
+                        dCols.push(colItem.colIdx);
+                        dItems.push(colItem.itemClean);
+
+                        for (let r = 1; r < rawExcelData.length; r++) {
+                            const val = String(rawExcelData[r][colItem.colIdx] || "").trim();
+                            if (val !== "") {
+                                dOptions.add(val);
+                                dFrequencies.set(val, (dFrequencies.get(val) || 0) + 1);
+                            }
+                        }
+                    }
+                }
+
+                if (dCols.length > 0) {
+                    const sortedOpts = Array.from(dOptions);
+                    sortedOpts.sort((a, b) => (dFrequencies.get(b) || 0) - (dFrequencies.get(a) || 0));
+
+                    identifiedScaleGroups.set(dName, {
+                        options: sortedOpts,
+                        positives: new Set(combinedPositives),
+                        cols: dCols,
+                        items: dItems,
+                        isSuggestion: false,
+                        isMultiSelect: false,
+                        userAddedOptions: new Set(),
+                        frequencies: dFrequencies
+                    });
+                }
+            });
+
+            nonScaleGroups.forEach((g, k) => {
+                identifiedScaleGroups.set(k, g);
+            });
+
+            renderScaleGroups();
+        }
+
+        /* --- Table Rendering Functions --- */
         function renderTable(title, rows, opts, positives) {
             const d = languageData[currentLang];
             const container = document.getElementById('resultsContainer');
@@ -1202,7 +978,7 @@
                         <tbody>
             `;
             
-            rows.forEach((r, i) => {
+            rows.forEach((r) => {
                 const rowCheckSum = opts.reduce((acc, o) => acc + (r.freqs[o] / r.total * 100), 0);
                 const tdCells = opts.map(o => {
                     const cellVal = r.total > 0 ? (r.freqs[o] / r.total * 100).toFixed(1) : "0.0";
@@ -1351,7 +1127,7 @@
                     labels: options,
                     datasets: [{
                         data: dataVals,
-                        backgroundColor: '#10b981', // green for standard frequencies
+                        backgroundColor: '#10b981',
                         borderRadius: 4,
                         maxBarThickness: 60,
                         barPercentage: 0.8
@@ -1413,8 +1189,8 @@
             div.innerHTML = `
                 <div class="p-4 bg-indigo-50 border-b border-indigo-100 ${align} font-black">
                     <h2 class="text-2xl font-black">${title}</h2>
-                    <div class="mt-1 flex items-center font-black">
-                         <span class="text-sm font-black text-indigo-600 uppercase tracking-widest">${d.suggestionsTitle}</span>
+                    <div class="mt-1 flex items-center font-black"> 
+                        <span class="text-sm font-black text-indigo-600 uppercase tracking-widest">${d.suggestionsTitle}</span>
                     </div>
                 </div>
                 <div class="p-4 ${align} font-black">
@@ -1554,7 +1330,7 @@
                         : score > 65 ? d.evaluations[2] 
                         : score > 50 ? d.evaluations[3] 
                         : d.evaluations[4];
-            
+                        
             div.innerHTML = `
                 <h2 class="text-3xl thin-title mb-6 text-center text-indigo-900 font-black border-b border-indigo-50 pb-4">${d.recommendation}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-black">
@@ -1568,7 +1344,7 @@
                     </div>
                 </div>
             `;
-                             
+            
             container.innerHTML = ''; 
             container.appendChild(div); 
             container.classList.remove('hidden');
@@ -2027,6 +1803,7 @@
                 
                 document.getElementById('filterSection').classList.remove('hidden'); 
                 renderScaleGroups();
+                initVisualDomainSection();
                 
                 let hasScaleGroups = false;
                 identifiedScaleGroups.forEach((group) => {
@@ -2043,6 +1820,40 @@
                 }
                 
                 document.getElementById('actionButtons').classList.remove('hidden');
+            };
+
+            /* ========================================================= */
+            /* --- VISUAL DOMAIN RANGE CONTROLS EVENTS                   */
+            /* ========================================================= */
+            document.getElementById('enableVisualDomainToggle').onchange = (e) => {
+                const controls = document.getElementById('visualDomainControls');
+                if (e.target.checked) {
+                    controls.classList.remove('opacity-50', 'pointer-events-none');
+                    applyVisualDomainsToIdentifiedGroups();
+                } else {
+                    controls.classList.add('opacity-50', 'pointer-events-none');
+                    document.getElementById('confirmMappingBtn').click();
+                }
+            };
+
+            document.getElementById('addVisualDomainBtn').onclick = () => {
+                const totalItems = visualScaleCols.length;
+                let lastEnd = 0;
+                if (visualDomains.length > 0) {
+                    lastEnd = visualDomains[visualDomains.length - 1].endIdx;
+                }
+
+                const newStart = Math.min(lastEnd + 1, totalItems);
+                const newEnd = Math.min(newStart + 4, totalItems);
+
+                visualDomains.push({
+                    name: `المجال ${visualDomains.length + 1}`,
+                    startIdx: newStart,
+                    endIdx: newEnd
+                });
+
+                renderVisualDomainsUI();
+                applyVisualDomainsToIdentifiedGroups();
             };
 
             /* ========================================================= */
@@ -2304,7 +2115,8 @@
                 document.getElementById('filterSection').classList.remove('hidden'); 
                 
                 renderScaleGroups();
-                
+                initVisualDomainSection();
+
                 // Show Step 3 only if there is at least one scale group
                 let hasScaleGroups = false;
                 identifiedScaleGroups.forEach((group) => {
@@ -2322,11 +2134,15 @@
                 
                 document.getElementById('actionButtons').classList.remove('hidden');
             };
-            /* ========================================================= */
 
+            /* ========================================================= */
             document.getElementById('analyzeButton').onclick = async () => {
                 if (!rawExcelData) return;
                 
+                if (document.getElementById('enableVisualDomainToggle').checked) {
+                    applyVisualDomainsToIdentifiedGroups();
+                }
+
                 const allItemsList = []; 
                 const summaryDataList = []; 
                 const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
@@ -2338,7 +2154,7 @@
                 resultsContainer.innerHTML = ''; 
                 document.getElementById('chartContainer').innerHTML = ''; 
                 document.getElementById('positiveNegativeItemsContainer').innerHTML = ''; 
-                document.getElementById('finalRecommendationContainer').innerHTML = '';
+                document.getElementById('finalRecommendationContainer').innerHTML = ''; 
                 
                 chartInstances.forEach(c => c.destroy()); 
                 chartInstances = [];
@@ -2418,10 +2234,10 @@
                             let posCount = 0; 
                             let validRespondents = 0;
                             
-                            rps.forEach(r => { 
+                            rps.forEach(r => {
                                 const tr = String(r || "").trim(); 
                                 if (!tr) return; 
-                                validRespondents++; 
+                                validRespondents++;
                                 
                                 if (freqs[tr] !== undefined) freqs[tr]++; 
                                 if (groupData.positives.has(tr)) posCount++; 
@@ -2462,15 +2278,15 @@
                         
                         chartInstances.push(new Chart(ctx, { 
                             type: 'bar', 
-                            data: { 
-                                labels: finalOpts, 
-                                datasets: [{ 
-                                    data: dataVals, 
-                                    backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'], 
-                                    borderRadius: 4, 
-                                    maxBarThickness: 50, 
-                                    barPercentage: 0.8 
-                                }] 
+                            data: {
+                                labels: finalOpts,
+                                datasets: [{
+                                    data: dataVals,
+                                    backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#64748b'],
+                                    borderRadius: 4,
+                                    maxBarThickness: 50,
+                                    barPercentage: 0.8
+                                }]
                             },
                             options: {
                                 animation: false, 
@@ -2479,7 +2295,7 @@
                                 devicePixelRatio: 2, 
                                 locale: 'en-US', 
                                 rtl: true, 
-                                layout: { padding: { top: 30, bottom: 10, left: 10, right: 10 } },
+                                layout: { padding: { top: 30, bottom: 10, left: 10, right: 10 } }, 
                                 scales: { 
                                     y: { 
                                         beginAtZero: true, 
@@ -2491,7 +2307,7 @@
                                         grid: { display: false }, 
                                         ticks: { font: { weight: '900', family: 'Cairo', size: 10 }, autoSkip: false, maxRotation: 0 } 
                                     } 
-                                },
+                                }, 
                                 plugins: { 
                                     legend: { display: false }, 
                                     datalabels: { 
@@ -2561,11 +2377,11 @@
                                 const cs = parseInt(c.getAttribute('colspan') || 1); 
                                 let val = c.innerText.trim(); 
                                 if (['=', '-', '+', '@'].includes(val.charAt(0))) {
-                                    val = "'" + val; 
+                                    val = "'" + val;
                                 }
                                 rD.push(val); 
                                 for (let k = 1; k < cs; k++) {
-                                    rD.push(""); 
+                                    rD.push("");
                                 }
                             }); 
                             copyContent += rD.join('\t') + '\n'; 
@@ -2585,7 +2401,7 @@
                         box.querySelectorAll('li').forEach(li => { 
                             let text = li.innerText.trim(); 
                             if (['=', '-', '+', '@'].includes(text.charAt(0))) {
-                                text = "'" + text; 
+                                text = "'" + text;
                             }
                             copyContent += `• ${text}\n`; 
                         }); 
@@ -2642,7 +2458,7 @@
                                     r.push(sanitizeValue(val)); 
                                 } 
                                 for (let k = 1; k < cs; k++) {
-                                    r.push(""); 
+                                    r.push("");
                                 }
                             }); 
                             allD.push(r); 
