@@ -65,7 +65,7 @@
         @media print {
             @page { size: A4 portrait; margin: 5mm; }
             body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 8pt !important; line-height: 1.1 !important; }
-            .max-w-4xl, #domainModeSwitchContainer, #dataConfigSection, #filterSection, #scaleOrderSection, #visualDomainSection, #actionButtons, footer, .floating-nav, .copy-btn-wrapper, #messageBoxModal, #manualGroupSection { display: none !important; }
+            .max-w-4xl, #domainModeSwitchContainer, #dataConfigSection, #filterSection, #scaleOrderSection, #visualDomainSection, #actionButtons, footer, .floating-nav, .copy-btn-wrapper, #messageBoxModal, #manualGroupSection, .chart-toggle-container, .hide-on-print { display: none !important; }
             main { box-shadow: none !important; padding: 0 !important; background-color: transparent !important; max-width: 100% !important; margin: 0 !important; border: none !important; }
             .flex.justify-between.items-start.mb-8 { display: flex !important; position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; align-items: flex-start !important; margin-bottom: 0 !important; }
             .flex.justify-between.items-start.mb-8 img { height: 105px !important; width: 105px !important; box-shadow: none !important; border: none !important; padding: 0 !important; display: block !important; background: transparent !important; }
@@ -493,7 +493,7 @@
                     item: 'بيان البند', 
                     checkTotal: 'إجمالي الصف (%)', 
                     total: 'الإجمالي (%)', 
-                    positives: 'إيجيات (%)', 
+                    positives: 'إيجابيات (%)', 
                     footer: 'المتوسط' 
                 },
                 strengths: '★ نقاط القوة الأساسية',
@@ -868,7 +868,6 @@
                 let isActive = (idx === activeVisualDomainIdx);
                 let cardClass = isActive ? 'border-2 border-indigo-500 shadow-md ring-4 ring-indigo-50 transform scale-[1.01]' : 'border border-indigo-100 hover:border-indigo-300 opacity-70';
 
-                // Enforce DEPENDENT dropdowns logic!
                 let minStart = idx > 0 ? visualDomains[idx-1].endIdx + 1 : 0;
                 let maxStart = domain.endIdx;
                 let minEnd = domain.startIdx;
@@ -1221,14 +1220,27 @@
             container.appendChild(div);
         }
 
+        /* --- UPDATED: Chart rendering with Toggle functionality --- */
         function renderMultiSelectChart(title, options, freqs, totalRespondents) {
             const canvasId = 'chart-' + Math.random().toString(36).substr(2, 9);
             const divC = document.createElement('div');
             
             divC.className = 'bg-white p-4 rounded-2xl shadow-xl border border-blue-100 flex flex-col items-center lg:col-span-2';
             
+            let totalSelections = 0;
+            options.forEach(opt => { totalSelections += (freqs[opt] || 0); });
+
+            const dataRespVals = options.map(o => totalRespondents > 0 ? ((freqs[o] / totalRespondents) * 100).toFixed(1) : 0);
+            const dataSelVals = options.map(o => totalSelections > 0 ? ((freqs[o] / totalSelections) * 100).toFixed(1) : 0);
+
             divC.innerHTML = `
                 <h3 class="text-lg font-black mb-3 text-center text-indigo-900">${title}</h3>
+                <div class="chart-toggle-container flex justify-center mb-4 hide-on-print w-full">
+                    <div class="flex p-1 bg-indigo-100/50 rounded-xl">
+                        <button class="toggle-resp-btn flex-1 px-4 py-2 rounded-lg font-black text-xs transition-all bg-white text-indigo-700 shadow-sm border border-indigo-200">النسبة من العدد الكلي</button>
+                        <button class="toggle-sel-btn flex-1 px-4 py-2 rounded-lg font-black text-xs transition-all text-slate-500 hover:text-indigo-600 hover:bg-white/50 border border-transparent">نسبة الاختيارات (%)</button>
+                    </div>
+                </div>
                 <div class="w-full relative flex-grow" style="height: 350px; max-height: 350px;">
                     <canvas id="${canvasId}"></canvas>
                 </div>
@@ -1236,14 +1248,13 @@
             document.getElementById('chartContainer').appendChild(divC);
             
             const ctx = document.getElementById(canvasId).getContext('2d');
-            const dataVals = options.map(o => totalRespondents > 0 ? ((freqs[o] / totalRespondents) * 100).toFixed(1) : 0);
             
-            chartInstances.push(new Chart(ctx, { 
+            const chart = new Chart(ctx, { 
                 type: 'bar', 
                 data: {
                     labels: options,
                     datasets: [{
-                        data: dataVals,
+                        data: dataRespVals,
                         backgroundColor: '#10b981',
                         borderRadius: 4,
                         maxBarThickness: 60,
@@ -1289,7 +1300,27 @@
                         }
                     } 
                 } 
-            }));
+            });
+            
+            chartInstances.push(chart);
+
+            // Add Event Listeners for the toggle
+            const btnResp = divC.querySelector('.toggle-resp-btn');
+            const btnSel = divC.querySelector('.toggle-sel-btn');
+
+            btnResp.onclick = () => {
+                btnResp.className = "toggle-resp-btn flex-1 px-4 py-2 rounded-lg font-black text-xs transition-all bg-white text-indigo-700 shadow-sm border border-indigo-200";
+                btnSel.className = "toggle-sel-btn flex-1 px-4 py-2 rounded-lg font-black text-xs transition-all text-slate-500 hover:text-indigo-600 hover:bg-white/50 border border-transparent";
+                chart.data.datasets[0].data = dataRespVals;
+                chart.update();
+            };
+
+            btnSel.onclick = () => {
+                btnSel.className = "toggle-sel-btn flex-1 px-4 py-2 rounded-lg font-black text-xs transition-all bg-white text-indigo-700 shadow-sm border border-indigo-200";
+                btnResp.className = "toggle-resp-btn flex-1 px-4 py-2 rounded-lg font-black text-xs transition-all text-slate-500 hover:text-indigo-600 hover:bg-white/50 border border-transparent";
+                chart.data.datasets[0].data = dataSelVals;
+                chart.update();
+            };
         }
 
         async function renderAISuggestionBox(title, responses) {
@@ -2002,7 +2033,7 @@
                     endIdx: newEnd
                 });
 
-                activeVisualDomainIdx = visualDomains.length - 1; // Set newly added to active
+                activeVisualDomainIdx = visualDomains.length - 1; 
                 renderVisualDomainsUI();
                 if(currentDomainMode === 'visual') applyVisualDomainsToIdentifiedGroups();
             };
