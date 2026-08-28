@@ -65,7 +65,7 @@
         @media print {
             @page { size: A4 portrait; margin: 5mm; }
             body { background-color: white !important; padding: 0 !important; color: black !important; font-size: 8pt !important; line-height: 1.1 !important; }
-            .max-w-4xl, #dataConfigSection, #filterSection, #scaleOrderSection, #visualDomainSection, #actionButtons, footer, .floating-nav, .copy-btn-wrapper, #messageBoxModal, #manualGroupSection { display: none !important; }
+            .max-w-4xl, #domainModeSwitchContainer, #dataConfigSection, #filterSection, #scaleOrderSection, #visualDomainSection, #actionButtons, footer, .floating-nav, .copy-btn-wrapper, #messageBoxModal, #manualGroupSection { display: none !important; }
             main { box-shadow: none !important; padding: 0 !important; background-color: transparent !important; max-width: 100% !important; margin: 0 !important; border: none !important; }
             .flex.justify-between.items-start.mb-8 { display: flex !important; position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; align-items: flex-start !important; margin-bottom: 0 !important; }
             .flex.justify-between.items-start.mb-8 img { height: 105px !important; width: 105px !important; box-shadow: none !important; border: none !important; padding: 0 !important; display: block !important; background: transparent !important; }
@@ -285,30 +285,6 @@
             </div>
         </div>
 
-        <!-- MANUAL GROUPING SECTION (SCALES ONLY) -->
-        <div id="manualGroupSection" class="hidden mb-10 input-card bg-purple-50/40 border-2 border-purple-200">
-            <h2 class="text-3xl font-black text-purple-900 mb-2 text-center thin-title">التجميع والتصنيف اليدوي</h2>
-            <p class="text-center text-slate-500 font-bold mb-8 text-sm leading-relaxed">
-                أضف مجموعات المقاييس واختر الأسئلة التي تنتمي لها.
-                <br>
-                <span class="text-purple-700 font-black">ملاحظة الذكاء الاصطناعي:</span> لن تظهر هنا أسئلة "التكرارات" أو "المقترحات المفتوحة"؛ حيث تم فصلها ليتم التعامل معها تلقائياً خلف الكواليس لتوفير وقتك.
-            </p>
-            
-            <div id="manualGroupsContainer" class="space-y-6 mb-8"></div>
-            
-            <div class="flex justify-center mb-8">
-                <button id="addManualGroupBtn" class="px-6 py-3 bg-white text-purple-600 border-2 border-purple-200 font-black rounded-xl hover-zoom shadow-sm">
-                    + إضافة مجموعة جديدة
-                </button>
-            </div>
-
-            <div class="flex justify-center border-t border-purple-100 pt-8">
-                <button id="applyManualGroupsBtn" class="px-12 py-4 btn-execute text-xl font-black rounded-2xl shadow-lg hover-zoom uppercase text-white w-full md:w-auto">
-                    اعتماد التقسيم اليدوي ومتابعة
-                </button>
-            </div>
-        </div>
-
         <!-- Filters Section -->
         <div id="filterSection" class="hidden max-w-4xl mx-auto mb-10">
             <div class="input-card border-indigo-200 bg-indigo-50/30">
@@ -346,43 +322,27 @@
             </div>
         </div>
 
-        <!-- Step 3: Scale Configuration -->
-        <div id="scaleOrderSection" class="hidden mb-10 p-8 bg-slate-100 rounded-3xl shadow-inner border border-slate-200">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 text-right">
-                <div id="scaleHeaderBox">
-                    <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 font-black"></h2>
-                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic"></p>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center shadow-sm">
-                    <label id="labelThreshold" class="font-black text-xs text-slate-800 ml-4 uppercase">حد الإيجابيات (%):</label>
-                    <input type="number" id="positivesThresholdInput" value="85" min="0" max="100" class="w-24 px-4 py-2 border rounded-xl font-black text-xl text-center text-indigo-700">
-                </div>
+        <!-- NEW: MODE SWITCHER (AUTO VS VISUAL DOMAINS) -->
+        <div id="domainModeSwitchContainer" class="hidden mb-6 max-w-3xl mx-auto input-card !p-4 bg-indigo-50 border-2 border-indigo-100 flex flex-col items-center shadow-md">
+            <h3 class="text-sm font-black text-indigo-900 mb-3 uppercase tracking-widest">اختر طريقة تجميع المحاور (المجالات)</h3>
+            <div class="flex p-1 bg-indigo-100/50 rounded-xl w-full">
+                <button id="modeAutoBtn" class="flex-1 px-4 py-3 rounded-lg font-black text-sm transition-all bg-white text-indigo-700 shadow-sm border border-indigo-200">ترتيب المقاييس أوتوماتيكياً</button>
+                <button id="modeVisualBtn" class="flex-1 px-4 py-3 rounded-lg font-black text-sm transition-all text-slate-500 hover:text-indigo-600 hover:bg-white/50 border border-transparent">تحديد وتقسيم المجالات مرئياً</button>
             </div>
-            <div id="scaleGroupsContainer" class="space-y-10"></div>
         </div>
 
         <!-- NEW: VISUAL DOMAIN RANGE SPLITTER (OPTIONAL TOOL) -->
         <div id="visualDomainSection" class="hidden mb-10 input-card bg-gradient-to-br from-indigo-50/70 to-blue-50/50 border-2 border-indigo-200">
-            <div class="flex flex-col md:flex-row justify-between items-center border-b border-indigo-100 pb-4 mb-6 gap-4">
-                <div>
-                    <h2 class="text-2xl font-black text-indigo-900 thin-title flex items-center gap-3">
-                        <span>🎯</span> تحديد وتقسيم المجالات / المحاور (اختياري)
-                    </h2>
-                    <p class="text-slate-500 font-bold text-xs mt-1">
-                        يمكنك تحديد نطاق البنود لكل محور بصرياً (من بند كذا إلى بند كذا) وتخصيص اسمها
-                    </p>
-                </div>
-                <!-- Toggle switch -->
-                <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-2xl border border-indigo-200 shadow-sm">
-                    <span class="text-sm font-black text-slate-700">تفعيل التقسيم المرئي:</span>
-                    <label class="relative inline-block w-12 h-6 cursor-pointer">
-                        <input type="checkbox" id="enableVisualDomainToggle" class="sr-only peer">
-                        <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                    </label>
-                </div>
+            <div class="border-b border-indigo-100 pb-4 mb-6">
+                <h2 class="text-2xl font-black text-indigo-900 thin-title flex items-center gap-3">
+                    <span>🎯</span> تحديد وتقسيم المجالات / المحاور
+                </h2>
+                <p class="text-slate-500 font-bold text-xs mt-1">
+                    اختر عمود البداية وعمود النهاية لكل مجال وسيتم سحب البنود بينهما (تظهر الاختيارات بحروف أعمدة الإكسيل).
+                </p>
             </div>
 
-            <div id="visualDomainControls" class="opacity-50 pointer-events-none transition-all duration-300 space-y-6">
+            <div id="visualDomainControls" class="transition-all duration-300 space-y-6">
                 <!-- Visual Summary Strip -->
                 <div class="bg-white p-4 rounded-2xl border border-indigo-100 shadow-inner">
                     <div class="flex justify-between items-center mb-2 font-black text-xs text-indigo-900">
@@ -404,6 +364,45 @@
             </div>
         </div>
 
+        <!-- Step 3: Scale Configuration -->
+        <div id="scaleOrderSection" class="hidden mb-10 p-8 bg-slate-100 rounded-3xl shadow-inner border border-slate-200">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 text-right">
+                <div id="scaleHeaderBox">
+                    <h2 id="scaleOrderTitle" class="text-3xl thin-title text-slate-900 font-black"></h2>
+                    <p id="scaleOrderSubtitle" class="text-slate-600 text-sm font-bold italic"></p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center shadow-sm">
+                    <label id="labelThreshold" class="font-black text-xs text-slate-800 ml-4 uppercase">حد الإيجابيات (%):</label>
+                    <input type="number" id="positivesThresholdInput" value="85" min="0" max="100" class="w-24 px-4 py-2 border rounded-xl font-black text-xl text-center text-indigo-700">
+                </div>
+            </div>
+            <div id="scaleGroupsContainer" class="space-y-10"></div>
+        </div>
+
+        <!-- MANUAL GROUPING SECTION (SCALES ONLY) -->
+        <div id="manualGroupSection" class="hidden mb-10 input-card bg-purple-50/40 border-2 border-purple-200">
+            <h2 class="text-3xl font-black text-purple-900 mb-2 text-center thin-title">التجميع والتصنيف اليدوي</h2>
+            <p class="text-center text-slate-500 font-bold mb-8 text-sm leading-relaxed">
+                أضف مجموعات المقاييس واختر الأسئلة التي تنتمي لها.
+                <br>
+                <span class="text-purple-700 font-black">ملاحظة الذكاء الاصطناعي:</span> لن تظهر هنا أسئلة "التكرارات" أو "المقترحات المفتوحة"؛ حيث تم فصلها ليتم التعامل معها تلقائياً خلف الكواليس لتوفير وقتك.
+            </p>
+            
+            <div id="manualGroupsContainer" class="space-y-6 mb-8"></div>
+            
+            <div class="flex justify-center mb-8">
+                <button id="addManualGroupBtn" class="px-6 py-3 bg-white text-purple-600 border-2 border-purple-200 font-black rounded-xl hover-zoom shadow-sm">
+                    + إضافة مجموعة جديدة
+                </button>
+            </div>
+
+            <div class="flex justify-center border-t border-purple-100 pt-8">
+                <button id="applyManualGroupsBtn" class="px-12 py-4 btn-execute text-xl font-black rounded-2xl shadow-lg hover-zoom uppercase text-white w-full md:w-auto">
+                    اعتماد التقسيم اليدوي ومتابعة
+                </button>
+            </div>
+        </div>
+
         <!-- Action Buttons -->
         <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-6 mb-10">
             <button id="analyzeButton" class="px-14 py-6 btn-execute text-3xl font-black rounded-[2rem] shadow-2xl hover-zoom uppercase text-white">
@@ -418,10 +417,8 @@
 
         <!-- Report Output Scope -->
         <div id="reportPrintScope">
-            
             <div class="mb-6 relative">
                 <p id="fileNameDisplay" class="text-4xl thin-title text-slate-900 hidden font-black uppercase text-center mb-4"></p>
-                
                 <div id="metaInfoDisplay" class="hidden flex justify-end gap-2 md:gap-4 text-base md:text-lg font-black w-full overflow-hidden">
                     <div class="bg-indigo-50 text-indigo-800 px-3 md:px-4 py-2 rounded-xl border border-indigo-100 flex items-center whitespace-nowrap shrink-0">
                         <span id="participantCountDisplay"></span>
@@ -452,7 +449,6 @@
                     <p class="text-indigo-900 font-black">د. احمد عوض</p>
                 </div>
             </div>
-
         </div>
     </main>
 
@@ -467,9 +463,11 @@
         let currentLang = 'ar';
         let rawExcelData = null;
         let identifiedScaleGroups = new Map();
+        let autoIdentifiedGroupsBackup = new Map(); // Backup for switching modes
         let chartInstances = [];
         let selectedDepts = new Set();
         let selectedCats = new Set();
+        let currentDomainMode = 'auto'; // 'auto' or 'visual'
         
         // NEW STATE FOR MANUAL MODE
         let manualAvailableCols = [];
@@ -544,6 +542,17 @@
                 selectAll: 'اختيار الكل'
             }
         };
+
+        /* --- Global Excel Letter Helper --- */
+        function getColLetter(colIdx) {
+            let letter = '';
+            let temp = colIdx;
+            while (temp >= 0) {
+                letter = String.fromCharCode((temp % 26) + 65) + letter;
+                temp = Math.floor(temp / 26) - 1;
+            }
+            return letter;
+        }
 
         /* --- 2. AI Summarization --- */
         async function summarizeWithAI(text) {
@@ -767,6 +776,7 @@
 
                     visualScaleCols.push({
                         colIdx: col,
+                        colLetter: getColLetter(col),
                         fullHeader: headerStr,
                         itemClean: itemClean,
                         itemNumber: visualScaleCols.length + 1
@@ -775,18 +785,17 @@
             }
 
             if (visualScaleCols.length === 0) {
+                document.getElementById('domainModeSwitchContainer').classList.add('hidden');
                 document.getElementById('visualDomainSection').classList.add('hidden');
                 return;
             }
 
-            document.getElementById('visualDomainSection').classList.remove('hidden');
-
             if (visualDomains.length === 0) {
                 visualDomains = [
-                    { name: 'المجال الأول', startIdx: 1, endIdx: Math.min(5, visualScaleCols.length) }
+                    { name: 'المجال الأول', startIdx: 0, endIdx: Math.min(4, visualScaleCols.length - 1) }
                 ];
                 if (visualScaleCols.length > 5) {
-                    visualDomains.push({ name: 'المجال الثاني', startIdx: 6, endIdx: visualScaleCols.length });
+                    visualDomains.push({ name: 'المجال الثاني', startIdx: 5, endIdx: visualScaleCols.length - 1 });
                 }
             }
 
@@ -813,12 +822,16 @@
                 seg.style.width = `${perc}%`;
                 seg.style.backgroundColor = color;
                 seg.className = 'h-full transition-all flex items-center justify-center text-[10px] text-white font-bold overflow-hidden px-1';
-                seg.title = `${domain.name}: من بند ${domain.startIdx} إلى ${domain.endIdx} (${count} بنود)`;
+                seg.title = `${domain.name}: من عمود ${visualScaleCols[domain.startIdx]?.colLetter} إلى عمود ${visualScaleCols[domain.endIdx]?.colLetter} (${count} بنود)`;
                 seg.textContent = count > 0 ? `${domain.name} (${count})` : '';
                 progBar.appendChild(seg);
 
                 const card = document.createElement('div');
                 card.className = 'bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm flex flex-col md:flex-row items-center gap-4 transition-all hover:border-indigo-300';
+                
+                let startOptions = visualScaleCols.map((col, i) => `<option value="${i}" ${i === domain.startIdx ? 'selected' : ''}>${col.colLetter} - ${col.itemClean.substring(0,15)}...</option>`).join('');
+                let endOptions = visualScaleCols.map((col, i) => `<option value="${i}" ${i === domain.endIdx ? 'selected' : ''}>${col.colLetter} - ${col.itemClean.substring(0,15)}...</option>`).join('');
+
                 card.innerHTML = `
                     <div class="w-4 h-10 rounded-lg shrink-0 hidden md:block" style="background-color: ${color}"></div>
                     <div class="flex-1 w-full md:w-auto">
@@ -827,13 +840,17 @@
                     </div>
                     <div class="flex items-center gap-2 w-full md:w-auto justify-between md:justify-start">
                         <div>
-                            <label class="block text-[11px] font-black text-slate-600 mb-1">من بند:</label>
-                            <input type="number" min="1" max="${totalItems}" value="${domain.startIdx}" class="w-20 p-2.5 border border-slate-200 rounded-xl font-black text-center text-indigo-700 start-inp">
+                            <label class="block text-[11px] font-black text-slate-600 mb-1">من البند (عمود):</label>
+                            <select class="w-full sm:w-36 p-2.5 border border-slate-200 rounded-xl font-black text-indigo-700 start-select truncate bg-slate-50 cursor-pointer">
+                                ${startOptions}
+                            </select>
                         </div>
                         <span class="text-slate-400 font-black mt-5">←</span>
                         <div>
-                            <label class="block text-[11px] font-black text-slate-600 mb-1">إلى بند:</label>
-                            <input type="number" min="1" max="${totalItems}" value="${domain.endIdx}" class="w-20 p-2.5 border border-slate-200 rounded-xl font-black text-center text-indigo-700 end-inp">
+                            <label class="block text-[11px] font-black text-slate-600 mb-1">إلى البند (عمود):</label>
+                            <select class="w-full sm:w-36 p-2.5 border border-slate-200 rounded-xl font-black text-indigo-700 end-select truncate bg-slate-50 cursor-pointer">
+                                ${endOptions}
+                            </select>
                         </div>
                         <div class="text-xs font-black text-indigo-900 bg-indigo-50 px-3 py-2.5 rounded-xl mt-5 border border-indigo-100 shrink-0">
                             ${count} بنود
@@ -848,22 +865,23 @@
                     domain.name = e.target.value;
                 };
 
-                const startInp = card.querySelector('.start-inp');
-                const endInp = card.querySelector('.end-inp');
+                const startSel = card.querySelector('.start-select');
+                const endSel = card.querySelector('.end-select');
 
-                startInp.onchange = (e) => {
-                    let val = parseInt(e.target.value) || 1;
-                    val = Math.max(1, Math.min(val, totalItems));
+                startSel.onchange = (e) => {
+                    let val = parseInt(e.target.value);
                     domain.startIdx = val;
                     if (domain.endIdx < domain.startIdx) domain.endIdx = domain.startIdx;
                     renderVisualDomainsUI();
+                    if(currentDomainMode === 'visual') applyVisualDomainsToIdentifiedGroups();
                 };
 
-                endInp.onchange = (e) => {
-                    let val = parseInt(e.target.value) || totalItems;
-                    val = Math.max(domain.startIdx, Math.min(val, totalItems));
+                endSel.onchange = (e) => {
+                    let val = parseInt(e.target.value);
+                    if (val < domain.startIdx) val = domain.startIdx;
                     domain.endIdx = val;
                     renderVisualDomainsUI();
+                    if(currentDomainMode === 'visual') applyVisualDomainsToIdentifiedGroups();
                 };
 
                 card.querySelector('.remove-domain-btn').onclick = () => {
@@ -873,6 +891,7 @@
                     }
                     visualDomains.splice(idx, 1);
                     renderVisualDomainsUI();
+                    if(currentDomainMode === 'visual') applyVisualDomainsToIdentifiedGroups();
                 };
 
                 container.appendChild(card);
@@ -880,10 +899,8 @@
         }
 
         function applyVisualDomainsToIdentifiedGroups() {
-            if (!document.getElementById('enableVisualDomainToggle').checked) return;
-
             const nonScaleGroups = new Map();
-            identifiedScaleGroups.forEach((g, k) => {
+            autoIdentifiedGroupsBackup.forEach((g, k) => {
                 if (g.isSuggestion || g.isMultiSelect) {
                     nonScaleGroups.set(k, g);
                 }
@@ -892,7 +909,7 @@
             let combinedOptions = new Set();
             let combinedPositives = new Set();
             
-            identifiedScaleGroups.forEach((g) => {
+            autoIdentifiedGroupsBackup.forEach((g) => {
                 if (!g.isSuggestion && !g.isMultiSelect) {
                     (g.options || []).forEach(o => combinedOptions.add(o));
                     (g.positives || []).forEach(p => combinedPositives.add(p));
@@ -908,7 +925,7 @@
                 const dOptions = new Set(combinedOptions);
                 const dFrequencies = new Map();
 
-                for (let i = domain.startIdx - 1; i <= domain.endIdx - 1; i++) {
+                for (let i = domain.startIdx; i <= domain.endIdx; i++) {
                     if (visualScaleCols[i]) {
                         const colItem = visualScaleCols[i];
                         dCols.push(colItem.colIdx);
@@ -1416,16 +1433,6 @@
                 document.getElementById('fileNameDisplay').classList.remove('hidden');
                 document.getElementById('dataConfigSection').classList.remove('hidden');
                 
-                function getColLetter(colIdx) {
-                    let letter = '';
-                    let temp = colIdx;
-                    while (temp >= 0) {
-                        letter = String.fromCharCode((temp % 26) + 65) + letter;
-                        temp = Math.floor(temp / 26) - 1;
-                    }
-                    return letter;
-                }
-
                 const fs = document.getElementById('filterColSelect');
                 const cs = document.getElementById('categoryColSelect');
                 const as = document.getElementById('analysisStartColSelect');
@@ -1689,6 +1696,7 @@
             document.getElementById('confirmMappingBtn').onclick = () => {
                 if (!rawExcelData) return;
                 identifiedScaleGroups.clear();
+                autoIdentifiedGroupsBackup.clear();
                 setupFilters();
 
                 const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
@@ -1800,9 +1808,25 @@
                         group.options = [];
                     }
                 }
+
+                // Create Backup of Auto Groups
+                identifiedScaleGroups.forEach((val, key) => {
+                    autoIdentifiedGroupsBackup.set(key, {
+                        options: Array.isArray(val.options) ? [...val.options] : new Set(val.options),
+                        positives: new Set(val.positives),
+                        cols: [...val.cols],
+                        items: [...val.items],
+                        isSuggestion: val.isSuggestion,
+                        isMultiSelect: val.isMultiSelect,
+                        userAddedOptions: new Set(val.userAddedOptions),
+                        frequencies: new Map(val.frequencies)
+                    });
+                });
                 
                 document.getElementById('filterSection').classList.remove('hidden'); 
-                renderScaleGroups();
+                document.getElementById('domainModeSwitchContainer').classList.remove('hidden');
+                document.getElementById('modeAutoBtn').click(); // trigger Auto by default
+
                 initVisualDomainSection();
                 
                 let hasScaleGroups = false;
@@ -1823,17 +1847,38 @@
             };
 
             /* ========================================================= */
-            /* --- VISUAL DOMAIN RANGE CONTROLS EVENTS                   */
+            /* --- SEGMENTED CONTROL MODE SWITCHER                       */
             /* ========================================================= */
-            document.getElementById('enableVisualDomainToggle').onchange = (e) => {
-                const controls = document.getElementById('visualDomainControls');
-                if (e.target.checked) {
-                    controls.classList.remove('opacity-50', 'pointer-events-none');
-                    applyVisualDomainsToIdentifiedGroups();
-                } else {
-                    controls.classList.add('opacity-50', 'pointer-events-none');
-                    document.getElementById('confirmMappingBtn').click();
-                }
+            document.getElementById('modeAutoBtn').onclick = () => {
+                currentDomainMode = 'auto';
+                document.getElementById('modeAutoBtn').className = "flex-1 px-4 py-3 rounded-lg font-black text-sm transition-all bg-white text-indigo-700 shadow-sm border border-indigo-200";
+                document.getElementById('modeVisualBtn').className = "flex-1 px-4 py-3 rounded-lg font-black text-sm transition-all text-slate-500 hover:text-indigo-600 hover:bg-white/50 border border-transparent";
+                document.getElementById('visualDomainSection').classList.add('hidden');
+                
+                // Restore Auto Domains from Backup
+                identifiedScaleGroups.clear();
+                autoIdentifiedGroupsBackup.forEach((val, key) => {
+                    identifiedScaleGroups.set(key, {
+                        options: Array.isArray(val.options) ? [...val.options] : new Set(val.options),
+                        positives: new Set(val.positives),
+                        cols: [...val.cols],
+                        items: [...val.items],
+                        isSuggestion: val.isSuggestion,
+                        isMultiSelect: val.isMultiSelect,
+                        userAddedOptions: new Set(val.userAddedOptions),
+                        frequencies: new Map(val.frequencies)
+                    });
+                });
+                renderScaleGroups();
+            };
+
+            document.getElementById('modeVisualBtn').onclick = () => {
+                currentDomainMode = 'visual';
+                document.getElementById('modeVisualBtn').className = "flex-1 px-4 py-3 rounded-lg font-black text-sm transition-all bg-white text-indigo-700 shadow-sm border border-indigo-200";
+                document.getElementById('modeAutoBtn').className = "flex-1 px-4 py-3 rounded-lg font-black text-sm transition-all text-slate-500 hover:text-indigo-600 hover:bg-white/50 border border-transparent";
+                document.getElementById('visualDomainSection').classList.remove('hidden');
+                
+                applyVisualDomainsToIdentifiedGroups();
             };
 
             document.getElementById('addVisualDomainBtn').onclick = () => {
@@ -1843,8 +1888,8 @@
                     lastEnd = visualDomains[visualDomains.length - 1].endIdx;
                 }
 
-                const newStart = Math.min(lastEnd + 1, totalItems);
-                const newEnd = Math.min(newStart + 4, totalItems);
+                const newStart = Math.min(lastEnd + 1, totalItems - 1);
+                const newEnd = Math.min(newStart + 4, totalItems - 1);
 
                 visualDomains.push({
                     name: `المجال ${visualDomains.length + 1}`,
@@ -1853,7 +1898,7 @@
                 });
 
                 renderVisualDomainsUI();
-                applyVisualDomainsToIdentifiedGroups();
+                if(currentDomainMode === 'visual') applyVisualDomainsToIdentifiedGroups();
             };
 
             /* ========================================================= */
@@ -1939,6 +1984,9 @@
                 if (!rawExcelData) return;
                 setupFilters();
                 
+                document.getElementById('domainModeSwitchContainer').classList.add('hidden');
+                document.getElementById('visualDomainSection').classList.add('hidden');
+
                 identifiedScaleGroups.clear();
                 manualAvailableCols = [];
                 
@@ -1947,7 +1995,6 @@
                 const headers = rawExcelData[0];
                 const endColIdx = endColVal !== "" ? parseInt(endColVal) : headers.length - 1;
                 
-                // PRE-PROCESS ALL COLUMNS TO FILTER OUT FREQUENCIES AND SUGGESTIONS
                 for (let col = startColIdx; col <= endColIdx; col++) {
                     const headerStr = String(headers[col] || "").trim();
                     const matchFull = headerStr.match(/(.+) \[(.+)\]/);
@@ -1987,7 +2034,6 @@
                     }
 
                     if (isColMultiSelect || isColSuggestion) {
-                        // IT'S A FREQUENCY OR SUGGESTION - PROCESS IMMEDIATELY BEHIND THE SCENES
                         if (!identifiedScaleGroups.has(dName)) {
                             identifiedScaleGroups.set(dName, { options: new Set(), positives: new Set(), cols: [], items: [], isSuggestion: isColSuggestion, isMultiSelect: isColMultiSelect, userAddedOptions: new Set(), frequencies: new Map() });
                         }
@@ -2000,7 +2046,6 @@
                             colVals.forEach(val => { group.options.add(val); group.frequencies.set(val, (group.frequencies.get(val) || 0) + 1); });
                         }
                     } else {
-                        // IT'S A SCALE ITEM - ADD TO MANUAL UI POOL
                         manualAvailableCols.push({ idx: col, name: headerStr, dNameAuto: dName, iNameAuto: iName });
                     }
                 }
@@ -2025,7 +2070,6 @@
                 const groups = document.querySelectorAll('.manual-group-item');
                 const manuallyAssignedCols = new Set();
                 
-                // 1. Process Manually Assigend Groups (Which are strictly Scales now)
                 groups.forEach(g => {
                     const dName = g.querySelector('.group-name-input').value.trim() || 'مجموعة بدون اسم';
                     const checkedCols = Array.from(g.querySelectorAll('.group-col-checkbox:checked')).map(cb => parseInt(cb.value));
@@ -2052,7 +2096,7 @@
                         const colDef = manualAvailableCols.find(c => c.idx === colIdx);
                         
                         group.cols.push(colIdx);
-                        group.items.push(colDef.iNameAuto); // Use auto-detected item name
+                        group.items.push(colDef.iNameAuto); 
                         
                         for (let r = 1; r < rawExcelData.length; r++) {
                             const val = String(rawExcelData[r][colIdx] || "").trim();
@@ -2064,7 +2108,6 @@
                     });
                 });
 
-                // 2. Process Remaining unassigned SCALE columns automatically (Fallback)
                 manualAvailableCols.forEach(colDef => {
                     if (!manuallyAssignedCols.has(colDef.idx)) {
                         if (!identifiedScaleGroups.has(colDef.dNameAuto)) {
@@ -2094,12 +2137,10 @@
                     }
                 });
 
-                // 3. Finalize all groups
                 for (const [dName, group] of identifiedScaleGroups.entries()) {
                     group.options = Array.from(group.options);
                     group.options.sort((a, b) => (group.frequencies.get(b) || 0) - (group.frequencies.get(a) || 0));
                     
-                    // Only apply scale heuristic check to scale groups
                     if (!group.isMultiSelect && !group.isSuggestion) {
                         if (group.options.length > 12 || (group.cols.length === 1 && group.options.length > 6)) {
                             group.isSuggestion = true;
@@ -2115,9 +2156,7 @@
                 document.getElementById('filterSection').classList.remove('hidden'); 
                 
                 renderScaleGroups();
-                initVisualDomainSection();
 
-                // Show Step 3 only if there is at least one scale group
                 let hasScaleGroups = false;
                 identifiedScaleGroups.forEach((group) => {
                     if (!group.isSuggestion && !group.isMultiSelect) {
@@ -2139,10 +2178,6 @@
             document.getElementById('analyzeButton').onclick = async () => {
                 if (!rawExcelData) return;
                 
-                if (document.getElementById('enableVisualDomainToggle').checked) {
-                    applyVisualDomainsToIdentifiedGroups();
-                }
-
                 const allItemsList = []; 
                 const summaryDataList = []; 
                 const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
