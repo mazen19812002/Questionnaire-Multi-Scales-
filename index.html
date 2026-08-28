@@ -337,8 +337,8 @@
                 <h2 class="text-2xl font-black text-indigo-900 thin-title flex items-center gap-3">
                     <span>🎯</span> تحديد وتقسيم المجالات / المحاور
                 </h2>
-                <p class="text-slate-500 font-bold text-xs mt-1">
-                    اختر عمود البداية وعمود النهاية لكل مجال وسيتم سحب البنود بينهما (تظهر الاختيارات بحروف أعمدة الإكسيل).
+                <p class="text-slate-500 font-bold text-xs mt-1 leading-relaxed">
+                    يمكنك ضبط البداية والنهاية من القوائم (لا تتداخل أبداً)، أو قم بالضغط على أي مجال لتنشيطه ثم <strong class="text-indigo-700">اسحب بالماوس 🖱️</strong> على الشريط الملون بالأسفل لتحديد نطاقه مباشرة!
                 </p>
             </div>
 
@@ -346,10 +346,10 @@
                 <!-- Visual Summary Strip -->
                 <div class="bg-white p-4 rounded-2xl border border-indigo-100 shadow-inner">
                     <div class="flex justify-between items-center mb-2 font-black text-xs text-indigo-900">
-                        <span>شريط التوزيع البصري للبنود:</span>
+                        <span>شريط التوزيع البصري للبنود (اسحب بالماوس للرسم):</span>
                         <span id="visualDomainTotalStatus" class="text-indigo-600 font-bold"></span>
                     </div>
-                    <div id="visualRangesProgressBar" class="h-6 w-full rounded-xl bg-slate-100 flex overflow-hidden border border-slate-200"></div>
+                    <div id="visualRangesProgressBar" class="h-10 w-full rounded-xl bg-slate-100 flex overflow-visible border-2 border-slate-300 shadow-inner relative cursor-crosshair select-none"></div>
                 </div>
 
                 <!-- Domain Cards Container -->
@@ -463,18 +463,20 @@
         let currentLang = 'ar';
         let rawExcelData = null;
         let identifiedScaleGroups = new Map();
-        let autoIdentifiedGroupsBackup = new Map(); // Backup for switching modes
+        let autoIdentifiedGroupsBackup = new Map(); 
         let chartInstances = [];
         let selectedDepts = new Set();
         let selectedCats = new Set();
-        let currentDomainMode = 'auto'; // 'auto' or 'visual'
+        let currentDomainMode = 'auto'; 
         
-        // NEW STATE FOR MANUAL MODE
         let manualAvailableCols = [];
 
-        // NEW STATE FOR VISUAL RANGE TOOL
+        // Visual Range Tool States
         let visualScaleCols = [];
         let visualDomains = [];
+        let activeVisualDomainIdx = 0;
+        let isDraggingBar = false;
+        let dragStartCol = 0;
         const domainColorPalette = ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#f97316'];
 
         const languageData = {
@@ -491,7 +493,7 @@
                     item: 'بيان البند', 
                     checkTotal: 'إجمالي الصف (%)', 
                     total: 'الإجمالي (%)', 
-                    positives: 'إيجابيات (%)', 
+                    positives: 'إيجيات (%)', 
                     footer: 'المتوسط' 
                 },
                 strengths: '★ نقاط القوة الأساسية',
@@ -543,7 +545,7 @@
             }
         };
 
-        /* --- Global Excel Letter Helper --- */
+        /* --- Helper: Excel Column Letter --- */
         function getColLetter(colIdx) {
             let letter = '';
             let temp = colIdx;
@@ -646,7 +648,7 @@
             document.getElementById('messageBoxModal').classList.remove('hidden');
         }
 
-        /* --- 4. Components Rendering --- */
+        /* --- 4. Scale Groups Rendering --- */
         function renderScaleGroups() {
             const container = document.getElementById('scaleGroupsContainer');
             container.innerHTML = '';
@@ -798,8 +800,37 @@
                     visualDomains.push({ name: 'المجال الثاني', startIdx: 5, endIdx: visualScaleCols.length - 1 });
                 }
             }
+            
+            if (activeVisualDomainIdx >= visualDomains.length) activeVisualDomainIdx = 0;
 
             renderVisualDomainsUI();
+        }
+
+        function updateActiveDomainRange(colA, colB) {
+            if (activeVisualDomainIdx === null || activeVisualDomainIdx >= visualDomains.length) return;
+            
+            let minCol = Math.min(colA, colB);
+            let maxCol = Math.max(colA, colB);
+            
+            let dIdx = activeVisualDomainIdx;
+            let minAllowed = dIdx > 0 ? visualDomains[dIdx-1].endIdx + 1 : 0;
+            let maxAllowed = dIdx < visualDomains.length - 1 ? visualDomains[dIdx+1].startIdx - 1 : visualScaleCols.length - 1;
+            
+            minCol = Math.max(minCol, minAllowed);
+            maxCol = Math.min(maxCol, maxAllowed);
+            
+            visualDomains[dIdx].startIdx = minCol;
+            visualDomains[dIdx].endIdx = maxCol;
+            
+            // Fast visual update
+            const progBar = document.getElementById('visualRangesProgressBar');
+            if(progBar) {
+                const cells = progBar.children;
+                for(let i=0; i<visualScaleCols.length; i++) {
+                    let foundDIdx = visualDomains.findIndex(d => i >= d.startIdx && i <= d.endIdx);
+                    cells[i].style.backgroundColor = foundDIdx !== -1 ? domainColorPalette[foundDIdx % domainColorPalette.length] : '#f1f5f9';
+                }
+            }
         }
 
         function renderVisualDomainsUI() {
@@ -813,25 +844,48 @@
 
             totalStatus.textContent = `إجمالي البنود المتاحة للمقاييس: ${totalItems} بند`;
 
+            // Render Interactive Mouse Bar
+            let barHtml = '';
+            for(let i=0; i<totalItems; i++) {
+                let dIdx = visualDomains.findIndex(d => i >= d.startIdx && i <= d.endIdx);
+                let color = dIdx !== -1 ? domainColorPalette[dIdx % domainColorPalette.length] : '#f1f5f9';
+                let isEnd = dIdx !== -1 && visualDomains[dIdx].endIdx === i;
+                let borderRight = isEnd ? 'border-r-2 border-slate-800' : 'border-r border-white/20';
+                
+                barHtml += `<div class="flex-1 ${borderRight} transition-colors duration-75 group relative" 
+                    style="background-color: ${color}" 
+                    data-idx="${i}" 
+                    title="عمود ${visualScaleCols[i].colLetter}: ${visualScaleCols[i].itemClean}">
+                </div>`;
+            }
+            progBar.innerHTML = barHtml;
+
+            // Render Cards
             visualDomains.forEach((domain, idx) => {
                 const color = domainColorPalette[idx % domainColorPalette.length];
                 const count = Math.max(0, domain.endIdx - domain.startIdx + 1);
-                const perc = totalItems > 0 ? (count / totalItems) * 100 : 0;
+                
+                let isActive = (idx === activeVisualDomainIdx);
+                let cardClass = isActive ? 'border-2 border-indigo-500 shadow-md ring-4 ring-indigo-50 transform scale-[1.01]' : 'border border-indigo-100 hover:border-indigo-300 opacity-70';
 
-                const seg = document.createElement('div');
-                seg.style.width = `${perc}%`;
-                seg.style.backgroundColor = color;
-                seg.className = 'h-full transition-all flex items-center justify-center text-[10px] text-white font-bold overflow-hidden px-1';
-                seg.title = `${domain.name}: من عمود ${visualScaleCols[domain.startIdx]?.colLetter} إلى عمود ${visualScaleCols[domain.endIdx]?.colLetter} (${count} بنود)`;
-                seg.textContent = count > 0 ? `${domain.name} (${count})` : '';
-                progBar.appendChild(seg);
+                // Enforce DEPENDENT dropdowns logic!
+                let minStart = idx > 0 ? visualDomains[idx-1].endIdx + 1 : 0;
+                let maxStart = domain.endIdx;
+                let minEnd = domain.startIdx;
+                let maxEnd = idx < visualDomains.length - 1 ? visualDomains[idx+1].startIdx - 1 : totalItems - 1;
+
+                let startOptions = visualScaleCols.map((col, i) => {
+                    let disabled = (i < minStart || i > maxStart) ? 'disabled' : '';
+                    return `<option value="${i}" ${i === domain.startIdx ? 'selected' : ''} ${disabled}>${col.colLetter} - ${col.itemClean.substring(0,15)}...</option>`;
+                }).join('');
+
+                let endOptions = visualScaleCols.map((col, i) => {
+                    let disabled = (i < minEnd || i > maxEnd) ? 'disabled' : '';
+                    return `<option value="${i}" ${i === domain.endIdx ? 'selected' : ''} ${disabled}>${col.colLetter} - ${col.itemClean.substring(0,15)}...</option>`;
+                }).join('');
 
                 const card = document.createElement('div');
-                card.className = 'bg-white p-5 rounded-2xl border border-indigo-100 shadow-sm flex flex-col md:flex-row items-center gap-4 transition-all hover:border-indigo-300';
-                
-                let startOptions = visualScaleCols.map((col, i) => `<option value="${i}" ${i === domain.startIdx ? 'selected' : ''}>${col.colLetter} - ${col.itemClean.substring(0,15)}...</option>`).join('');
-                let endOptions = visualScaleCols.map((col, i) => `<option value="${i}" ${i === domain.endIdx ? 'selected' : ''}>${col.colLetter} - ${col.itemClean.substring(0,15)}...</option>`).join('');
-
+                card.className = `bg-white p-5 rounded-2xl flex flex-col md:flex-row items-center gap-4 transition-all cursor-pointer ${cardClass}`;
                 card.innerHTML = `
                     <div class="w-4 h-10 rounded-lg shrink-0 hidden md:block" style="background-color: ${color}"></div>
                     <div class="flex-1 w-full md:w-auto">
@@ -856,10 +910,19 @@
                             ${count} بنود
                         </div>
                     </div>
-                    <div class="mt-2 md:mt-5 flex gap-2 w-full md:w-auto justify-end">
+                    <div class="mt-2 md:mt-5 flex gap-2 w-full md:w-auto justify-end items-center">
+                        ${isActive ? '<span class="text-xs font-black text-indigo-600 bg-indigo-100 px-3 py-1.5 rounded-full animate-pulse mx-2 whitespace-nowrap">✍️ التعديل بالماوس نشط</span>' : ''}
                         <button class="p-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-black text-sm transition-all remove-domain-btn" title="حذف المحور">🗑️</button>
                     </div>
                 `;
+
+                // Card Activation Click
+                card.onclick = (e) => {
+                    if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'BUTTON') {
+                        activeVisualDomainIdx = idx;
+                        renderVisualDomainsUI();
+                    }
+                };
 
                 card.querySelector('.domain-name-inp').oninput = (e) => {
                     domain.name = e.target.value;
@@ -872,6 +935,7 @@
                     let val = parseInt(e.target.value);
                     domain.startIdx = val;
                     if (domain.endIdx < domain.startIdx) domain.endIdx = domain.startIdx;
+                    activeVisualDomainIdx = idx;
                     renderVisualDomainsUI();
                     if(currentDomainMode === 'visual') applyVisualDomainsToIdentifiedGroups();
                 };
@@ -880,16 +944,19 @@
                     let val = parseInt(e.target.value);
                     if (val < domain.startIdx) val = domain.startIdx;
                     domain.endIdx = val;
+                    activeVisualDomainIdx = idx;
                     renderVisualDomainsUI();
                     if(currentDomainMode === 'visual') applyVisualDomainsToIdentifiedGroups();
                 };
 
-                card.querySelector('.remove-domain-btn').onclick = () => {
+                card.querySelector('.remove-domain-btn').onclick = (e) => {
+                    e.stopPropagation();
                     if (visualDomains.length <= 1) {
                         showMessage("تنبيه", "يجب الإبقاء على مجال واحد على الأقل.");
                         return;
                     }
                     visualDomains.splice(idx, 1);
+                    activeVisualDomainIdx = 0;
                     renderVisualDomainsUI();
                     if(currentDomainMode === 'visual') applyVisualDomainsToIdentifiedGroups();
                 };
@@ -964,6 +1031,39 @@
 
             renderScaleGroups();
         }
+
+        /* --- GLOBAL MOUSE EVENTS FOR INTERACTIVE BAR --- */
+        document.addEventListener('mousedown', (e) => {
+            const progBar = document.getElementById('visualRangesProgressBar');
+            if (progBar && progBar.contains(e.target)) {
+                let cell = e.target.closest('[data-idx]');
+                if(cell) {
+                    isDraggingBar = true;
+                    dragStartCol = parseInt(cell.getAttribute('data-idx'));
+                    updateActiveDomainRange(dragStartCol, dragStartCol);
+                }
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if(!isDraggingBar) return;
+            const progBar = document.getElementById('visualRangesProgressBar');
+            if (progBar && progBar.contains(e.target)) {
+                let cell = e.target.closest('[data-idx]');
+                if(cell) {
+                    let currentCol = parseInt(cell.getAttribute('data-idx'));
+                    updateActiveDomainRange(dragStartCol, currentCol);
+                }
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if(isDraggingBar) {
+                isDraggingBar = false;
+                renderVisualDomainsUI();
+                if(currentDomainMode === 'visual') applyVisualDomainsToIdentifiedGroups();
+            }
+        });
 
         /* --- Table Rendering Functions --- */
         function renderTable(title, rows, opts, positives) {
@@ -1822,11 +1922,11 @@
                         frequencies: new Map(val.frequencies)
                     });
                 });
-                
+
                 document.getElementById('filterSection').classList.remove('hidden'); 
                 document.getElementById('domainModeSwitchContainer').classList.remove('hidden');
                 document.getElementById('modeAutoBtn').click(); // trigger Auto by default
-
+                
                 initVisualDomainSection();
                 
                 let hasScaleGroups = false;
@@ -1883,12 +1983,17 @@
 
             document.getElementById('addVisualDomainBtn').onclick = () => {
                 const totalItems = visualScaleCols.length;
-                let lastEnd = 0;
+                let lastEnd = -1;
                 if (visualDomains.length > 0) {
                     lastEnd = visualDomains[visualDomains.length - 1].endIdx;
                 }
 
-                const newStart = Math.min(lastEnd + 1, totalItems - 1);
+                if (lastEnd >= totalItems - 1) {
+                    showMessage("تنبيه", "لا توجد بنود متبقية لإضافة مجال جديد. يرجى تقليل مساحة المجالات السابقة أولاً لتوفير مساحة.");
+                    return;
+                }
+
+                const newStart = lastEnd + 1;
                 const newEnd = Math.min(newStart + 4, totalItems - 1);
 
                 visualDomains.push({
@@ -1897,6 +2002,7 @@
                     endIdx: newEnd
                 });
 
+                activeVisualDomainIdx = visualDomains.length - 1; // Set newly added to active
                 renderVisualDomainsUI();
                 if(currentDomainMode === 'visual') applyVisualDomainsToIdentifiedGroups();
             };
@@ -2178,6 +2284,10 @@
             document.getElementById('analyzeButton').onclick = async () => {
                 if (!rawExcelData) return;
                 
+                if (currentDomainMode === 'visual') {
+                    applyVisualDomainsToIdentifiedGroups();
+                }
+
                 const allItemsList = []; 
                 const summaryDataList = []; 
                 const startColIdx = parseInt(document.getElementById('analysisStartColSelect').value);
